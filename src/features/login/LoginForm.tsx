@@ -1,8 +1,7 @@
-import React from "react";
-import { Box, Typography, TextField, Button, Divider } from "@mui/material";
+import { Box, Button, Divider, TextField, Typography } from "@mui/material";
 import { useFormik } from "formik";
+import React from "react";
 import * as Yup from "yup";
-import { useTheme } from "@mui/material/styles";
 
 // Validation schema for Login form
 const mobileRegex = /^[0-9]{10}$/;
@@ -17,7 +16,7 @@ const LoginFormSchema = Yup.object({
 });
 
 const LoginForm: React.FC = () => {
-  const theme = useTheme();
+  // const theme = useTheme();
 
   const formik = useFormik({
     initialValues: {

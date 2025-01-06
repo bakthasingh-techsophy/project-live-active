@@ -1,53 +1,10 @@
-import React, { useState } from "react";
-import {
-  Modal,
-  Box,
-  Button,
-  Typography,
-  TextField,
-  IconButton,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { useTheme } from "@mui/material/styles";
 import { backgroundPic1 } from "@assets/index";
-import RegisterForm from "./forms/RegisterForm";
-import LoginForm from "./forms/LoginForm";
-
-// Login and Register forms as components
-// const LoginForm: React.FC = () => {
-//   return (
-//     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-//       <TextField label="Username" variant="outlined" fullWidth />
-//       <TextField
-//         label="Password"
-//         variant="outlined"
-//         fullWidth
-//         type="password"
-//       />
-//       <Button variant="contained" color="primary" fullWidth>
-//         Login
-//       </Button>
-//     </Box>
-//   );
-// };
-
-// const RegisterForm: React.FC = () => {
-//   return (
-//     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-//       <TextField label="Username" variant="outlined" fullWidth />
-//       <TextField label="Email" variant="outlined" fullWidth />
-//       <TextField
-//         label="Password"
-//         variant="outlined"
-//         fullWidth
-//         type="password"
-//       />
-//       <Button variant="contained" color="primary" fullWidth>
-//         Register
-//       </Button>
-//     </Box>
-//   );
-// };
+import CloseIcon from "@mui/icons-material/Close";
+import { Box, IconButton, Modal, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { useState } from "react";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
 
 interface AuthFormModalProps {
   open: boolean;
@@ -58,8 +15,6 @@ const AuthFormModal = ({ open, setOpen }: AuthFormModalProps) => {
   const theme = useTheme();
   const [isRegistering, setIsRegistering] = useState(false);
 
-  // Handle modal open/close
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   // Toggle between login and register form
@@ -69,7 +24,11 @@ const AuthFormModal = ({ open, setOpen }: AuthFormModalProps) => {
 
   return (
     <div>
-      <Modal open={open} onClose={handleClose} disableAutoFocus>
+      <Modal
+        open={open}
+        onClose={(e: any) => e.preventDefault()}
+        disableAutoFocus
+      >
         <Box
           sx={{
             position: "absolute",

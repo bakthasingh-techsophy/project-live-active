@@ -14,7 +14,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthFormModal from "./login/loginSection/LoginModal";
+import AuthFormModal from "./login/LoginModal";
 
 interface ResponsiveToolbarProps {
   menuItems: { label: string; link: string }[];

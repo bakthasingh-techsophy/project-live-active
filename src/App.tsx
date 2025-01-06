@@ -2,7 +2,6 @@ import ResponsiveToolbar from "@features/ResponsiveToolbar";
 import Home from "@pages/Home";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Login from "@features/login/Login";
 
 const menuItems = [
   { label: "Browse Studios", link: "/studios" },

@@ -70,7 +70,6 @@ const RegisterForm: React.FC = () => {
             label="Name"
             name="name"
             variant="outlined"
-            component={"input"}
             fullWidth
             value={formik.values.name}
             onChange={formik.handleChange}
