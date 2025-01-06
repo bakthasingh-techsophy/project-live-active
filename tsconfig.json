@@ -1,0 +1,23 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+  ],
+  // "compilerOptions": {
+  //   "baseUrl": "./src",
+  //   "paths": {
+  //     "@assets/*": ["assets/*"],
+  //     "@components/*": ["components/*"],
+  //     "@customThemes/*": ["customThemes/*"],
+  //     "@features/*": ["features/*"],
+  //     "@hooks/*": ["hooks/*"],
+  //     "@pages/*": ["pages/*"],
+  //     "@redux/*": ["redux/*"],
+  //     "@services/*": ["services/*"],
+  //     "@types/*": ["types/*"],
+  //     "@utils/*": ["utils/*"],
+  //     "@data/*": ["data/*"]
+  //   }
+  // }
+}
