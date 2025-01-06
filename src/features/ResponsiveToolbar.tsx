@@ -42,7 +42,7 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
       {isLoginModalOpen && (
         <AuthFormModal open={isLoginModalOpen} setOpen={setIsLoginModalOpen} />
       )}
-      <AppBar position="sticky" color="transparent">
+      <AppBar position="sticky" color="default">
         <Toolbar
           sx={{
             display: "flex",
