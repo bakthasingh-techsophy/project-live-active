@@ -11,6 +11,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
 import { phoneNumberRegex } from "@utils/constants";
+import UserPreferencesModal from "@features/UserPreferencesModal";
 
 interface ProfileInformationProps {
   subHeading: any;
@@ -37,6 +38,8 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
   const [countryRegex] = useState(
     phoneNumberRegex[countryCode as keyof typeof phoneNumberRegex]
   );
+
+  const [userModalOpen, setUserModalOpen] = useState<boolean>(false);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -168,6 +171,18 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
             </Form>
           )}
         </Formik>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          sx={{ mt: 4 }}
+          onClick={() => {
+            setUserModalOpen(true);
+          }}
+        >
+          Test User Modal
+        </Button>
+        <UserPreferencesModal open={userModalOpen} setOpen={setUserModalOpen} />
       </Box>
     </Box>
   );
