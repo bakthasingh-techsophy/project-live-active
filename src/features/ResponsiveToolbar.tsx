@@ -98,9 +98,7 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                   padding: "8px 18px",
                   borderRadius: "8px",
                   backgroundColor:
-                    selectedMenu === item.label
-                      ? "#12121211"
-                      : "transparent", // Apply background to selected item
+                    selectedMenu === item.label ? "#12121211" : "transparent", // Apply background to selected item
                   "&:hover": {
                     background: "#12121211",
                   },
@@ -125,6 +123,7 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                 variant="contained"
                 color="primary"
                 sx={{ marginRight: 2, whiteSpace: "nowrap" }}
+                onClick={() => handleNavigation("/my-profile", "Profile")}
               >
                 Get Started
               </Button>
