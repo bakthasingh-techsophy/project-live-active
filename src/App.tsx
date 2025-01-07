@@ -5,7 +5,7 @@ import "./App.css";
 import BrowseEvents from "@pages/BrowseEvents";
 
 const menuItems = [
-  { label: "Browse Studios", link: "/events" },
+  { label: "Browse Events", link: "/events" },
   { label: "Fit Coach", link: "/fit-coach" },
   { label: "Fit Feast", link: "/fit-feast" },
   { label: "Fitpass-TV", link: "/fitpass-tv" },
