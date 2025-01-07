@@ -15,8 +15,6 @@ interface UserPreferencesProps {
 }
 
 const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
-  const theme = useTheme();
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
       <Box
@@ -28,7 +26,7 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
       >
         <Typography variant="h6">Settings</Typography>
         <ChevronRightIcon />
-        <Typography variant="h6" color={theme.palette.primary.main}>
+        <Typography variant="h6" color={"primary.main"}>
           {subHeading}
         </Typography>
       </Box>
