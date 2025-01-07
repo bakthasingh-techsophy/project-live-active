@@ -40,8 +40,9 @@ const LandingPageBanner = () => {
               borderRadius: "8px",
               textTransform: "none",
               whiteSpace: "nowrap",
+              background: theme.palette.secondary.main,
               "&:hover": {
-                background: theme.palette.primary.main,
+                background: theme.palette.secondary.dark,
               },
             }}
             // onClick={handleExploreClick}

@@ -67,8 +67,15 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
             onClick={() => handleNavigation("/", "Home")}
           >
             <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+                fontSize: { xs: "2rem", sm: "2.5rem", md: "2rem" },
+              }}
             >
               Live Active
             </Typography>
@@ -119,21 +126,32 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Button
+              {/* <Button
                 variant="contained"
                 color="primary"
-                sx={{ marginRight: 2, whiteSpace: "nowrap" }}
+                sx={{
+                  marginRight: 2,
+                  whiteSpace: "nowrap",
+                  background: theme.palette.secondary.main,
+                  "&:hover": {
+                    background: theme.palette.secondary.dark,
+                  },
+                }}
                 onClick={() => handleNavigation("/my-profile", "Profile")}
               >
                 Get Started
-              </Button>
+              </Button> */}
               <Button
-                variant="outlined"
+                variant="contained"
                 color="primary"
                 sx={{
                   display: {
                     xs: "none",
                     sm: "block",
+                  },
+                  background: theme.palette.secondary.main,
+                  "&:hover": {
+                    background: theme.palette.secondary.dark,
                   },
                 }}
                 onClick={handleLoginClick}

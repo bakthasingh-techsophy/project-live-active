@@ -4,15 +4,15 @@ const lightTheme = createTheme({
   palette: {
     mode: "light", // Set to light mode
     primary: {
-      main: "#DA4444", // Red
-      light: "#fa909046", // Light red
-      dark: "#A32929", // Dark red
+      main: "#00a86b", 
+      light: "#00a86a27", 
+      dark: "#169757", 
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#0F4FBD", // Blue
+      main: "#677c27", // Blue
       light: "#4c76d98c", // Light blue
-      dark: "#0C3870", // Dark blue
+      dark: "#5a7017", // Dark blue
     },
     background: {
       default: "#FFFFFF", // Light background (for light theme)

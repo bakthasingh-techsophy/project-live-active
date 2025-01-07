@@ -29,8 +29,9 @@ const ServiceBanner1 = () => {
               borderRadius: "8px",
               textTransform: "none",
               whiteSpace: "nowrap",
+              background: theme.palette.secondary.main,
               "&:hover": {
-                background: theme.palette.primary.main,
+                background: theme.palette.secondary.dark,
               },
               fontSize: {
                 xs: "0.9rem",
