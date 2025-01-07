@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Profile from "@pages/Profile";
 import BrowseEvents from "@pages/BrowseEvents";
+import Footer from "@features/Footer";
 
 const menuItems = [
   { label: "Browse Events", link: "/events" },
@@ -29,6 +30,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
