@@ -1,29 +1,30 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
 const lightTheme = createTheme({
   palette: {
-    mode: 'light',  // Set to light mode
+    mode: "light", // Set to light mode
     primary: {
-      main: '#DA4444',  // Red
-      light: '#fa909046',  // Light red
-      dark: '#A32929',   // Dark red
+      main: "#DA4444", // Red
+      light: "#fa909046", // Light red
+      dark: "#A32929", // Dark red
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: '#0F4FBD',  // Blue
-      light: '#4c76d98c',  // Light blue
-      dark: '#0C3870',   // Dark blue
+      main: "#0F4FBD", // Blue
+      light: "#4c76d98c", // Light blue
+      dark: "#0C3870", // Dark blue
     },
     background: {
-      default: '#FFFFFF',  // Light background (for light theme)
-      paper: '#F5F5F5',    // Paper background (for light theme)
+      default: "#FFFFFF", // Light background (for light theme)
+      paper: "#F5F5F5", // Paper background (for light theme)
     },
     text: {
-      primary: '#000000',  // Dark text (for light theme)
-      secondary: '#555555', // Secondary text (for light theme)
+      primary: "#000000", // Dark text (for light theme)
+      secondary: "#555555", // Secondary text (for light theme)
     },
   },
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: "Roboto, sans-serif",
     h6: {
       fontWeight: 600,
     },
@@ -39,7 +40,7 @@ const lightTheme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none',
+          textTransform: "none",
           // padding: '8px 16px',
           // borderRadius: '20px',
         },
