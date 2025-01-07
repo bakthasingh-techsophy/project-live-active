@@ -24,19 +24,24 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
   const theme = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState<string | null>(null); // Track selected menu item
   const navigate = useNavigate();
 
   // Handle opening the drawer for small screens
   const toggleDrawer = (open: boolean) => {
     setIsDrawerOpen(open);
   };
-  const handleNavigation = (link: string) => {
+
+  const handleNavigation = (link: string, label: string) => {
+    setSelectedMenu(label); // Set the clicked menu item as selected
     navigate(link);
   };
+
   const handleLoginClick = () => {
     setIsLoginModalOpen((prev) => !prev);
     setIsDrawerOpen(false);
   };
+
   return (
     <>
       {isLoginModalOpen && (
@@ -59,7 +64,7 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                 cursor: "pointer",
               },
             }}
-            onClick={() => handleNavigation("/")}
+            onClick={() => handleNavigation("/", "Home")}
           >
             <Typography
               variant="h6"
@@ -92,12 +97,16 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                   fontWeight: "bold",
                   padding: "8px 18px",
                   borderRadius: "8px",
+                  backgroundColor:
+                    selectedMenu === item.label
+                      ? "#12121211"
+                      : "transparent", // Apply background to selected item
                   "&:hover": {
                     background: "#12121211",
                   },
                   whiteSpace: "nowrap",
                 }}
-                onClick={() => handleNavigation(item.link)}
+                onClick={() => handleNavigation(item.link, item.label)} // Pass both link and label
               >
                 {item.label}
               </Button>
@@ -187,9 +196,20 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                     justifyContent: "space-between",
                     alignItems: "center",
                     paddingY: 1,
+                    backgroundColor:
+                      selectedMenu === item.label
+                        ? theme.palette.primary.light
+                        : "transparent", // Apply background to selected item in drawer
                   }}
                 >
-                  <Button sx={{ textTransform: "uppercase" }}>
+                  <Button
+                    sx={{
+                      textTransform: "uppercase",
+                      width: "100%",
+                      color: selectedMenu === item.label ? "white" : "inherit", // Change text color when selected
+                    }}
+                    onClick={() => handleNavigation(item.link, item.label)} // Pass both link and label
+                  >
                     {item.label}
                   </Button>
                   <ArrowForwardIcon sx={{ fontSize: 18 }} />
