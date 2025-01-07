@@ -33,7 +33,6 @@ const validationSchema = (countryRegex: any) => {
 };
 
 const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
-  const theme = useTheme();
   const [countryCode] = useState("in");
   const [countryRegex] = useState(
     phoneNumberRegex[countryCode as keyof typeof phoneNumberRegex]
@@ -50,7 +49,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
       >
         <Typography variant="h6">Account Details</Typography>
         <ChevronRightIcon />
-        <Typography variant="h6" color={theme.palette.primary.main}>
+        <Typography variant="h6" color={"primary.main"}>
           {subHeading}
         </Typography>
       </Box>

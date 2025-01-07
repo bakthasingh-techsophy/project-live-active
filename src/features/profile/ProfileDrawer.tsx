@@ -16,8 +16,6 @@ const ProfileDrawer = ({
   setActiveSubMenu,
 }: //   toggleDrawer,
 ProfileDrawerProps) => {
-  const theme = useTheme();
-
   const currentDate = new Date();
   const timeInIST = currentDate.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
@@ -138,7 +136,7 @@ ProfileDrawerProps) => {
                   sx={{
                     bgcolor:
                       activeMenu === menuIndex && activeSubMenu === subMenuIndex
-                        ? theme.palette.primary.main
+                        ? "primary.main"
                         : "transparent",
                     color:
                       activeMenu === menuIndex && activeSubMenu === subMenuIndex
