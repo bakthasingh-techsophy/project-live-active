@@ -1,4 +1,4 @@
-import { Box, Drawer } from "@mui/material";
+import { Box, Drawer, IconButton } from "@mui/material";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -45,14 +45,15 @@ const ProfileLayout = () => {
     <Box
       sx={{
         display: "flex",
-        gap: 4,
-        padding: 4,
-        alignItems: {
-          lg: "start",
-          md: "start",
-          sm: "center",
-          xs: "center",
+        gap: {
+          lg: "4",
+          md: "4",
+          sm: "1",
+          xs: "1",
         },
+        padding: 4,
+        alignItems: "start",
+        minHeight: "80%",
       }}
     >
       <Box
@@ -73,8 +74,7 @@ const ProfileLayout = () => {
           setActiveSubMenu={setActiveSubMenu}
         />
       </Box>
-      <ChevronRightIcon
-        onClick={() => toggleDrawer(true)}
+      <IconButton
         sx={{
           display: {
             lg: "none",
@@ -83,8 +83,17 @@ const ProfileLayout = () => {
             xs: "flex",
           },
           cursor: "pointer",
+          marginLeft: -2,
+          alignSelf: "center",
+          backgroundColor: "rgb(128, 128, 128,0.1)",
+          padding: "2rem 0rem",
+          borderRadius: 2,
         }}
-      />
+        onClick={() => toggleDrawer(true)}
+      >
+        <ChevronRightIcon sx={{}} />
+      </IconButton>
+
       <Drawer
         anchor="left"
         open={isDrawerOpen}
