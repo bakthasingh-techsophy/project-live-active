@@ -1,12 +1,11 @@
 import ResponsiveToolbar from "@features/ResponsiveToolbar";
 import BrowseEvents from "@pages/BrowseEvents";
 import LandingPage from "@pages/LandingPage";
-import Profile from "@pages/Profile";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Profile from "@pages/Profile";
-import BrowseEvents from "@pages/BrowseEvents";
+
 import Footer from "@features/Footer";
+import Profile from "@pages/Profile";
 
 const menuItems = [
   { label: "Browse Events", link: "/events" },
