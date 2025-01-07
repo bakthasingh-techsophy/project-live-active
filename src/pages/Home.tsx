@@ -1,9 +1,9 @@
+import { Typography } from "@mui/material";
 
 const Home = () => {
   return (
     <>
-      {/* <ResponsiveToolbar /> */}
-      Home
+      <Typography>Home</Typography>
     </>
   );
 };
