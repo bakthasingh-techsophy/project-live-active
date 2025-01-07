@@ -119,6 +119,7 @@ const Footer = () => {
           flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: 4,
         }}
       >
         {testContactUsLinks?.map((test) => (
@@ -153,7 +154,7 @@ const Footer = () => {
 
       <Divider
         sx={{
-          backgroundColor: "#EAECF0",
+          backgroundColor: "rgb(234, 236, 240,0.5)",
         }}
       />
       <Typography
