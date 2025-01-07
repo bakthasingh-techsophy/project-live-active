@@ -14,8 +14,8 @@ const ProfileDrawer = ({
   setActiveMenu,
   activeSubMenu,
   setActiveSubMenu,
-//   toggleDrawer,
-}: ProfileDrawerProps) => {
+}: //   toggleDrawer,
+ProfileDrawerProps) => {
   const theme = useTheme();
 
   const currentDate = new Date();
@@ -63,7 +63,7 @@ const ProfileDrawer = ({
         },
       }}
     >
-      <Box sx={{ display: "flex", gap: 2 }}>
+      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
         <Box
           component="img"
           sx={{
