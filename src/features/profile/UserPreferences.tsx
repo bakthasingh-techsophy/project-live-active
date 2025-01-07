@@ -6,15 +6,28 @@ import {
   FormControlLabel,
   FormGroup,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { Form, Formik } from "formik";
+import * as Yup from "yup";
 
 interface UserPreferencesProps {
   subHeading: any;
 }
 
 const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
+  const validationSchema = Yup.object().shape({
+    preferences: Yup.object().test(
+      "at-least-three-selected",
+      "At least three preferences must be selected.",
+      (preferences) => {
+        const selectedCount = Object.values(preferences || {}).filter(
+          (value) => value === true
+        ).length;
+        return selectedCount >= 3;
+      }
+    ),
+  });
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
       <Box
@@ -34,19 +47,19 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
         <Formik
           initialValues={{
             preferences: {
+              gymAndWellness: false,
               yoga: false,
-              fitness: false,
-              food: false,
+              meditation: false,
               nutrition: false,
-              cooking: false,
-              wellness: false,
+              equipment: false,
             },
           }}
+          validationSchema={validationSchema}
           onSubmit={(values) => {
             console.log("Form Values:", values);
           }}
         >
-          {({ values, handleChange }) => (
+          {({ values, handleChange, errors, touched }) => (
             <Form>
               <Box
                 sx={{
@@ -73,6 +86,16 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
                     <FormControlLabel
                       control={
                         <Checkbox
+                          checked={values.preferences.gymAndWellness}
+                          onChange={handleChange}
+                          name="preferences.gymAndWellness"
+                        />
+                      }
+                      label="Gym and Wellness"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
                           checked={values.preferences.yoga}
                           onChange={handleChange}
                           name="preferences.yoga"
@@ -83,22 +106,12 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={values.preferences.fitness}
+                          checked={values.preferences.meditation}
                           onChange={handleChange}
-                          name="preferences.fitness"
+                          name="preferences.meditation"
                         />
                       }
-                      label="Fitness"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={values.preferences.food}
-                          onChange={handleChange}
-                          name="preferences.food"
-                        />
-                      }
-                      label="Food"
+                      label="Meditation"
                     />
                     <FormControlLabel
                       control={
@@ -113,25 +126,22 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={values.preferences.cooking}
+                          checked={values.preferences.equipment}
                           onChange={handleChange}
-                          name="preferences.cooking"
+                          name="preferences.equipment"
                         />
                       }
-                      label="Cooking"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={values.preferences.wellness}
-                          onChange={handleChange}
-                          name="preferences.wellness"
-                        />
-                      }
-                      label="Wellness"
+                      label="Equipment"
                     />
                   </FormGroup>
                 </Box>
+                {errors.preferences &&
+                  touched.preferences &&
+                  typeof errors.preferences === "string" && (
+                    <Typography color="error" variant="body2">
+                      {errors.preferences}
+                    </Typography>
+                  )}
               </Box>
 
               <Box
