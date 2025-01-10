@@ -32,6 +32,65 @@ const menuOptions = [
   },
 ];
 
+const staticStyles = {
+  container: {
+    mainContainer: {
+      display: "flex",
+      padding: 4,
+      alignItems: "start",
+      minHeight: "80%",
+      gap: 3,
+    },
+    drawer: { width: "100%", position: "relative" },
+    componentContainer: {
+      flex: 1,
+      p: 1,
+    },
+  },
+  typography: {},
+  button: {
+    drawerButton: {
+      cursor: "pointer",
+      marginLeft: -2,
+      alignSelf: "center",
+      backgroundColor: "rgb(128, 128, 128,0.1)",
+      padding: "2rem 0rem",
+      borderRadius: 2,
+    },
+  },
+};
+const dynamicStyles = {
+  container: {
+    mainContainer: {
+      gap: {
+        lg: "4",
+        md: "4",
+        sm: "1",
+        xs: "1",
+      },
+    },
+    menuBar: {
+      display: {
+        lg: "flex",
+        md: "flex",
+        sm: "none",
+        xs: "none",
+      },
+    },
+  },
+  typography: {},
+  button: {
+    drawerButton: {
+      display: {
+        lg: "none",
+        md: "none",
+        sm: "flex",
+        xs: "flex",
+      },
+    },
+  },
+};
+
 const ProfileLayout = () => {
   const [activeMenu, setActiveMenu] = useState(0);
   const [activeSubMenu, setActiveSubMenu] = useState(0);
@@ -43,29 +102,12 @@ const ProfileLayout = () => {
 
   return (
     <Box
-      sx={{
-        display: "flex",
-        gap: {
-          lg: "4",
-          md: "4",
-          sm: "1",
-          xs: "1",
-        },
-        padding: 4,
-        alignItems: "start",
-        minHeight: "80%",
-      }}
+      sx={[
+        staticStyles?.container?.mainContainer,
+        dynamicStyles?.container?.mainContainer,
+      ]}
     >
-      <Box
-        sx={{
-          display: {
-            lg: "flex",
-            md: "flex",
-            sm: "none",
-            xs: "none",
-          },
-        }}
-      >
+      <Box sx={dynamicStyles?.container?.menuBar}>
         <ProfileDrawer
           menuOptions={menuOptions}
           activeMenu={activeMenu}
@@ -75,30 +117,20 @@ const ProfileLayout = () => {
         />
       </Box>
       <IconButton
-        sx={{
-          display: {
-            lg: "none",
-            md: "none",
-            sm: "flex",
-            xs: "flex",
-          },
-          cursor: "pointer",
-          marginLeft: -2,
-          alignSelf: "center",
-          backgroundColor: "rgb(128, 128, 128,0.1)",
-          padding: "2rem 0rem",
-          borderRadius: 2,
-        }}
+        sx={[
+          staticStyles?.button?.drawerButton,
+          dynamicStyles?.button?.drawerButton,
+        ]}
         onClick={() => toggleDrawer(true)}
       >
-        <ChevronRightIcon sx={{}} />
+        <ChevronRightIcon />
       </IconButton>
 
       <Drawer
         anchor="left"
         open={isDrawerOpen}
         onClose={() => toggleDrawer(false)}
-        sx={{ width: "100%", position: "relative" }}
+        sx={staticStyles?.container?.drawer}
       >
         <ProfileDrawer
           menuOptions={menuOptions}
@@ -109,15 +141,10 @@ const ProfileLayout = () => {
           toggleDrawer={toggleDrawer}
         />
       </Drawer>
-      <Box
-        sx={{
-          flex: 1,
-          p: 2,
-        }}
-      >
+      <Box sx={staticStyles?.container?.componentContainer}>
         {activeMenu !== null &&
           activeSubMenu !== null &&
-          menuOptions[activeMenu].subMenu[activeSubMenu].component()}
+          menuOptions[activeMenu]?.subMenu[activeSubMenu]?.component()}
       </Box>
     </Box>
   );

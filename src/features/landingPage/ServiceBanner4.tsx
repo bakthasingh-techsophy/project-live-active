@@ -1,17 +1,54 @@
-import { servicePic4 } from "@assets/index";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button, useTheme } from "@mui/material";
-import Banner from "./Banner";
+import Banner from "../../components/Banner";
 
-const ServiceBanner4 = () => {
+interface ServiceBanner4Props {
+  backgroundImage: string;
+}
+
+const staticStyles = {
+  container: {},
+  typography: {
+    header: (theme: any) => ({
+      fontWeight: 900,
+      color: theme?.palette?.primary?.main,
+    }),
+  },
+  button: {
+    optimizeButton: (theme: any) => ({
+      padding: "12px 24px",
+      fontWeight: "bold",
+      borderRadius: "8px",
+      textTransform: "none",
+      whiteSpace: "nowrap",
+      background: theme?.palette?.secondary?.main,
+      "&:hover": {
+        background: theme?.palette?.secondary?.dark,
+      },
+    }),
+  },
+};
+const dynamicStyles = {
+  container: {},
+  typography: {},
+  button: {
+    optimizeButton: {
+      fontSize: {
+        xs: "0.9rem",
+        sm: "1rem",
+      },
+    },
+  },
+};
+const ServiceBanner4 = ({ backgroundImage }: ServiceBanner4Props) => {
   const theme = useTheme();
 
   return (
     <Banner
-      backgroundImage={servicePic4}
+      backgroundImage={backgroundImage}
       heading={
         <>
-          <span style={{ fontWeight: 900, color: theme.palette.primary.main }}>
+          <span style={staticStyles?.typography?.header(theme)}>
             Optimize Your Nutrition
           </span>
           <br />
@@ -24,25 +61,13 @@ const ServiceBanner4 = () => {
           <Button
             variant="contained"
             color="primary"
-            sx={{
-              padding: "12px 24px",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              textTransform: "none",
-              whiteSpace: "nowrap",
-              background: theme.palette.secondary.main,
-              "&:hover": {
-                background: theme.palette.secondary.dark,
-              },
-              fontSize: {
-                xs: "0.9rem",
-                sm: "1rem",
-              },
-            }}
+            sx={[
+              staticStyles?.button?.optimizeButton(theme),
+              dynamicStyles?.button?.optimizeButton,
+            ]}
             endIcon={<ChevronRightIcon />}
-            // onClick={handleExploreClick}
           >
-            I want food
+            Optimize
           </Button>
         </>
       }

@@ -1,4 +1,4 @@
-import { cardPic1 } from "@assets/index";
+import { cardPic1, eventPic1, eventPic2 } from "@assets/index";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -27,7 +27,7 @@ const events = [
     scheduledTime: "2025-01-20T07:30:00",
     description: "Start your day with a calming and energizing yoga session.",
     tags: ["Yoga", "Morning", "Beginner", "Relaxation", "Breathwork"],
-    image: cardPic1,
+    image: eventPic1,
     isEnrolled: false,
     isStarted: false,
     isExpired: true,
@@ -40,7 +40,7 @@ const events = [
     scheduledTime: "2025-01-21T10:00:00",
     description: "High-intensity interval training for ultimate fitness!",
     tags: ["HIIT", "Strength", "Cardio", "Fitness", "Endurance"],
-    image: cardPic1,
+    image: eventPic2,
     isEnrolled: true,
     isStarted: false,
     isExpired: false,
@@ -71,9 +71,87 @@ const events = [
   },
 ];
 
+const staticStyles = {
+  container: {
+    mainContainer: { padding: 4 },
+    grid: {
+      px: 2,
+    },
+    cardContainer: (theme: any) => ({
+      display: "flex",
+      boxShadow: 3,
+      borderRadius: 2,
+      backgroundColor: theme?.palette?.background?.paper,
+      position: "relative",
+      height: "100%",
+      overflow: "hidden",
+    }),
+    cardMediaContainer: {
+      objectFit: "cover",
+    },
+    cardContentContainer: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      padding: 2,
+      flex: 1,
+    },
+    contentHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    ratingContainer: { display: "flex", alignItems: "center", marginTop: 1 },
+    tagsContainer: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 1,
+      marginTop: 2,
+    },
+    popoverContainer: { padding: 2, maxWidth: 300 },
+    popoverTagsContainer: { display: "flex", flexWrap: "wrap", gap: 1 },
+    closeButton: { marginTop: 1, textAlign: "right" },
+  },
+  typography: {
+    boldText: { fontWeight: "bold" },
+    ratingText: { marginLeft: 1 },
+    scheduleText: { marginTop: 1 },
+  },
+  button: {
+    moreButton: {
+      textTransform: "none",
+      fontSize: "12px",
+      marginLeft: 1,
+    },
+    enrollButton: {
+      whiteSpace: "nowrap",
+      fontSize: "0.8rem",
+    },
+  },
+};
+const dynamicStyles = {
+  container: {
+    cardContainer: {
+      flexDirection: {
+        lg: "row",
+        md: "row",
+        sm: "row",
+        xs: "column",
+      },
+    },
+    cardMediaContainer: {
+      width: {
+        lg: "40%",
+        sm: "40%",
+        md: "40%",
+        xs: "100%",
+      },
+    },
+  },
+};
+
 const BrowseEventsComponent: React.FC = () => {
   const theme = useTheme();
-  // const [expandedTags, setExpandedTags] = useState<Record<number, boolean>>({});
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
 
@@ -81,7 +159,7 @@ const BrowseEventsComponent: React.FC = () => {
     event: React.MouseEvent<HTMLElement>,
     tags: string[]
   ) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorEl(event?.currentTarget);
     setPopoverTags(tags);
   };
 
@@ -94,81 +172,43 @@ const BrowseEventsComponent: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString(); // Customize this to your preferred format
+    return date?.toLocaleString();
   };
 
   return (
-    <Container sx={{ padding: 4 }} maxWidth={false}>
+    <Container sx={staticStyles?.container?.mainContainer} maxWidth={false}>
       {/* Container for the event cards */}
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          px: 2,
-        }}
-      >
+      <Grid container spacing={2} sx={staticStyles?.container?.grid}>
         {/* Map through events and render each card */}
         {[...events, ...events].map((event) => (
-          <Grid item xs={12} sm={14} md={6} key={event.id}>
+          <Grid item xs={12} sm={14} md={6} key={event?.id}>
             <Card
-              sx={{
-                display: "flex",
-                flexDirection: {
-                  lg: "row",
-                  md: "row",
-                  sm: "row",
-                  xs: "column",
-                },
-                boxShadow: 3,
-                borderRadius: 2,
-                backgroundColor: theme.palette.background.paper,
-                position: "relative",
-                height: "100%",
-                overflow: "hidden", // To prevent content overflow issues
-              }}
+              sx={[
+                staticStyles?.container?.cardContainer(theme),
+                dynamicStyles?.container?.cardContainer,
+              ]}
             >
               <CardMedia
                 component="img"
-                sx={{
-                  width: {
-                    lg: "40%",
-                    sm: "40%",
-                    md: "40%",
-                    xs: "100%",
-                  },
-                  // height: "200px", // Fixed height for consistent image size
-                  objectFit: "cover",
-                }}
-                image={event.image}
-                alt={event.title}
+                sx={[
+                  staticStyles?.container?.cardMediaContainer,
+                  dynamicStyles?.container?.cardMediaContainer,
+                ]}
+                image={event?.image}
+                alt={event?.title}
               />
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  padding: 2,
-                  flex: 1,
-                }}
-              >
+              <CardContent sx={staticStyles?.container?.cardContentContainer}>
                 {/* Event Title */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    {event.title}
+                <Box sx={staticStyles?.container?.contentHeader}>
+                  <Typography
+                    variant="h6"
+                    sx={staticStyles?.typography?.boldText}
+                  >
+                    {event?.title}
                   </Typography>
                   <Button
                     variant="contained"
-                    sx={{
-                      whiteSpace: "nowrap",
-                      fontSize: "0.8rem",
-                    }}
-                    // disabled={event.isExpired || !event.isStarted}
+                    sx={staticStyles?.button?.enrollButton}
                   >
                     Enroll
                   </Button>
@@ -176,20 +216,18 @@ const BrowseEventsComponent: React.FC = () => {
 
                 {/* Host Name */}
                 <Typography variant="body2" color="text.secondary">
-                  Hosted by: {event.host}
+                  Hosted by: {event?.host}
                 </Typography>
 
                 {/* Rating */}
-                <Box
-                  sx={{ display: "flex", alignItems: "center", marginTop: 1 }}
-                >
-                  <Rating value={event.rating} precision={0.1} readOnly />
+                <Box sx={staticStyles?.container?.ratingContainer}>
+                  <Rating value={event?.rating} precision={0.1} readOnly />
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ marginLeft: 1 }}
+                    sx={staticStyles?.typography?.ratingText}
                   >
-                    ({event.rating})
+                    ({event?.rating})
                   </Typography>
                 </Box>
 
@@ -197,26 +235,22 @@ const BrowseEventsComponent: React.FC = () => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ marginTop: 1 }}
+                  sx={staticStyles?.typography.scheduleText}
                 >
-                  Scheduled for: {formatDate(event.scheduledTime)}
+                  Scheduled for: {formatDate(event?.scheduledTime)}
                 </Typography>
 
                 {/* Event Description */}
-                <Typography variant="body2" sx={{ marginTop: 1 }}>
-                  {event.description}
+                <Typography
+                  variant="body2"
+                  sx={staticStyles?.typography?.scheduleText}
+                >
+                  {event?.description}
                 </Typography>
 
                 {/* Tags */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 1,
-                    marginTop: 2,
-                  }}
-                >
-                  {event.tags.slice(0, 3).map((tag, index) => (
+                <Box sx={staticStyles?.container?.tagsContainer}>
+                  {event?.tags?.slice(0, 3).map((tag, index) => (
                     <Chip
                       key={index}
                       label={tag}
@@ -225,14 +259,10 @@ const BrowseEventsComponent: React.FC = () => {
                       color="primary"
                     />
                   ))}
-                  {event.tags.length > 3 && (
+                  {event?.tags?.length > 3 && (
                     <Button
-                      onClick={(e) => handlePopoverOpen(e, event.tags)}
-                      sx={{
-                        textTransform: "none",
-                        fontSize: "12px",
-                        marginLeft: 1,
-                      }}
+                      onClick={(e) => handlePopoverOpen(e, event?.tags)}
+                      sx={staticStyles?.button?.moreButton}
                       color="primary"
                     >
                       ...More
@@ -260,9 +290,9 @@ const BrowseEventsComponent: React.FC = () => {
           horizontal: "left",
         }}
       >
-        <Box sx={{ padding: 2, maxWidth: 300 }}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {popoverTags.map((tag, index) => (
+        <Box sx={staticStyles?.container?.popoverContainer}>
+          <Box sx={staticStyles?.container?.popoverTagsContainer}>
+            {popoverTags?.map((tag, index) => (
               <Chip
                 key={index}
                 label={tag}
@@ -272,7 +302,7 @@ const BrowseEventsComponent: React.FC = () => {
               />
             ))}
           </Box>
-          <Box sx={{ marginTop: 1, textAlign: "right" }}>
+          <Box sx={staticStyles?.container?.closeButton}>
             <IconButton onClick={handlePopoverClose} size="small">
               <CloseIcon />
             </IconButton>

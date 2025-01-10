@@ -1,22 +1,21 @@
 import ClipLoader from "react-spinners/ClipLoader";
 import { Backdrop, useTheme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-// import COLORS from "../theme/colors.json";
 import { useSelector } from "react-redux";
 
 export const Spinner = () => {
-  const isLoading = useSelector((state: any) => state.isLoading);
+  const isLoading = useSelector((state: any) => state?.isLoading);
   const theme = useTheme();
   const useStyles = makeStyles(() => ({
     spinnerRoot: {
-      color: theme.palette.background.default,
+      color: theme?.palette?.background?.default,
       position: "absolute",
       top: "50%",
       left: "50%",
     },
     spinnerWrapper: {
       position: "fixed",
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme?.palette?.background?.default,
       width: "100%",
       height: "100%",
       opacity: "0.5",
@@ -24,7 +23,7 @@ export const Spinner = () => {
     },
     backdrop: {
       zIndex: 10000,
-      color: theme.palette.primary.main,
+      color: theme?.palette?.primary?.main,
       backgroundColor: "#RRGGBBAA",
     },
     preLoaderSpin: {
@@ -35,7 +34,7 @@ export const Spinner = () => {
     },
     loaderText: {
       position: "relative",
-      color: theme.palette.text.primary,
+      color: theme?.palette?.text?.primary,
       margin: "10px 0 0 0",
       "&::after": {
         content: '""',
@@ -63,10 +62,10 @@ export const Spinner = () => {
   const classes = useStyles();
 
   return (
-    <Backdrop className={classes.backdrop} open={isLoading}>
-      <div className={classes.preLoaderSpin}>
+    <Backdrop className={classes?.backdrop} open={isLoading}>
+      <div className={classes?.preLoaderSpin}>
         <ClipLoader color={"#025e5e"} loading={isLoading} size={24} />
-        <p className={classes.loaderText}>Loading please wait</p>
+        <p className={classes?.loaderText}>Loading please wait</p>
       </div>
     </Backdrop>
   );

@@ -6,12 +6,15 @@ import "./App.css";
 
 import Footer from "@features/Footer";
 import Profile from "@pages/Profile";
+import MyWellness from "@pages/MyWellness";
+import Nutrition from "@pages/Nutrition";
+import MyProgress from "@pages/MyProgress";
 
 const menuItems = [
+  { label: "My Wellness", link: "/wellness" },
   { label: "Browse Events", link: "/events" },
-  { label: "Fit Coach", link: "/fit-coach" },
-  { label: "Fit Feast", link: "/fit-feast" },
-  { label: "Fitpass-TV", link: "/fitpass-tv" },
+  { label: "Coaches & Nutrition", link: "/coaches-nutrition" },
+  { label: "My Progress", link: "/progress" },
 ];
 
 function App() {
@@ -19,17 +22,14 @@ function App() {
     <BrowserRouter>
       <ResponsiveToolbar menuItems={menuItems} />
       <Routes>
-        {/* Define routes for each page */}
-        {/* <Route path="/" element={<Navigate to='/' />} /> */}
-        <Route path="/studios" element={<>Studios</>} />
-        <Route path="/events" element={<BrowseEvents />} />
-        <Route path="/fit-coach" element={<>Fit coa</>} />
-        <Route path="/fit-feast" element={<>Feast</>} />
-        <Route path="/fitpass-tv" element={<>TV</>} />
-        <Route path="/my-profile" element={<Profile />} />
-        {/* Optionally, you can define a default route */}
         <Route path="/" element={<LandingPage />} />
         <Route path="*" element={<Navigate to="/" />} />
+        {/* Optionally, you can define a default route */}
+        <Route path="/events" element={<BrowseEvents />} />
+        <Route path="/wellness" element={<MyWellness />} />
+        <Route path="/coaches-nutrition" element={<Nutrition />} />
+        <Route path="/progress" element={<MyProgress />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
       <Footer />
     </BrowserRouter>
