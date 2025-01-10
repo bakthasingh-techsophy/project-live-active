@@ -1,4 +1,5 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { userDp } from "@assets/index";
+import { Box, Typography } from "@mui/material";
 
 interface ProfileDrawerProps {
   menuOptions: any;
@@ -8,16 +9,103 @@ interface ProfileDrawerProps {
   setActiveSubMenu: any;
   toggleDrawer?: any;
 }
+
+const staticStyles = {
+  container: {
+    menuBox: {
+      borderRadius: 4,
+      p: 2,
+      display: "inline-block",
+    },
+    profileImage: {
+      width: 80,
+      height: "auto",
+      maxWidth: 400,
+      borderRadius: 2,
+      boxShadow: 3,
+      objectFit: "cover",
+    },
+    userInfoContainer: {
+      display: "flex",
+      flexDirection: "column",
+    },
+    logoutText: {
+      textTransform: "capitalize",
+      fontWeight: 600,
+      cursor: "pointer",
+    },
+    menuContainer: {
+      display: "flex",
+      flexDirection: "column",
+      padding: 2,
+      gap: 2,
+    },
+    menuOption: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 1,
+    },
+    menuHeading: {
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
+      bgcolor: "transparent",
+      color: "black",
+      textTransform: "uppercase",
+      fontWeight: 600,
+    },
+    subMenuOptionsContainer: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 0.5,
+    },
+    subMenuOption: {
+      textTransform: "none",
+      cursor: "pointer",
+      padding: "0.5rem 1rem",
+      borderRadius: 2,
+    },
+    profileDetailsContainer: { display: "flex", gap: 2, mb: 2 },
+  },
+  typography: {
+    greetHeader: {
+      textTransform: "uppercase",
+    },
+  },
+};
+
+const dynamicStyles = {
+  container: {
+    menuBox: {
+      boxShadow: {
+        lg: 2,
+        md: 2,
+        sm: 0,
+        xs: 0,
+      },
+      background: {
+        lg: "#f8fafc",
+        md: "#f8fafc",
+        sm: "transparent",
+        xs: "transparent",
+      },
+    },
+    subMenuOption: (isActive: boolean) => ({
+      bgcolor: isActive ? "primary.main" : "transparent",
+      color: isActive ? "white" : "black",
+    }),
+  },
+};
+
 const ProfileDrawer = ({
   menuOptions,
   activeMenu,
   setActiveMenu,
   activeSubMenu,
   setActiveSubMenu,
-}: //   toggleDrawer,
-ProfileDrawerProps) => {
+}: ProfileDrawerProps) => {
   const currentDate = new Date();
-  const timeInIST = currentDate.toLocaleString("en-IN", {
+  const timeInIST = currentDate?.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
   });
   const currentHour = new Date(timeInIST).getHours();
@@ -43,114 +131,61 @@ ProfileDrawerProps) => {
   return (
     <Box
       id="menuBox"
-      sx={{
-        borderRadius: 4,
-        p: 2,
-        boxShadow: {
-          lg: 2,
-          md: 2,
-          sm: 0,
-          xs: 0,
-        },
-        display: "inline-block",
-        background: {
-          lg: "#f8fafc",
-          md: "#f8fafc",
-          sm: "transparent",
-          xs: "transparent",
-        },
-      }}
+      sx={[staticStyles?.container?.menuBox, dynamicStyles?.container?.menuBox]}
     >
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+      <Box sx={staticStyles?.container?.profileDetailsContainer}>
         <Box
           component="img"
-          sx={{
-            width: 80,
-            height: "auto",
-            maxWidth: 400,
-            borderRadius: 2,
-            boxShadow: 3,
-            objectFit: "cover",
-          }}
-          src="https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?t=st=1736166081~exp=1736169681~hmac=a297d30d973c08702b35a0851731605fb05bd8e053d4ad26b679b705cb2f46c5&w=740"
+          sx={staticStyles?.container?.profileImage}
+          src={userDp}
           alt="Random Image"
         />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography variant="body2" sx={{ textTransform: "uppercase" }}>
+        <Box sx={staticStyles?.container?.userInfoContainer}>
+          <Typography
+            variant="body2"
+            sx={staticStyles?.typography?.greetHeader}
+          >
             Hi 👋, {greeting}
           </Typography>
-          <Typography sx={{ textTransform: "capitalize", fontWeight: 600 }}>
+          <Typography sx={staticStyles?.container?.logoutText}>
             Pavan Kola
           </Typography>
           <Typography
             variant="body2"
             color="primary"
-            sx={{
-              textTransform: "capitalize",
-              color: "primary.main",
-              cursor: "pointer",
-            }}
+            sx={staticStyles?.container?.logoutText}
             onClick={handleLogoutClick}
           >
             Logout
           </Typography>
         </Box>
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          padding: 2,
-          gap: 2,
-        }}
-      >
-        {menuOptions.map((menuOption: any, menuIndex: any) => (
-          <Box
-            key={menuIndex}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
-          >
-            <Typography
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                bgcolor: "transparent",
-                color: "black",
-                textTransform: "uppercase",
-                fontWeight: 600,
-              }}
-            >
+      <Box sx={staticStyles?.container?.menuContainer}>
+        {menuOptions?.map((menuOption: any, menuIndex: any) => (
+          <Box key={menuIndex} sx={staticStyles?.container?.menuOption}>
+            <Typography sx={staticStyles?.container?.menuHeading}>
               <menuOption.icon />
-              {menuOption.heading}
+              {menuOption?.heading}
             </Typography>
 
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-              {menuOption.subMenu.map((subMenuItem: any, subMenuIndex: any) => (
-                <Box
-                  key={subMenuIndex}
-                  onClick={() => handleSubMenuClick(menuIndex, subMenuIndex)}
-                  sx={{
-                    bgcolor:
-                      activeMenu === menuIndex && activeSubMenu === subMenuIndex
-                        ? "primary.main"
-                        : "transparent",
-                    color:
-                      activeMenu === menuIndex && activeSubMenu === subMenuIndex
-                        ? "white"
-                        : "black",
-                    textTransform: "none",
-                    cursor: "pointer",
-                    padding: "0.5rem 1rem",
-                    borderRadius: 2,
-                  }}
-                >
-                  {subMenuItem.subHeading}
-                </Box>
-              ))}
+            <Box sx={staticStyles?.container?.subMenuOptionsContainer}>
+              {menuOption?.subMenu?.map(
+                (subMenuItem: any, subMenuIndex: any) => (
+                  <Box
+                    key={subMenuIndex}
+                    onClick={() => handleSubMenuClick(menuIndex, subMenuIndex)}
+                    sx={[
+                      staticStyles?.container?.subMenuOption,
+                      dynamicStyles?.container?.subMenuOption(
+                        activeMenu === menuIndex &&
+                          activeSubMenu === subMenuIndex
+                      ),
+                    ]}
+                  >
+                    {subMenuItem?.subHeading}
+                  </Box>
+                )
+              )}
             </Box>
           </Box>
         ))}

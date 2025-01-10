@@ -1,28 +1,57 @@
 import { Button, useTheme } from "@mui/material";
-import { backgroundPic2 } from "@assets/index";
-import Banner from "./Banner";
+import Banner from "../../components/Banner";
 
-const LandingPageBanner = () => {
-  //   const handleExploreClick = () => {
-  //     console.log("Explore Now clicked!");
-  //   };
+interface LandingPageBannerProps {
+  backgroundImage: string;
+}
 
-  //   const handleGetStartedClick = () => {
-  //     console.log("Get Started clicked!");
-  //   };
+const staticStyles = {
+  container: {},
+  typography: {},
+  button: {
+    buttonOne: (theme: any) => ({
+      padding: "12px 24px",
+      fontWeight: "bold",
+      borderRadius: "8px",
+      textTransform: "none",
+      whiteSpace: "nowrap",
+      background: theme?.palette?.secondary?.main,
+      "&:hover": {
+        background: theme?.palette?.secondary?.dark,
+      },
+    }),
+    buttonTwo: (theme: any) => ({
+      padding: "12px 24px",
+      fontWeight: "bold",
+      borderRadius: "8px",
+      textTransform: "none",
+      whiteSpace: "nowrap",
+      color: "primary.contrastText",
+      border: `1px solid ${theme?.palette?.primary?.contrastText}`,
+      "&:hover": {
+        background: "transparent",
+      },
+    }),
+  },
+};
+const LandingPageBanner = ({ backgroundImage }: LandingPageBannerProps) => {
   const theme = useTheme();
 
   return (
     <Banner
-      backgroundImage={backgroundPic2}
+      backgroundImage={backgroundImage}
       heading={
         <>
-          <span style={{ fontWeight: 900, color: theme.palette.primary.main }}>
+          <span
+            style={{ fontWeight: 900, color: theme?.palette?.primary?.main }}
+          >
             Get Active Now
           </span>
           <br />
           and join exciting <br />
-          <span style={{ fontWeight: 900, color: theme.palette.primary.main }}>
+          <span
+            style={{ fontWeight: 900, color: theme?.palette?.primary?.main }}
+          >
             Live Fitness Events
           </span>{" "}
           with expert guidance!
@@ -34,37 +63,11 @@ const LandingPageBanner = () => {
           <Button
             variant="contained"
             color="primary"
-            sx={{
-              padding: "12px 24px",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              textTransform: "none",
-              whiteSpace: "nowrap",
-              background: theme.palette.secondary.main,
-              "&:hover": {
-                background: theme.palette.secondary.dark,
-              },
-            }}
-            // onClick={handleExploreClick}
+            sx={staticStyles?.button?.buttonOne}
           >
             Explore Now
           </Button>
-          <Button
-            variant="outlined"
-            sx={{
-              padding: "12px 24px",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              textTransform: "none",
-              whiteSpace: "nowrap",
-              color: "primary.contrastText",
-              border: `1px solid ${theme.palette.primary.contrastText}`,
-              "&:hover": {
-                background: "transparent",
-              },
-            }}
-            // onClick={handleGetStartedClick}
-          >
+          <Button variant="outlined" sx={staticStyles?.button?.buttonTwo}>
             Get Started
           </Button>
         </>

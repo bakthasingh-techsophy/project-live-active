@@ -1,230 +1,173 @@
+import { laLogo } from "@assets/index";
 import { Box, Divider, Link, Typography, useTheme } from "@mui/material";
+
+const staticStyles = (theme: any) => ({
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    background: theme?.palette?.background?.default,
+    padding: "2rem",
+    boxShadow: 4,
+    "& *": {
+      whiteSpace: "nowrap",
+    },
+  },
+  topSection: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  leftSection: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 2,
+  },
+  headerText: {
+    fontWeight: 700,
+    background: `linear-gradient(90deg, ${theme?.palette?.primary?.main}, ${theme?.palette?.secondary?.main})`,
+    backgroundClip: "text",
+    WebkitBackgroundClip: "text",
+    color: "transparent",
+    marginBottom: "1rem",
+  },
+  descriptionText: {
+    color: theme?.palette?.text?.secondary,
+    lineHeight: 1.6,
+    marginBottom: "1rem",
+    maxWidth: "500px",
+    whiteSpace: "wrap",
+  },
+  rightSection: {
+    display: "flex",
+    flex: 2,
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  column: {
+    flex: 1,
+  },
+  columnHeader: {
+    fontWeight: 600,
+    color: theme?.palette?.text?.primary,
+    marginBottom: "1rem",
+  },
+  link: {
+    textDecoration: "none",
+    display: "block",
+    marginBottom: "0.5rem",
+  },
+  contactText: {
+    color: theme?.palette?.text?.secondary,
+  },
+  divider: {
+    width: "100%",
+    height: 1,
+    margin: "1rem 0",
+  },
+  footerText: {
+    textAlign: "center",
+    padding: "1rem",
+  },
+  footerCopyright: {
+    color: theme?.palette?.text?.secondary,
+    fontWeight: 800,
+  },
+});
+
+const dynamicStyles = {
+  topSection: {
+    flexDirection: { xs: "column", sm: "column", md: "row" },
+    gap: { xs: "2rem", sm: "2rem", md: "4rem" },
+  },
+  headerText: {
+    fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+  },
+  rightSection: {
+    flexDirection: { xs: "column", sm: "column", md: "row" },
+    gap: { xs: "2rem", sm: "2rem", md: "2rem" },
+  },
+};
+
+const footerLinksData = [
+  {
+    header: "About Us",
+    links: [
+      { label: "About Us", href: "/about" },
+      { label: "Careers", href: "/careers" },
+      { label: "Our Team", href: "/team" },
+    ],
+  },
+  {
+    header: "Quick Links",
+    links: [
+      { label: "Home", href: "/home" },
+      { label: "Services", href: "/services" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
+  {
+    header: "Resources",
+    links: [
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms and Conditions", href: "/terms-conditions" },
+    ],
+  },
+];
 
 const Footer = () => {
   const theme = useTheme();
 
+  const customStaticStyles = staticStyles(theme);
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column", // Stack content vertically on all devices
-        background: theme.palette.background.default,
-        padding: "2rem",
-        "& *": {
-          whiteSpace: "nowrap",
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "column", md: "row" }, // Column on small screens, row on larger ones
-          justifyContent: "space-between", // Space between sections on larger screens
-          alignItems: "flex-start", // Align the items at the top
-          gap: { xs: "2rem", sm: "2rem", md: "4rem" },
-        }}
-      >
-        {/* Left Section - Company Logo and Description */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-          }}
-        >
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              color: "transparent",
-              fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
-              marginBottom: "1rem",
-            }}
-          >
-            Live Active
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: theme.palette.text.secondary,
-              lineHeight: 1.6,
-              marginBottom: "1rem",
-              maxWidth: "500px", // Limit width for readability
-              whiteSpace: "wrap",
-            }}
-          >
+    <Box sx={customStaticStyles?.container}>
+      <Box sx={[customStaticStyles?.topSection, dynamicStyles?.topSection]}>
+        <Box sx={customStaticStyles?.leftSection}>
+          <Box component={"img"} src={laLogo} sx={{ width: 80 }} />
+          {/* <Box sx={{ display: "flex" }}> */}
+          {/* <Typography
+              variant="h4"
+              sx={[customStaticStyles?.headerText, dynamicStyles?.headerText]}
+            >
+              Live Active
+            </Typography> */}
+          {/* </Box> */}
+          <Typography variant="body2" sx={customStaticStyles?.descriptionText}>
             Empowering you to live healthier, balanced lives with expert
             fitness, wellness, and yoga programs.
           </Typography>
         </Box>
 
-        {/* Right Section - Multiple Columns */}
         <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "column", md: "row" }, // Column on small screens, row on larger ones
-            gap: { xs: "2rem", sm: "2rem", md: "2rem" },
-            flex: 2,
-            justifyContent: "space-between",
-            width: "100%",
-          }}
+          sx={[customStaticStyles?.rightSection, dynamicStyles?.rightSection]}
         >
-          {/* About Us */}
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: theme.palette.text.primary,
-                marginBottom: "1rem",
-              }}
-            >
-              About Us
-            </Typography>
-            <Box>
-              <Link
-                href="/about"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">About Us</Typography>
-              </Link>
-              <Link
-                href="/careers"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">Careers</Typography>
-              </Link>
-              <Link
-                href="/team"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">Our Team</Typography>
-              </Link>
+          {footerLinksData?.map((column, index) => (
+            <Box key={index} sx={customStaticStyles?.column}>
+              <Typography variant="h6" sx={customStaticStyles?.columnHeader}>
+                {column?.header}
+              </Typography>
+              <Box>
+                {column?.links?.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link?.href}
+                    color="textSecondary"
+                    sx={customStaticStyles?.link}
+                  >
+                    <Typography variant="body2">{link?.label}</Typography>
+                  </Link>
+                ))}
+              </Box>
             </Box>
-          </Box>
+          ))}
 
-          {/* Quick Links */}
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: theme.palette.text.primary,
-                marginBottom: "1rem",
-              }}
-            >
-              Quick Links
-            </Typography>
-            <Box>
-              <Link
-                href="/home"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">Home</Typography>
-              </Link>
-              <Link
-                href="/services"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">Services</Typography>
-              </Link>
-              <Link
-                href="/blog"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">Blog</Typography>
-              </Link>
-            </Box>
-          </Box>
-
-          {/* Resources */}
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: theme.palette.text.primary,
-                marginBottom: "1rem",
-              }}
-            >
-              Resources
-            </Typography>
-            <Box>
-              <Link
-                href="/privacy-policy"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">Privacy Policy</Typography>
-              </Link>
-              <Link
-                href="/terms-conditions"
-                color="textSecondary"
-                sx={{
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <Typography variant="body2">Terms and Conditions</Typography>
-              </Link>
-            </Box>
-          </Box>
-
-          {/* Contact Us */}
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: theme.palette.text.primary,
-                marginBottom: "1rem",
-              }}
-            >
+          <Box sx={customStaticStyles?.column}>
+            <Typography variant="h6" sx={customStaticStyles?.columnHeader}>
               Contact Us
             </Typography>
             <Box>
-              <Typography
-                variant="body2"
-                sx={{ color: theme.palette.text.secondary }}
-              >
+              <Typography variant="body2" sx={customStaticStyles?.contactText}>
                 1234 Fitness Lane
                 <br />
                 Wellness City, Country
@@ -238,19 +181,10 @@ const Footer = () => {
         </Box>
       </Box>
 
-      <Divider sx={{ width: "100%", height: 1, margin: "1rem 0" }} />
+      <Divider sx={customStaticStyles?.divider} />
 
-      <Box
-        sx={{
-          textAlign: "center",
-          padding: "1rem",
-          // backgroundColor: theme.palette.background.default,
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{ color: theme.palette.text.secondary, fontWeight: 800 }}
-        >
+      <Box sx={customStaticStyles?.footerText}>
+        <Typography variant="body2" sx={customStaticStyles?.footerCopyright}>
           &copy; {new Date().getFullYear()} Live Active. All Rights Reserved.
         </Typography>
       </Box>

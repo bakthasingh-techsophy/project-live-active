@@ -1,29 +1,30 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark',  // Set to dark mode
+    mode: "dark",
     primary: {
-      main: '#DA4444',  // Red
-      light: '#FF6B6B',  // Light red
-      dark: '#A32929',   // Dark red
+      main: "#00a86b",
+      light: "#00a86a27",
+      dark: "#169757",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: '#0F4FBD',  // Blue
-      light: '#4C77D9',  // Light blue
-      dark: '#0C3870',   // Dark blue
+      main: "#677c27",
+      light: "#819447",
+      dark: "#5a7017",
     },
     background: {
-      default: '#121212',  // Dark background (for dark theme)
-      paper: '#1E1E1E',    // Paper background (for dark theme)
+      default: "#121212",
+      paper: "#1e1e1e",
     },
     text: {
-      primary: '#FFFFFF',  // Light text (for dark theme)
-      secondary: '#B0B0B0', // Secondary text (for dark theme)
+      primary: "#ffffff",
+      secondary: "#b0b0b0",
     },
   },
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: "Roboto, sans-serif",
     h6: {
       fontWeight: 600,
     },
@@ -32,16 +33,14 @@ const darkTheme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: 'none',
+          boxShadow: "none",
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none',
-          padding: '8px 16px',
-          borderRadius: '20px',
+          textTransform: "none",
         },
       },
     },

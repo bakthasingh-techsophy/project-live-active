@@ -1,16 +1,55 @@
-import { servicePic1 } from "@assets/index";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button, useTheme } from "@mui/material";
-import Banner from "./Banner";
-const ServiceBanner1 = () => {
+import Banner from "../../components/Banner";
+
+interface ServiceBanner1Props {
+  backgroundImage: string;
+}
+
+const staticStyles = {
+  container: {},
+  typography: {
+    header: (theme: any) => ({
+      fontWeight: 900,
+      color: theme?.palette?.primary?.main,
+    }),
+  },
+  button: {
+    joinButton: (theme: any) => ({
+      padding: "12px 24px",
+      fontWeight: "bold",
+      borderRadius: "8px",
+      textTransform: "none",
+      whiteSpace: "nowrap",
+      background: theme?.palette?.secondary?.main,
+      "&:hover": {
+        background: theme?.palette?.secondary?.dark,
+      },
+    }),
+  },
+};
+const dynamicStyles = {
+  container: {},
+  typography: {},
+  button: {
+    joinButton: {
+      fontSize: {
+        xs: "0.9rem",
+        sm: "1rem",
+      },
+    },
+  },
+};
+
+const ServiceBanner1 = ({ backgroundImage }: ServiceBanner1Props) => {
   const theme = useTheme();
 
   return (
     <Banner
-      backgroundImage={servicePic1}
+      backgroundImage={backgroundImage}
       heading={
         <>
-          <span style={{ fontWeight: 900, color: theme.palette.primary.main }}>
+          <span style={staticStyles?.typography?.header(theme)}>
             Join Live Yoga
           </span>
           <br />
@@ -23,44 +62,14 @@ const ServiceBanner1 = () => {
           <Button
             variant="contained"
             color="primary"
-            sx={{
-              padding: "12px 24px",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              textTransform: "none",
-              whiteSpace: "nowrap",
-              background: theme.palette.secondary.main,
-              "&:hover": {
-                background: theme.palette.secondary.dark,
-              },
-              fontSize: {
-                xs: "0.9rem",
-                sm: "1rem",
-              },
-            }}
+            sx={[
+              staticStyles?.button?.joinButton(theme),
+              dynamicStyles?.button?.joinButton,
+            ]}
             endIcon={<ChevronRightIcon />}
-            // onClick={handleExploreClick}
           >
             Join Live
           </Button>
-          {/* <Button
-            variant="outlined"
-            sx={{
-              padding: "12px 24px",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              textTransform: "none",
-              whiteSpace: "nowrap",
-              color: "primary.contrastText",
-              border: `1px solid ${theme.palette.primary.contrastText}`,
-              "&:hover": {
-                background: "transparent",
-              },
-            }}
-            // onClick={handleGetStartedClick}
-          >
-            Get Started
-          </Button> */}
         </>
       }
     />

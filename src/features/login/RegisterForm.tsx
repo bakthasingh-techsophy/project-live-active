@@ -9,7 +9,7 @@ const mobileRegex = /^[0-9]{10}$/;
 const RegisterFormSchema = Yup.object({
   loginAsset: Yup.string()
     .test("is-valid", "Invalid Mobile Number", (value: any) => {
-      return mobileRegex.test(value);
+      return mobileRegex?.test(value);
     })
     .required("Mobile Number is required"),
   name: Yup.string().required("Name is required"),
@@ -20,8 +20,31 @@ const RegisterFormSchema = Yup.object({
     .oneOf([Yup.ref("newPassword")], "Password Mismatch"),
 });
 
+const staticStyles = {
+  container: {
+    mainContainer: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      padding: 3,
+      borderRadius: 2,
+    },
+    form: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "stretch",
+      gap: 2,
+    },
+  },
+  typography: {
+    h1: { fontWeight: 700 },
+  },
+  button: { submitButton: { marginTop: 2 } },
+  divider: { marginBottom: 2 },
+};
+
 const RegisterForm: React.FC = () => {
-  // const theme = useTheme();
   const formik = useFormik({
     initialValues: {
       loginAsset: "",
@@ -38,117 +61,99 @@ const RegisterForm: React.FC = () => {
   });
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        padding: 3,
-        borderRadius: 2,
-      }}
-    >
-      {/* Heading */}
-      <Typography variant="h6" component="h2" sx={{ fontWeight: 700 }}>
+    <Box sx={staticStyles?.container?.mainContainer}>
+      <Typography variant="h6" component="h2" sx={staticStyles?.typography?.h1}>
         Register
       </Typography>
 
-      {/* Divider */}
-      <Divider sx={{ marginBottom: 2 }} />
+      <Divider sx={staticStyles?.divider} />
 
-      <form onSubmit={formik.handleSubmit}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-            alignItems: "stretch",
-            gap: 2,
-          }}
-        >
-          {/* Name Field */}
+      <form onSubmit={formik?.handleSubmit}>
+        <Box sx={staticStyles?.container?.form}>
           <TextField
             label="Name"
             name="name"
             variant="outlined"
             fullWidth
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.name && Boolean(formik.errors.name)}
-            helperText={formik.touched.name && formik.errors.name}
+            value={formik?.values?.name}
+            onChange={formik?.handleChange}
+            onBlur={formik?.handleBlur}
+            error={formik?.touched?.name && Boolean(formik?.errors?.name)}
+            helperText={formik?.touched?.name && formik?.errors?.name}
             size="small"
           />
 
-          {/* Mobile Number Field */}
           <TextField
             label="Mobile Number"
             name="loginAsset"
             variant="outlined"
             fullWidth
-            value={formik.values.loginAsset}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            value={formik?.values?.loginAsset}
+            onChange={formik?.handleChange}
+            onBlur={formik?.handleBlur}
             error={
-              formik.touched.loginAsset && Boolean(formik.errors.loginAsset)
+              formik?.touched?.loginAsset && Boolean(formik?.errors?.loginAsset)
             }
-            helperText={formik.touched.loginAsset && formik.errors.loginAsset}
+            helperText={
+              formik?.touched?.loginAsset && formik?.errors?.loginAsset
+            }
           />
 
-          {/* Age Field */}
           <TextField
             label="Age"
             name="age"
             variant="outlined"
             fullWidth
-            value={formik.values.age}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.age && Boolean(formik.errors.age)}
-            helperText={formik.touched.age && formik.errors.age}
+            value={formik?.values?.age}
+            onChange={formik?.handleChange}
+            onBlur={formik?.handleBlur}
+            error={formik?.touched?.age && Boolean(formik?.errors?.age)}
+            helperText={formik?.touched?.age && formik?.errors?.age}
           />
 
-          {/* Password Field */}
           <TextField
             label="New Password"
             name="newPassword"
             variant="outlined"
             fullWidth
             type="password"
-            value={formik.values.newPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            value={formik?.values?.newPassword}
+            onChange={formik?.handleChange}
+            onBlur={formik?.handleBlur}
             error={
-              formik.touched.newPassword && Boolean(formik.errors.newPassword)
+              formik?.touched?.newPassword &&
+              Boolean(formik?.errors?.newPassword)
             }
-            helperText={formik.touched.newPassword && formik.errors.newPassword}
+            helperText={
+              formik?.touched?.newPassword && formik?.errors?.newPassword
+            }
           />
 
-          {/* Confirm Password Field */}
           <TextField
             label="Confirm Password"
             name="confirmPassword"
             variant="outlined"
             fullWidth
             type="password"
-            value={formik.values.confirmPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            value={formik?.values?.confirmPassword}
+            onChange={formik?.handleChange}
+            onBlur={formik?.handleBlur}
             error={
-              formik.touched.confirmPassword &&
-              Boolean(formik.errors.confirmPassword)
+              formik?.touched?.confirmPassword &&
+              Boolean(formik?.errors?.confirmPassword)
             }
             helperText={
-              formik.touched.confirmPassword && formik.errors.confirmPassword
+              formik?.touched?.confirmPassword &&
+              formik?.errors?.confirmPassword
             }
           />
 
-          {/* Submit Button */}
           <Button
             variant="contained"
             color="primary"
-            sx={{ marginTop: 2 }}
+            sx={staticStyles?.button?.submitButton}
             type="submit"
-            disabled={formik.isSubmitting}
+            disabled={formik?.isSubmitting}
           >
             Register
           </Button>

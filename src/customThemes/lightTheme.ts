@@ -4,23 +4,23 @@ const lightTheme = createTheme({
   palette: {
     mode: "light", // Set to light mode
     primary: {
-      main: "#00a86b", 
-      light: "#00a86a27", 
-      dark: "#169757", 
+      main: "#00a86b",
+      light: "#00a86a27",
+      dark: "#169757",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#677c27", // Blue
-      light: "#4c76d98c", // Light blue
-      dark: "#5a7017", // Dark blue
+      main: "#677c27",
+      light: "#819447",
+      dark: "#5a7017",
     },
     background: {
-      default: "#FFFFFF", // Light background (for light theme)
-      paper: "#F5F5F5", // Paper background (for light theme)
+      default: "#FFFFFF",
+      paper: "#F5F5F5",
     },
     text: {
-      primary: "#000000", // Dark text (for light theme)
-      secondary: "#555555", // Secondary text (for light theme)
+      primary: "#000000",
+      secondary: "#555555",
     },
   },
   typography: {

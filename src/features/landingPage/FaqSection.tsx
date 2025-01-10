@@ -1,17 +1,95 @@
 import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Box,
-    Container,
-    Typography
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Container,
+  Typography,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+
+const staticStyles = {
+  container: {
+    root: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      borderRadius: "8px",
+    },
+    heading: {
+      fontWeight: 700,
+      marginBottom: "1rem",
+      textAlign: "center",
+    },
+    tagline: {
+      fontWeight: 500,
+      marginBottom: "2rem",
+      textAlign: "center",
+    },
+    accordionContainer: {
+      width: "100%",
+      mt: 4,
+    },
+    accordion: {
+      marginBottom: "1rem",
+    },
+    accordionSummary: {
+      fontWeight: 600,
+    },
+  },
+  typography: {
+    heading: {
+      color: "primary.main",
+      fontSize: "2rem",
+      sm: {
+        fontSize: "2.5rem",
+      },
+    },
+    tagline: {
+      color: "text.secondary",
+      fontSize: "1rem",
+      sm: {
+        fontSize: "1rem",
+      },
+    },
+    accordionText: {
+      fontWeight: 600,
+      fontSize: "1rem",
+    },
+  },
+};
+
+const dynamicStyles = {
+  container: {
+    root: {
+      padding: { xs: "2rem 1rem", sm: "3rem 2rem", md: "4rem 4rem" },
+    },
+  },
+  typography: {
+    heading: {
+      fontSize: {
+        xs: "2rem",
+        sm: "2.5rem",
+      },
+    },
+    tagline: {
+      fontSize: {
+        xs: "1rem",
+        sm: "1rem",
+      },
+    },
+    accordionText: {
+      fontSize: {
+        lg: "1.3rem",
+        md: "1rem",
+        sm: "1rem",
+        xs: "1rem",
+      },
+    },
+  },
+};
 
 const FAQSection = () => {
-  const theme = useTheme();
-
   const faqData = [
     {
       question: "What is Live Yoga Class?",
@@ -37,26 +115,15 @@ const FAQSection = () => {
 
   return (
     <Container
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: { xs: "2rem 1rem", sm: "3rem 2rem", md: "4rem 4rem" },
-        // backgroundColor: theme.palette.background.paper,
-        borderRadius: "8px",
-        // boxShadow: 3,
-      }}
+      sx={[staticStyles?.container?.root, dynamicStyles?.container?.root]}
     >
       {/* Section Heading */}
       <Typography
         variant="h3"
-        sx={{
-          fontWeight: 700,
-          fontSize: { xs: "2rem", sm: "2.5rem" },
-          color: theme.palette.primary.main,
-          marginBottom: "1rem",
-          textAlign: "center",
-        }}
+        sx={[
+          staticStyles?.typography?.heading,
+          dynamicStyles?.typography?.heading,
+        ]}
       >
         Frequently Asked Questions
       </Typography>
@@ -64,43 +131,35 @@ const FAQSection = () => {
       {/* Tagline */}
       <Typography
         variant="h6"
-        sx={{
-          fontWeight: 500,
-          fontSize: { xs: "1rem", sm: "1rem" },
-          color: theme.palette.text.secondary,
-          marginBottom: "2rem",
-          textAlign: "center",
-        }}
+        sx={[
+          staticStyles?.typography?.tagline,
+          dynamicStyles?.typography?.tagline,
+        ]}
       >
         Get answers to the most common questions about our services and how you
         can make the most of your fitness journey.
       </Typography>
 
       {/* FAQ Accordion */}
-      <Box sx={{ width: "100%" }}>
-        {faqData.map((faq, index) => (
-          <Accordion key={index} sx={{ marginBottom: "1rem" }}>
+      <Box sx={staticStyles?.container?.accordionContainer}>
+        {faqData?.map((faq, index) => (
+          <Accordion key={index} sx={staticStyles?.container?.accordion}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls={`faq-${index}-content`}
               id={`faq-${index}-header`}
             >
               <Typography
-                sx={{
-                  fontWeight: 600,
-                  fontSize: {
-                    lg: "1.3rem",
-                    md: "1rem",
-                    sm: "1rem",
-                    xs: "1rem",
-                  },
-                }}
+                sx={[
+                  staticStyles?.typography?.accordionText,
+                  dynamicStyles?.typography?.accordionText,
+                ]}
               >
-                {faq.question}
+                {faq?.question}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>{faq.answer}</Typography>
+              <Typography>{faq?.answer}</Typography>
             </AccordionDetails>
           </Accordion>
         ))}
