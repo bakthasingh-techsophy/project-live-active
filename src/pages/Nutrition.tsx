@@ -1,16 +1,21 @@
-import { Box, Typography } from "@mui/material";
+import CoachesSection from "@features/coachNutrition/CoachesSection";
+import CustomizeNutrition from "@features/coachNutrition/CustomizeNutrition";
+import HeaderSection from "@features/coachNutrition/HeaderSection";
+import NutritionFaqSection from "@features/coachNutrition/NutritionFaqSection";
+import { Box } from "@mui/material";
 
 const Nutrition = () => {
   return (
     <Box
       sx={{
         background:
-          "linear-gradient(180deg, rgb(255, 210, 229,0.5) 0%, rgb(253, 238, 250) 33%, rgb(248, 243, 253) 66%, rgb(255, 255, 255) 100%)",
+          "linear-gradient(180deg, rgb(255, 221, 235) 0%, rgb(255, 229, 250) 33%, rgb(249, 235, 255) 66%, rgb(255, 255, 255) 100%)",
       }}
     >
-      <Typography sx={{ textAlign: "center", py: 33 }}>
-        Coaches and Nutrition Page
-      </Typography>
+      <HeaderSection />
+      <CustomizeNutrition />
+      <CoachesSection />
+      <NutritionFaqSection />
     </Box>
   );
 };

@@ -1,8 +1,6 @@
 import {
-  cardPic1,
   preferencePic2,
-  preferencePic3,
-  preferencePic4,
+  preferencePic3
 } from "@assets/index";
 import {
   Box,
@@ -12,10 +10,8 @@ import {
   CardMedia,
   Container,
   Grid,
-  Rating,
-  Typography,
+  Typography
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 
 const events = [
   {
@@ -186,7 +182,7 @@ const QuickLinks = () => {
                 </Box>
                 <Button
                   variant="contained"
-                  onClick={(e) => {
+                  onClick={() => {
                     console.log("Join Clicked");
                   }}
                   sx={staticStyles?.button?.joinButton}
