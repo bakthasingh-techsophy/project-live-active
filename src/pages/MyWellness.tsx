@@ -1,8 +1,8 @@
 import PreferencePrograms from "@features/myWellness/PreferencePrograms";
 import QuickLinks from "@features/myWellness/QuickLinks";
-import QuoteSection from "@features/myWellness/QuoteSection";
 import WellnessHeader from "@features/myWellness/WellnessHeader";
 import { Box } from "@mui/material";
+import QuoteSection from "@features/myWellness/QuoteSection";
 
 const MyWellness = () => {
   return (

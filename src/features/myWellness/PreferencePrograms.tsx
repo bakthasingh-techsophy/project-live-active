@@ -241,7 +241,7 @@ const PreferencePrograms = () => {
                   </Typography>
                   <Button
                     variant="contained"
-                    onClick={(e) => {
+                    onClick={() => {
                       console.log("Explore Clicked");
                     }}
                     sx={staticStyles?.button?.exploreButton}
