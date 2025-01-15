@@ -1,4 +1,4 @@
-import { backgroundPic2, backgroundPic7 } from "@assets/index";
+import { backgroundPic7 } from "@assets/index";
 import CTABanner from "@features/landingPage/CtaBanner";
 import FAQSection from "@features/landingPage/FaqSection";
 import LandingPageBanner from "@features/landingPage/LandingPageBanner";
@@ -8,7 +8,7 @@ import ServicesSection from "@features/landingPage/ServicesSection";
 const LandingPage = () => {
   return (
     <>
-      <LandingPageBanner backgroundImage={backgroundPic2} />
+      <LandingPageBanner />
       <ServicesSection />
       <ServiceCarousel />
       <FAQSection />
