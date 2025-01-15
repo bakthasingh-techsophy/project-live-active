@@ -14,7 +14,7 @@ const menuItems = [
   { label: "My Wellness", link: "/wellness" },
   { label: "Browse Events", link: "/events" },
   { label: "Coaches & Nutrition", link: "/coaches-nutrition" },
-  { label: "My Progress", link: "/progress" },
+  // { label: "My Progress", link: "/progress" },
 ];
 
 function App() {
