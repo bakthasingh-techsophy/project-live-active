@@ -8,7 +8,7 @@ import {
   Container,
   Grid,
   Rating,
-  Typography
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 
@@ -122,8 +122,39 @@ const staticStyles = {
   },
   typography: {
     ratingText: { marginLeft: 1 },
-    boldText: { fontWeight: "bold", fontSize: "1.1rem", color: "#333" },
-    descriptionText: { fontSize: "0.95rem", color: "#555" },
+    boldText: {
+      fontWeight: "bold",
+      fontSize: "1.1rem",
+      color: "#333",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      position: "relative",
+      transition:
+        "whiteSpace 0.3s ease, overflow 0.3s ease, textOverflow 0.3s ease",
+      "&:hover": {
+        whiteSpace: "normal",
+        overflow: "visible",
+        textOverflow: "unset",
+        zIndex: 1,
+      },
+    },
+    descriptionText: {
+      fontSize: "0.95rem",
+      color: "#555",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      position: "relative",
+      transition:
+        "whiteSpace 0.3s ease, overflow 0.3s ease, textOverflow 0.3s ease",
+      "&:hover": {
+        whiteSpace: "normal",
+        overflow: "visible",
+        textOverflow: "unset",
+        zIndex: 1,
+      },
+    },
     sessionsText: { fontSize: "0.95rem", fontWeight: "500", color: "#333" },
     levelText: { fontSize: "0.875rem", color: "#777" },
   },
@@ -140,9 +171,17 @@ const staticStyles = {
 const dynamicStyles = {
   container: {
     grid: {
-      gap: 8,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: {
+        lg: 8,
+        md: 4,
+        sm: 4,
+        xs: 4,
+      },
       px: {
-        lg: 24,
+        lg: 16,
         md: 4,
         sm: 8,
         xs: 2,
@@ -174,7 +213,7 @@ const CoachesSection = () => {
       <Grid container spacing={2} sx={dynamicStyles?.container?.grid}>
         {/* Map through visible coaches and render each card */}
         {visibleCoaches.map((event) => (
-          <Grid item xs={12} sm={6} md={3.5} key={event?.id}>
+          <Grid item xs={12} sm={6} md={3} lg={3.5} key={event?.id}>
             <Card sx={[staticStyles?.container?.cardContainer]}>
               <CardMedia
                 component="img"
@@ -261,7 +300,6 @@ const CoachesSection = () => {
 };
 
 export default CoachesSection;
-
 
 // import { TestProfile1, TestProfile2, TestProfile3 } from "@assets/index";
 // import {

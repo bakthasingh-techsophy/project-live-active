@@ -180,7 +180,7 @@ const BrowseEventsComponent: React.FC = () => {
       {/* Container for the event cards */}
       <Grid container spacing={2} sx={staticStyles?.container?.grid}>
         {/* Map through events and render each card */}
-        {[...events, ...events].map((event) => (
+        {[...events].map((event) => (
           <Grid item xs={12} sm={14} md={6} key={event?.id}>
             <Card
               sx={[
@@ -188,14 +188,13 @@ const BrowseEventsComponent: React.FC = () => {
                 dynamicStyles?.container?.cardContainer,
               ]}
             >
-              <CardMedia
+              <Box
                 component="img"
                 sx={[
                   staticStyles?.container?.cardMediaContainer,
                   dynamicStyles?.container?.cardMediaContainer,
                 ]}
-                image={event?.image}
-                alt={event?.title}
+                src={event?.image}
               />
               <CardContent sx={staticStyles?.container?.cardContentContainer}>
                 {/* Event Title */}
