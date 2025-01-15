@@ -100,7 +100,7 @@ const staticStyles = (theme: any) => ({
       padding: "8px 18px",
       borderRadius: "8px",
       "&:hover": {
-        background: "#12121211",
+        background: "rgb(22, 151, 87,0.3)",
       },
       whiteSpace: "nowrap",
     },
@@ -226,7 +226,7 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                   {
                     backgroundColor:
                       selectedMenu === item?.label
-                        ? "#12121211"
+                        ? "rgb(22, 151, 87,0.2)"
                         : "transparent",
                   },
                 ]}
