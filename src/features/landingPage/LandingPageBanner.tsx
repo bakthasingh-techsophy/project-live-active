@@ -1,13 +1,77 @@
-import { Button, useTheme } from "@mui/material";
-import Banner from "../../components/Banner";
-
-interface LandingPageBannerProps {
-  backgroundImage: string;
-}
+import {
+  exerciseVideo3,
+  onlineExercise,
+  yogaVideo
+} from "@assets/index";
+import {
+  Box,
+  Button,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 
 const staticStyles = {
-  container: {},
-  typography: {},
+  container: {
+    mainContainer: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "90vh",
+      position: "relative",
+      textAlign: "center",
+      overflow: "hidden",
+    },
+    videoContainer: {
+      display: "flex",
+      width: "100%",
+      height: "100%",
+      overflow: "hidden",
+    },
+    headerContainer: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "start",
+      justifyContent: "center",
+      gap: 3,
+      position: "absolute",
+      zIndex: 1,
+    },
+    actionButtonsContainer: {
+      display: "flex",
+      gap: 2,
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+    },
+    overlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: "rgba(0, 0, 0, 0.7)",
+    },
+  },
+  typography: {
+    heading: {
+      fontWeight: 800,
+      color: "#fff",
+      textShadow: "2px 2px 3px rgba(0, 0, 0, 0.5)",
+      marginBottom: 2,
+      lineHeight: 1.2,
+      textAlign: "center",
+    },
+    tagline: {
+      textAlign: "center",
+      width: "100%",
+      fontWeight: 500,
+      color: "#fff",
+      marginBottom: 3,
+      lineHeight: 1.5,
+      // textShadow: "2px 2px 4px rgba(0, 0, 0, 0.6)",
+    },
+  },
   button: {
     buttonOne: (theme: any) => ({
       padding: "12px 24px",
@@ -34,45 +98,147 @@ const staticStyles = {
     }),
   },
 };
-const LandingPageBanner = ({ backgroundImage }: LandingPageBannerProps) => {
+
+const dynamicStyles = {
+  container: {
+    headerContainer: {
+      p: {
+        lg: 8,
+        md: 8,
+        sm: 4,
+        xs: 0,
+      },
+      textAlign: {
+        lg: "left",
+        md: "left",
+        sm: "center",
+      },
+    },
+  },
+  typography: {
+    heading: {
+      fontSize: {
+        xs: "1.9rem",
+        lg: "4rem",
+        md: "3rem",
+        sm: "3.5rem",
+      },
+    },
+    tagline: {
+      fontSize: {
+        xs: "0.9rem",
+        sm: "1.2rem",
+      },
+    },
+  },
+  button: {},
+};
+
+const LandingPageBanner = () => {
   const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
-    <Banner
-      backgroundImage={backgroundImage}
-      heading={
-        <>
-          <span
-            style={{ fontWeight: 900, color: theme?.palette?.primary?.main }}
-          >
-            Get Active Now
-          </span>
-          <br />
-          and join exciting <br />
-          <span
-            style={{ fontWeight: 900, color: theme?.palette?.primary?.main }}
-          >
-            Live Fitness Events
-          </span>{" "}
-          with expert guidance!
-        </>
-      }
-      tagline="Discover engaging fitness, wellness, and yoga sessions online, with expert instructors to guide you every step of the way."
-      actionButtons={
-        <>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={staticStyles?.button?.buttonOne}
-          >
-            Explore Now
-          </Button>
-          <Button variant="outlined" sx={staticStyles?.button?.buttonTwo}>
-            Get Started
-          </Button>
-        </>
-      }
-    />
+    <Box sx={staticStyles?.container?.mainContainer}>
+      <Box sx={staticStyles?.container?.videoContainer}>
+        <video
+          src={exerciseVideo3}
+          autoPlay
+          loop
+          muted
+          style={{
+            objectFit: "cover",
+            height: "100%",
+            width: isSmallScreen ? "100%" : isMediumScreen ? "50%" : "34%",
+          }}
+        />
+        <video
+          src={yogaVideo}
+          autoPlay
+          loop
+          muted
+          style={{
+            objectFit: "cover",
+            height: "100%",
+            width: isSmallScreen ? "0%" : isMediumScreen ? "50%" : "33%",
+          }}
+        />
+        <video
+          src={onlineExercise}
+          autoPlay
+          loop
+          muted
+          style={{
+            objectFit: "cover",
+            height: "100%",
+            width: isSmallScreen ? "0%" : isMediumScreen ? "0%" : "33%",
+          }}
+        />
+        <Box sx={staticStyles?.container?.overlay} />
+      </Box>
+      <Box
+        sx={[
+          staticStyles?.container?.headerContainer,
+          dynamicStyles?.container?.headerContainer,
+        ]}
+      >
+        <Typography
+          variant="h2"
+          sx={[
+            staticStyles?.typography?.heading,
+            dynamicStyles?.typography?.heading,
+          ]}
+        >
+          <>
+            <span
+              style={{
+                fontWeight: 900,
+                color: theme?.palette?.primary?.dark,
+              }}
+            >
+              Get Active Now
+            </span>{" "}
+            and join exciting <br />
+            <span
+              style={{
+                fontWeight: 900,
+                color: theme?.palette?.primary?.dark,
+              }}
+            >
+              Live Fitness Events
+            </span>{" "}
+            with expert guidance!
+          </>
+        </Typography>
+
+        <Typography
+          variant="h6"
+          sx={[
+            staticStyles?.typography?.tagline,
+            dynamicStyles?.typography?.tagline,
+          ]}
+        >
+          Discover engaging fitness, wellness, and yoga sessions online, with
+          expert instructors to guide you every step of the way.
+        </Typography>
+
+        <Box sx={[staticStyles?.container?.actionButtonsContainer]}>
+          <>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={staticStyles?.button?.buttonOne}
+            >
+              Explore Now
+            </Button>
+            <Button variant="outlined" sx={staticStyles?.button?.buttonTwo}>
+              Get Started
+            </Button>
+          </>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

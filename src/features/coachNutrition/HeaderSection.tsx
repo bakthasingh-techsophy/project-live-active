@@ -1,6 +1,6 @@
-import { coachVideo, exerciseVideo, nutritionVideo } from "@assets/index";
+import { coachVideo, nutritionVideo } from "@assets/index";
 import VideoBackground from "@components/VideoBackground";
-import { Box, Container, CssThemeVariables, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import React from "react";
 
 const staticStyles = {
