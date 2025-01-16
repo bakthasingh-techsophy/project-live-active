@@ -168,7 +168,7 @@ const Footer = () => {
             </Typography>
             <Box>
               <Typography variant="body2" sx={customStaticStyles?.contactText}>
-                1234 Fitness Lane
+                1234 Fitness Lane,
                 <br />
                 Wellness City, Country
                 <br />

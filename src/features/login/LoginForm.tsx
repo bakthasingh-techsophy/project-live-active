@@ -9,7 +9,6 @@ const staticStyles = {
       display: "flex",
       flexDirection: "column",
       gap: 2,
-      padding: 3,
       borderRadius: 2,
     },
     form: {
@@ -20,27 +19,22 @@ const staticStyles = {
       gap: 2,
     },
   },
-  typography: {
-    h1: { fontWeight: 700 },
-  },
-  button: { submitButton: { marginTop: 2 } },
-  divider: { marginBottom: 2 },
+
+  button: { submitButton: { marginY: 1 } },
 };
 
-// Validation schema for Login form
-const mobileRegex = /^[0-9]{10}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LoginFormSchema = Yup.object({
   loginAsset: Yup.string()
-    .test("is-valid", "Invalid Mobile Number", (value: any) => {
-      return mobileRegex?.test(value);
+    .test("is-valid", "Invalid Email", (value: any) => {
+      return emailRegex?.test(value);
     })
-    .required("Mobile Number is required"),
+    .required("Email is required"),
   password: Yup.string().required("Password is required"),
 });
 
 const LoginForm: React.FC = () => {
-
   const formik = useFormik({
     initialValues: {
       loginAsset: "",
@@ -55,16 +49,10 @@ const LoginForm: React.FC = () => {
 
   return (
     <Box sx={staticStyles?.container?.mainContainer}>
-      <Typography variant="h6" component="h2" sx={staticStyles?.typography?.h1}>
-        Login
-      </Typography>
-
-      <Divider sx={staticStyles?.divider} />
-
       <form onSubmit={formik?.handleSubmit}>
         <Box sx={staticStyles?.container?.form}>
           <TextField
-            label="Mobile Number"
+            label="Email"
             name="loginAsset"
             variant="outlined"
             fullWidth

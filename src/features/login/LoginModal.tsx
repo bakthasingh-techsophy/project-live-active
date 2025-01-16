@@ -1,6 +1,6 @@
 import { backgroundPic1 } from "@assets/index";
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, IconButton, Modal, Typography } from "@mui/material";
+import { Box, Divider, IconButton, Modal, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 import LoginForm from "./LoginForm";
@@ -18,7 +18,7 @@ const staticStyles = {
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
-      height: "85%",
+      height: "60%",
       bgcolor: "background.paper",
       boxShadow: 24,
       display: "flex",
@@ -26,14 +26,7 @@ const staticStyles = {
       borderRadius: 2,
       overflow: "auto",
     },
-    closeIconContainer: {
-      display: "flex",
-      justifyContent: "end",
-      alignItems: "center",
-      position: "absolute",
-      top: 16,
-      right: 16,
-    },
+
     leftImageBox: {
       height: "100%",
       backgroundImage: `url(${backgroundPic1})`,
@@ -47,10 +40,30 @@ const staticStyles = {
       justifyContent: "end",
       alignItems: "center",
       gap: 1,
-      pr: 4,
+      pr: 1,
+    },
+    formHeaderContainer: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      formHeader: {
+        width: "100%",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      },
+    },
+    form: {
+      overflowY: "auto",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "flex-start",
+      alignItems: "stretch",
     },
   },
   typography: {
+    h1: { fontWeight: 700 },
     toggleText: {
       display: "inline-block",
       fontSize: "0.9rem",
@@ -63,17 +76,31 @@ const staticStyles = {
       },
     },
   },
+  divider: { marginY: 2 },
 };
 
 const dynamicStyles = {
   container: {
     modalBox: (theme: any) => ({
       width: {
-        lg: "60%",
+        lg: "55%",
         sm: "60%",
         md: "60%",
         xs: "95%",
       },
+      "@media (max-height: 900px)": {
+        height: "75%",
+      },
+      "@media (max-height: 800px)": {
+        height: "80%",
+      },
+      "@media (max-height: 700px)": {
+        height: "85%",
+      },
+      "@media (max-height: 600px)": {
+        height: "95%",
+      },
+
       borderColor: theme?.palette?.primary?.main,
     }),
     leftImageBox: {
@@ -92,14 +119,11 @@ const dynamicStyles = {
         sm: "100%",
         xs: "100%",
       },
-      padding: {
-        lg: 4,
-        md: 6,
-        sm: 6,
-      },
+      padding: 3,
+      maxHeight: "100%",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "center",
+      justifyContent: "flex-start",
       alignItems: "stretch",
     },
     toggleBox: {
@@ -137,11 +161,6 @@ const AuthFormModal = ({ open, setOpen }: AuthFormModalProps) => {
             dynamicStyles?.container?.modalBox(theme),
           ]}
         >
-          <Box sx={staticStyles?.container?.closeIconContainer}>
-            <IconButton onClick={handleClose} color="primary">
-              <CloseIcon />
-            </IconButton>
-          </Box>
           <Box
             sx={[
               staticStyles?.container?.leftImageBox,
@@ -149,25 +168,45 @@ const AuthFormModal = ({ open, setOpen }: AuthFormModalProps) => {
             ]}
           />
           <Box sx={dynamicStyles?.container?.rightFormBox}>
-            {isRegistering ? <RegisterForm /> : <LoginForm />}
-            <Box
-              sx={[
-                staticStyles?.container?.toggleBox,
-                dynamicStyles?.container?.toggleBox,
-              ]}
-            >
-              <Typography sx={staticStyles?.typography?.toggleText}>
-                {isRegistering
-                  ? "Already have an account?"
-                  : "Don't have an account?"}
-              </Typography>
-              <Typography
-                onClick={toggleForm}
-                color="primary"
-                sx={staticStyles?.typography?.toggleLink}
+            <Box sx={staticStyles?.container?.formHeaderContainer}>
+              <Box
+                sx={staticStyles?.container?.formHeaderContainer?.formHeader}
               >
-                {isRegistering ? "Login" : "Register"}
-              </Typography>
+                <Typography
+                  variant="h6"
+                  component="h2"
+                  sx={staticStyles?.typography?.h1}
+                >
+                  {isRegistering ? "Register" : "Login"}
+                </Typography>
+                <IconButton onClick={handleClose} color="primary">
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+            </Box>
+            <Divider sx={staticStyles?.divider} />
+
+            <Box sx={staticStyles?.container?.form}>
+              {isRegistering ? <RegisterForm /> : <LoginForm />}
+              <Box
+                sx={[
+                  staticStyles?.container?.toggleBox,
+                  dynamicStyles?.container?.toggleBox,
+                ]}
+              >
+                <Typography sx={staticStyles?.typography?.toggleText}>
+                  {isRegistering
+                    ? "Already have an account?"
+                    : "Don't have an account?"}
+                </Typography>
+                <Typography
+                  onClick={toggleForm}
+                  color="primary"
+                  sx={staticStyles?.typography?.toggleLink}
+                >
+                  {isRegistering ? "Login" : "Register"}
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </Box>

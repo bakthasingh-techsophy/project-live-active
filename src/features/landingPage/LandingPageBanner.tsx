@@ -1,8 +1,4 @@
-import {
-  exerciseVideo3,
-  onlineExercise,
-  yogaVideo
-} from "@assets/index";
+import { exerciseVideo3, onlineExercise, yogaVideo } from "@assets/index";
 import {
   Box,
   Button,

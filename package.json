@@ -26,6 +26,7 @@
     "react-spinners": "^0.15.0",
     "redux": "^5.0.1",
     "slick-carousel": "^1.8.1",
+    "wretch": "^2.11.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {
