@@ -75,7 +75,7 @@ const staticStyles = {
     }),
     subHeader: (theme: any) => ({
       fontWeight: 900,
-      color: theme?.palette?.primary?.main,
+      color: theme?.palette?.primary?.dark,
     }),
     content: (theme: any) => ({
       maxWidth: "800px",
@@ -85,7 +85,7 @@ const staticStyles = {
     }),
     cardTitle: (theme: any) => ({
       fontWeight: 700,
-      color: theme?.palette?.primary?.main,
+      color: theme?.palette?.primary?.dark,
       marginBottom: 1,
     }),
     cardDescription: (theme: any) => ({

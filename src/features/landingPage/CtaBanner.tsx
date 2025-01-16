@@ -55,9 +55,11 @@ const staticStyles = {
       fontWeight: "bold",
       borderRadius: "8px",
       textTransform: "none",
+      color: "primary.contrastText",
       "&:hover": {
         backgroundColor: theme?.palette?.primary?.dark,
       },
+      background: theme?.palette?.primary?.main,
     }),
   },
 };
@@ -143,7 +145,6 @@ const CTABanner = ({ backgroundImage }: CTABannerProps) => {
         {/* CTA Button */}
         <Button
           variant="contained"
-          color="primary"
           sx={[
             staticStyles?.button?.startButton(theme),
             dynamicStyles?.button?.startButton(isSmallScreen),

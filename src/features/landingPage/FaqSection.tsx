@@ -39,7 +39,7 @@ const staticStyles = {
   },
   typography: {
     heading: {
-      color: "primary.main",
+      color: "primary.dark",
       fontSize: "2rem",
       sm: {
         fontSize: "2.5rem",

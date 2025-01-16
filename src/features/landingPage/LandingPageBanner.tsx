@@ -2,9 +2,10 @@ import { exerciseVideo3, onlineExercise, yogaVideo } from "@assets/index";
 import {
   Box,
   Button,
+  CssThemeVariables,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from "@mui/material";
 
 const staticStyles = {
@@ -46,14 +47,14 @@ const staticStyles = {
       left: 0,
       right: 0,
       bottom: 0,
-      background: "rgba(0, 0, 0, 0.7)",
+      background: "rgba(0, 0, 0, 0.6)",
     },
   },
   typography: {
     heading: {
       fontWeight: 800,
       color: "#fff",
-      textShadow: "2px 2px 3px rgba(0, 0, 0, 0.5)",
+      textShadow: "2px 2px 3px rgba(0, 0, 0, 0.8)",
       marginBottom: 2,
       lineHeight: 1.2,
       textAlign: "center",
@@ -93,6 +94,11 @@ const staticStyles = {
       },
     }),
   },
+  videoStyle: {
+    objectFit: "cover",
+    height: "100%",
+    // filter: "grayscale(100%)",
+  } as CssThemeVariables,
 };
 
 const dynamicStyles = {
@@ -128,6 +134,10 @@ const dynamicStyles = {
     },
   },
   button: {},
+  videoStyle: (isSmallScreen: boolean, isMediumScreen: boolean) =>
+    ({
+      width: isSmallScreen ? "100%" : isMediumScreen ? "50%" : "34%",
+    } as CssThemeVariables),
 };
 
 const LandingPageBanner = () => {
@@ -135,6 +145,12 @@ const LandingPageBanner = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
 
+  // const videoStyle = {
+  //   objectFit: "cover",
+  //   height: "100%",
+  //   width: isSmallScreen ? "100%" : isMediumScreen ? "50%" : "34%",
+  //   filter: "grayscale(100%)",
+  // } as CssThemeVariables;
   return (
     <Box sx={staticStyles?.container?.mainContainer}>
       <Box sx={staticStyles?.container?.videoContainer}>
@@ -144,9 +160,8 @@ const LandingPageBanner = () => {
           loop
           muted
           style={{
-            objectFit: "cover",
-            height: "100%",
-            width: isSmallScreen ? "100%" : isMediumScreen ? "50%" : "34%",
+            ...staticStyles.videoStyle,
+            ...dynamicStyles.videoStyle(isSmallScreen,isMediumScreen),
           }}
         />
         <video
@@ -155,9 +170,8 @@ const LandingPageBanner = () => {
           loop
           muted
           style={{
-            objectFit: "cover",
-            height: "100%",
-            width: isSmallScreen ? "0%" : isMediumScreen ? "50%" : "33%",
+            ...staticStyles.videoStyle,
+            ...dynamicStyles.videoStyle(isSmallScreen,isMediumScreen),
           }}
         />
         <video
@@ -166,9 +180,8 @@ const LandingPageBanner = () => {
           loop
           muted
           style={{
-            objectFit: "cover",
-            height: "100%",
-            width: isSmallScreen ? "0%" : isMediumScreen ? "0%" : "33%",
+            ...staticStyles.videoStyle,
+            ...dynamicStyles.videoStyle(isSmallScreen,isMediumScreen),
           }}
         />
         <Box sx={staticStyles?.container?.overlay} />
@@ -190,7 +203,7 @@ const LandingPageBanner = () => {
             <span
               style={{
                 fontWeight: 900,
-                color: theme?.palette?.primary?.dark,
+                color: theme?.palette?.primary?.main,
               }}
             >
               Get Active Now
@@ -199,7 +212,7 @@ const LandingPageBanner = () => {
             <span
               style={{
                 fontWeight: 900,
-                color: theme?.palette?.primary?.dark,
+                color: theme?.palette?.primary?.main,
               }}
             >
               Live Fitness Events

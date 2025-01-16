@@ -6,7 +6,7 @@ const lightTheme = createTheme({
     primary: {
       main: "#00a86b",
       light: "#00a86a27",
-      dark: "#169757",
+      dark: "#008643",
       contrastText: "#ffffff",
     },
     secondary: {
@@ -19,7 +19,7 @@ const lightTheme = createTheme({
       paper: "#F5F5F5",
     },
     text: {
-      primary: "#000000",
+      primary: "#121212",
       secondary: "#555555",
     },
   },
