@@ -1,14 +1,14 @@
 import ResponsiveToolbar from "@features/ResponsiveToolbar";
-import BrowseEvents from "@pages/BrowseEvents";
-import LandingPage from "@pages/LandingPage";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 
 import Footer from "@features/Footer";
-import Profile from "@pages/Profile";
-import MyWellness from "@pages/MyWellness";
-import Nutrition from "@pages/Nutrition";
-import MyProgress from "@pages/MyProgress";
+import Navigator from "@components/Navigator";
+import { useDispatch, useSelector } from "react-redux";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { Box } from "@mui/material";
+import Notification from "@components/notification";
+import { RootState } from "@redux/store";
 
 const menuItems = [
   { label: "My Wellness", link: "/wellness" },
@@ -17,21 +17,38 @@ const menuItems = [
   // { label: "My Progress", link: "/progress" },
 ];
 
+function AppContent() {
+  const dispatch = useDispatch();
+  const { notification } = useSelector((state: RootState) => state.loading);
+
+  const closeNotification = () => {
+    dispatch(
+      pushNotification({
+        ...notification,
+        isOpen: false,
+      })
+    );
+  };
+
+  return (
+    <Box className="App">
+      <Notification
+        isOpen={notification.isOpen}
+        type={notification.type}
+        message={notification.message}
+        handleClose={closeNotification}
+      />
+      <ResponsiveToolbar menuItems={menuItems} />
+      <Navigator />
+      <Footer />
+    </Box>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <ResponsiveToolbar menuItems={menuItems} />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="*" element={<Navigate to="/" />} />
-        {/* Optionally, you can define a default route */}
-        <Route path="/events" element={<BrowseEvents />} />
-        <Route path="/wellness" element={<MyWellness />} />
-        <Route path="/coaches-nutrition" element={<Nutrition />} />
-        <Route path="/progress" element={<MyProgress />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
-      <Footer />
+      <AppContent />
     </BrowserRouter>
   );
 }
