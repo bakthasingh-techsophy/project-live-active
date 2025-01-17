@@ -1,5 +1,5 @@
 import ResponsiveToolbar from "@features/ResponsiveToolbar";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import "./App.css";
 
 import Footer from "@features/Footer";
@@ -10,11 +10,12 @@ import { pushNotification } from "@redux/slices/loadingSlice";
 import { Box } from "@mui/material";
 import Notification from "@components/notification";
 import { RootState } from "@redux/store";
+import { AppRoutes } from "@utils/AppRoutes";
 
 const menuItems = [
-  { label: "My Wellness", link: "/wellness" },
-  { label: "Browse Events", link: "/events" },
-  { label: "Coaches & Nutrition", link: "/coaches-nutrition" },
+  { label: "My Wellness", link: AppRoutes.WELLNESS },
+  { label: "Browse Events", link: AppRoutes.BROWSE_EVENTS },
+  { label: "Coaches & Nutrition", link: AppRoutes.COACHES_AND_NUTRITION },
   // { label: "My Progress", link: "/progress" },
 ];
 
@@ -22,6 +23,7 @@ function AppContent() {
   const dispatch = useDispatch();
   const { notification } = useSelector((state: RootState) => state.loading);
   const [currentLocation, setCurrentLocation] = useState<any>("");
+  const currentUrlLocation = useLocation();
 
   const closeNotification = () => {
     dispatch(
@@ -33,8 +35,8 @@ function AppContent() {
   };
 
   useEffect(() => {
-    setCurrentLocation(window?.location?.pathname);
-  }, [window?.location?.pathname]);
+    setCurrentLocation(currentUrlLocation.pathname);
+  }, [currentUrlLocation.pathname]);
 
   return (
     <Box className="App">
@@ -44,11 +46,11 @@ function AppContent() {
         message={notification.message}
         handleClose={closeNotification}
       />
-      {currentLocation !== "/event-management" && (
+      {currentLocation !== AppRoutes.PROFILE_DASHBOARD && (
         <ResponsiveToolbar menuItems={menuItems} />
       )}
       <Navigator />
-      {currentLocation !== "/event-management" && <Footer />}
+      {currentLocation !== AppRoutes.PROFILE_DASHBOARD && <Footer />}
     </Box>
   );
 }

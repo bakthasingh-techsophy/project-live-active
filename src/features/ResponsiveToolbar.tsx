@@ -17,6 +17,12 @@ import { isTokenExpired } from "@utils/tokenUtils";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthFormModal from "./login/LoginModal";
+import {
+  AppRouteQueries,
+  AppRouteQueryParams,
+  AppRouteQueryValues,
+  AppRoutes,
+} from "@utils/AppRoutes";
 
 interface ResponsiveToolbarProps {
   menuItems: { label: string; link: string }[];
@@ -200,22 +206,28 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
 
   const handleLogoutConfirm = () => {
     setIsLogoutModalOpen((prev) => !prev);
+    navigate(AppRoutes.HOME);
+    window.location.reload();
     localStorage.clear();
   };
 
   const openLoginModal = () => {
-    navigate("?auth=login");
+    navigate(AppRouteQueries.AUTH_LOGIN);
   };
 
   const handleAuthModalClose = () => {
     const searchParams = new URLSearchParams(currentUrlLocation.search);
-    searchParams.delete("auth");
+    searchParams.delete(AppRouteQueryParams.AUTH);
     navigate({ search: searchParams.toString() }, { replace: true });
   };
 
   useEffect(() => {
-    const param = new URLSearchParams(currentUrlLocation.search).get("auth");
-    const isLoginModalOpen = param === "login" || param === "register";
+    const param = new URLSearchParams(currentUrlLocation.search).get(
+      AppRouteQueryParams.AUTH
+    );
+    const isLoginModalOpen =
+      param === AppRouteQueryValues.LOGIN ||
+      param === AppRouteQueryValues.REGISTER;
     setIsLoginModalOpen(isLoginModalOpen);
   }, [currentUrlLocation?.search]);
 
@@ -239,7 +251,7 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
         <Toolbar sx={customStaticStyles?.container?.toolbar}>
           <Box
             sx={customStaticStyles?.container?.logoHolder}
-            onClick={() => handleNavigation("/", "Home")}
+            onClick={() => handleNavigation(AppRoutes.HOME, "Home")}
           >
             <Box component={"img"} src={laLogo} sx={{ width: 60 }} />
           </Box>
@@ -294,7 +306,9 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                   sx={customStaticStyles?.container?.profileImage}
                   src={userDp}
                   alt="Random Image"
-                  onClick={() => handleNavigation("/profile", "")}
+                  onClick={() =>
+                    handleNavigation(AppRoutes.PROFILE_DASHBOARD, "")
+                  }
                 />
               )}
             </Box>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AppRouteQueries, AppRouteQueryValues } from "@utils/AppRoutes";
 
 interface AuthFormModalProps {
   open: boolean;
@@ -146,15 +147,18 @@ const AuthFormModal = ({ open, handleClose }: AuthFormModalProps) => {
 
   const toggleForm = async () => {
     const param = new URLSearchParams(currentUrlLocation.search).get("auth");
-    const path = param === "register" ? "login" : "register";
+    const path =
+      param === AppRouteQueryValues.REGISTER
+        ? AppRouteQueryValues.LOGIN
+        : AppRouteQueryValues.REGISTER;
     navigate(`?auth=${path}`);
   };
 
   useEffect(() => {
     const param = new URLSearchParams(currentUrlLocation.search).get("auth");
-    setIsRegistering(param === "register");
-    if (param === "login") {
-      navigate("?auth=login");
+    setIsRegistering(param === AppRouteQueryValues.REGISTER);
+    if (param === AppRouteQueryValues.LOGIN) {
+      navigate(AppRouteQueries.AUTH_LOGIN);
     }
   }, [currentUrlLocation?.search]);
 

@@ -1,5 +1,10 @@
 import UserPreferencesModal from "@features/UserPreferencesModal";
 import { Box, Button, Container, Typography } from "@mui/material";
+import {
+  AppRouteQueries,
+  AppRouteQueryParams,
+  AppRouteQueryValues,
+} from "@utils/AppRoutes";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -74,20 +79,22 @@ const WellnessHeader: React.FC = () => {
   const currentUrlLocation = useLocation();
 
   const handlePreferencesClick = () => {
-    navigate("?user-settings=preferences");
+    navigate(AppRouteQueries.USER_SETTINGS_PREFERENCES);
   };
-  
+
   const handleModalClose = () => {
     const searchParams = new URLSearchParams(currentUrlLocation.search);
-    searchParams.delete("user-settings");
+    searchParams.delete(AppRouteQueryParams.USER_SETTINGS);
     navigate({ search: searchParams.toString() }, { replace: true });
   };
 
-   useEffect(() => {
-      const param = new URLSearchParams(currentUrlLocation.search).get("user-settings");
-      const isLoginModalOpen = param === "preferences";
-      setUserModalOpen(isLoginModalOpen);
-    }, [currentUrlLocation?.search]);
+  useEffect(() => {
+    const param = new URLSearchParams(currentUrlLocation.search).get(
+      AppRouteQueryParams.USER_SETTINGS
+    );
+    const isLoginModalOpen = param === AppRouteQueryValues.PREFERENCES;
+    setUserModalOpen(isLoginModalOpen);
+  }, [currentUrlLocation?.search]);
 
   return (
     <Container sx={[staticStyles?.container?.mainContainer]} maxWidth={false}>
@@ -119,7 +126,10 @@ const WellnessHeader: React.FC = () => {
       >
         Customize your Preferences
       </Button>
-      <UserPreferencesModal open={userModalOpen} handleModalClose={handleModalClose} />
+      <UserPreferencesModal
+        open={userModalOpen}
+        handleModalClose={handleModalClose}
+      />
     </Container>
   );
 };

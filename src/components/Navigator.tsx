@@ -1,32 +1,35 @@
 import BrowseEvents from "@pages/BrowseEvents";
+import EventManagementPage from "@pages/EventManagementPage";
 import LandingPage from "@pages/LandingPage";
 import MyProgress from "@pages/MyProgress";
 import MyWellness from "@pages/MyWellness";
 import Nutrition from "@pages/Nutrition";
-import Profile from "@pages/Profile";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import EventManagementPage from "@pages/EventManagementPage";
+import { AppRoutes } from "@utils/AppRoutes";
 const Navigator = () => {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="*" element={<Navigate to="/" />} />
-      {/* Optionally, you can define a default route */}
-      <Route path="/events" element={<BrowseEvents />} />
-      <Route path="/wellness" element={<MyWellness />} />
-      <Route path="/coaches-nutrition" element={<Nutrition />} />
-      <Route path="/progress" element={<MyProgress />} />
+      <Route path={AppRoutes.HOME} element={<LandingPage />} />
       <Route
+        path={AppRoutes.OTHERS}
+        element={<Navigate to={AppRoutes.HOME} />}
+      />
+      {/* Optionally, you can define a default route */}
+      <Route path={AppRoutes.BROWSE_EVENTS} element={<BrowseEvents />} />
+      <Route path={AppRoutes.WELLNESS} element={<MyWellness />} />
+      <Route path={AppRoutes.COACHES_AND_NUTRITION} element={<Nutrition />} />
+      <Route path={AppRoutes.PROGRESS} element={<MyProgress />} />
+      {/* <Route
         path="/profile"
         element={
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
         }
-      />
+      /> */}
       <Route
-        path="/event-management"
+        path={AppRoutes.PROFILE_DASHBOARD}
         element={
           <ProtectedRoute>
             <EventManagementPage />
