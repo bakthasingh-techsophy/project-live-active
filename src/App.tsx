@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 
 import Footer from "@features/Footer";
+import { useEffect, useState } from "react";
 import Navigator from "@components/Navigator";
 import { useDispatch, useSelector } from "react-redux";
 import { pushNotification } from "@redux/slices/loadingSlice";
