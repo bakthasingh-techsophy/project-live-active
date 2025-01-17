@@ -2,15 +2,15 @@ import ResponsiveToolbar from "@features/ResponsiveToolbar";
 import { BrowserRouter, useLocation } from "react-router-dom";
 import "./App.css";
 
-import Footer from "@features/Footer";
-import { useEffect, useState } from "react";
 import Navigator from "@components/Navigator";
-import { useDispatch, useSelector } from "react-redux";
-import { pushNotification } from "@redux/slices/loadingSlice";
-import { Box } from "@mui/material";
 import Notification from "@components/notification";
+import Footer from "@features/Footer";
+import { Box } from "@mui/material";
+import { pushNotification } from "@redux/slices/loadingSlice";
 import { RootState } from "@redux/store";
 import { AppRoutes } from "@utils/AppRoutes";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const menuItems = [
   { label: "My Wellness", link: AppRoutes.WELLNESS },
@@ -46,11 +46,11 @@ function AppContent() {
         message={notification.message}
         handleClose={closeNotification}
       />
-      {currentLocation !== AppRoutes.PROFILE_DASHBOARD && (
+      {!currentLocation.startsWith(AppRoutes.DASHBOARD) && (
         <ResponsiveToolbar menuItems={menuItems} />
       )}
       <Navigator />
-      {currentLocation !== AppRoutes.PROFILE_DASHBOARD && <Footer />}
+      {!currentLocation.startsWith(AppRoutes.DASHBOARD) && <Footer />}
     </Box>
   );
 }

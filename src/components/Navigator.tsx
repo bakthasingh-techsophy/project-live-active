@@ -6,15 +6,16 @@ import MyWellness from "@pages/MyWellness";
 import Nutrition from "@pages/Nutrition";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import { AppRoutes } from "@utils/AppRoutes";
+import { AppRouteQueries, AppRoutes } from "@utils/AppRoutes";
+import Dashboard from "@features/profileDdashboard/Dashboard";
 const Navigator = () => {
   return (
     <Routes>
       <Route path={AppRoutes.HOME} element={<LandingPage />} />
-      <Route
+      {/* <Route
         path={AppRoutes.OTHERS}
-        element={<Navigate to={AppRoutes.HOME} />}
-      />
+        element={<Navigate to={AppRoutes.PROFILE_DASHBOARD} />}
+      /> */}
       {/* Optionally, you can define a default route */}
       <Route path={AppRoutes.BROWSE_EVENTS} element={<BrowseEvents />} />
       <Route path={AppRoutes.WELLNESS} element={<MyWellness />} />
@@ -29,10 +30,10 @@ const Navigator = () => {
         }
       /> */}
       <Route
-        path={AppRoutes.PROFILE_DASHBOARD}
+        path={AppRoutes.DASHBOARD + "/*"}
         element={
           <ProtectedRoute>
-            <EventManagementPage />
+            <Dashboard />
           </ProtectedRoute>
         }
       />

@@ -307,7 +307,10 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                   src={userDp}
                   alt="Random Image"
                   onClick={() =>
-                    handleNavigation(AppRoutes.PROFILE_DASHBOARD, "")
+                    handleNavigation(
+                      AppRouteQueries.DASHBOARD_EXPLORE_EVENTS,
+                      ""
+                    )
                   }
                 />
               )}
