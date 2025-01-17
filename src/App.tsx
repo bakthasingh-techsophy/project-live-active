@@ -21,6 +21,7 @@ const menuItems = [
 function AppContent() {
   const dispatch = useDispatch();
   const { notification } = useSelector((state: RootState) => state.loading);
+  const [currentLocation, setCurrentLocation] = useState<any>("");
 
   const closeNotification = () => {
     dispatch(
@@ -31,6 +32,10 @@ function AppContent() {
     );
   };
 
+  useEffect(() => {
+    setCurrentLocation(window?.location?.pathname);
+  }, [window?.location?.pathname]);
+
   return (
     <Box className="App">
       <Notification
@@ -39,9 +44,11 @@ function AppContent() {
         message={notification.message}
         handleClose={closeNotification}
       />
-      <ResponsiveToolbar menuItems={menuItems} />
+      {currentLocation !== "/event-management" && (
+        <ResponsiveToolbar menuItems={menuItems} />
+      )}
       <Navigator />
-      <Footer />
+      {currentLocation !== "/event-management" && <Footer />}
     </Box>
   );
 }

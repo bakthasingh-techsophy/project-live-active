@@ -6,6 +6,7 @@ import Nutrition from "@pages/Nutrition";
 import Profile from "@pages/Profile";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
+import EventManagementPage from "@pages/EventManagementPage";
 const Navigator = () => {
   return (
     <Routes>
@@ -21,6 +22,14 @@ const Navigator = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/event-management"
+        element={
+          <ProtectedRoute>
+            <EventManagementPage />
           </ProtectedRoute>
         }
       />
