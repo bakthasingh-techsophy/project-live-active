@@ -2,13 +2,14 @@ import { backgroundPic1 } from "@assets/index";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Divider, IconButton, Modal, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface AuthFormModalProps {
   open: boolean;
-  setOpen: any;
+  handleClose: any;
 }
 
 const staticStyles = {
@@ -137,16 +138,25 @@ const dynamicStyles = {
   },
 };
 
-const AuthFormModal = ({ open, setOpen }: AuthFormModalProps) => {
+const AuthFormModal = ({ open, handleClose }: AuthFormModalProps) => {
   const theme = useTheme();
   const [isRegistering, setIsRegistering] = useState(false);
+  const navigate = useNavigate();
+  const currentUrlLocation = useLocation();
 
-  const handleClose = () => setOpen(false);
-
-  // Toggle between login and register form
-  const toggleForm = () => {
-    setIsRegistering((prev) => !prev);
+  const toggleForm = async () => {
+    const param = new URLSearchParams(currentUrlLocation.search).get("auth");
+    const path = param === "register" ? "login" : "register";
+    navigate(`?auth=${path}`);
   };
+
+  useEffect(() => {
+    const param = new URLSearchParams(currentUrlLocation.search).get("auth");
+    setIsRegistering(param === "register");
+    if (param === "login") {
+      navigate("?auth=login");
+    }
+  }, [currentUrlLocation?.search]);
 
   return (
     <div>
@@ -187,7 +197,11 @@ const AuthFormModal = ({ open, setOpen }: AuthFormModalProps) => {
             <Divider sx={staticStyles?.divider} />
 
             <Box sx={staticStyles?.container?.form}>
-              {isRegistering ? <RegisterForm /> : <LoginForm />}
+              {isRegistering ? (
+                <RegisterForm toggleForm={toggleForm} />
+              ) : (
+                <LoginForm setOpen={handleClose} />
+              )}
               <Box
                 sx={[
                   staticStyles?.container?.toggleBox,

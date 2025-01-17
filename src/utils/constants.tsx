@@ -130,5 +130,9 @@ export const CONSTANTS = {
   USER_NAME: "userName",
   API_RESPONSE_MESSAGES: {
     LOGIN_EXPIRED: "LOGIN EXPIRED",
+    LOGIN_SUCCESS: "Login Successful",
+    LOGIN_FAILURE: "Login Failed",
+    REGISTRATION_SUCCESS: "Registration Successful. Please Login",
+    REGISTRATION_FAILURE: "Registration Failed",
   },
 };

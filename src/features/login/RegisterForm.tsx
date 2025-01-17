@@ -6,8 +6,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { postRegisterForm } from "@services/userAuthService";
+import { CONSTANTS } from "@utils/constants";
+import { NotificationTypes } from "@utils/types";
 import { useFormik } from "formik";
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { ClipLoader } from "react-spinners";
 import * as Yup from "yup";
 
 // Validation schema for Register form
@@ -40,6 +46,7 @@ const staticStyles = {
       flexDirection: "column",
       gap: 2,
       borderRadius: 2,
+      padding: 1,
     },
     form: {
       display: "flex",
@@ -52,7 +59,58 @@ const staticStyles = {
   button: { submitButton: { marginY: 1 } },
 };
 
-const RegisterForm: React.FC = () => {
+interface RegisterFormProps {
+  toggleForm: any;
+}
+
+const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (payload: any) => {
+    try {
+      setIsLoading(true);
+
+      const postFormResponse = await postRegisterForm(payload);
+
+      if (postFormResponse?.success) {
+        setIsLoading(false);
+
+        await dispatch(
+          pushNotification({
+            isOpen: true,
+            message: CONSTANTS.API_RESPONSE_MESSAGES.REGISTRATION_SUCCESS,
+            type: NotificationTypes.SUCCESS,
+          })
+        );
+        await toggleForm();
+        formik?.resetForm();
+      } else {
+        setIsLoading(false);
+
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              postFormResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.REGISTRATION_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.REGISTRATION_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       mobileNumber: "",
@@ -64,8 +122,15 @@ const RegisterForm: React.FC = () => {
     },
     validationSchema: RegisterFormSchema,
     onSubmit: (values) => {
-      console.log(values);
-      // Handle submit logic here
+      const payload = {
+        firstName: values?.firstName,
+        lastName: values?.lastName,
+        mobileNumber: values?.mobileNumber,
+        emailId: values?.email,
+        password: values?.confirmPassword,
+      };
+
+      handleSubmit(payload);
     },
   });
 
@@ -178,9 +243,12 @@ const RegisterForm: React.FC = () => {
             color="primary"
             sx={staticStyles?.button?.submitButton}
             type="submit"
-            disabled={formik?.isSubmitting}
           >
-            Register
+            {isLoading ? (
+              <ClipLoader color={"#fff"} loading={isLoading} size={24} />
+            ) : (
+              "Register"
+            )}
           </Button>
         </Box>
       </form>

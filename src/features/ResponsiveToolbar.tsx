@@ -1,4 +1,5 @@
 import { laLogo, userDp } from "@assets/index";
+import ConfirmationPopup from "@components/ConfirmationPopup";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -12,8 +13,9 @@ import {
   Toolbar,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthFormModal from "./login/LoginModal";
 
 interface ResponsiveToolbarProps {
@@ -112,6 +114,7 @@ const staticStyles = (theme: any) => ({
     },
     menuBtn: {
       color: theme?.palette?.primary?.main,
+      ml: 2,
     },
     drawerItemButton: {
       textTransform: "uppercase",
@@ -154,7 +157,7 @@ const dynamicStyles = {
       },
     },
     menuBtn: {
-      display: { xs: "block", md: "none" },
+      display: { xs: "flex", md: "none" },
     },
     drawerLoginBtn: {
       display: {
@@ -170,8 +173,11 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
   const customStaticStyles = staticStyles(theme);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState<string | null>(null);
   const navigate = useNavigate();
+  const currentUrlLocation = useLocation();
+  const isTokenActive = !isTokenExpired();
 
   const toggleDrawer = (open: boolean) => {
     setIsDrawerOpen(open);
@@ -183,31 +189,58 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
   };
 
   const handleLoginClick = () => {
-    setIsLoginModalOpen((prev) => !prev);
+    openLoginModal();
     setIsDrawerOpen(false);
   };
+
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen((prev) => !prev);
+    setIsDrawerOpen(false);
+  };
+
+  const handleLogoutConfirm = () => {
+    setIsLogoutModalOpen((prev) => !prev);
+    localStorage.clear();
+  };
+
+  const openLoginModal = () => {
+    navigate("?auth=login");
+  };
+
+  const handleAuthModalClose = () => {
+    const searchParams = new URLSearchParams(currentUrlLocation.search);
+    searchParams.delete("auth");
+    navigate({ search: searchParams.toString() }, { replace: true });
+  };
+
+  useEffect(() => {
+    const param = new URLSearchParams(currentUrlLocation.search).get("auth");
+    const isLoginModalOpen = param === "login" || param === "register";
+    setIsLoginModalOpen(isLoginModalOpen);
+  }, [currentUrlLocation?.search]);
 
   return (
     <>
       {isLoginModalOpen && (
-        <AuthFormModal open={isLoginModalOpen} setOpen={setIsLoginModalOpen} />
+        <AuthFormModal
+          open={isLoginModalOpen}
+          handleClose={handleAuthModalClose}
+        />
+      )}
+      {isLogoutModalOpen && (
+        <ConfirmationPopup
+          open={isLogoutModalOpen}
+          onClose={handleLogoutClick}
+          onConfirm={handleLogoutConfirm}
+          title={"Are you sure you want to Logout?"}
+        />
       )}
       <AppBar position="sticky" color="default">
         <Toolbar sx={customStaticStyles?.container?.toolbar}>
-          {/* Logo on the left */}
           <Box
             sx={customStaticStyles?.container?.logoHolder}
             onClick={() => handleNavigation("/", "Home")}
           >
-            {/* <Typography
-              variant="h4"
-              sx={[
-                customStaticStyles?.typography?.logo,
-                dynamicStyles?.typography?.logo,
-              ]}
-            >
-              Live Active
-            </Typography> */}
             <Box component={"img"} src={laLogo} sx={{ width: 60 }} />
           </Box>
 
@@ -251,17 +284,19 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                   customStaticStyles?.button?.loginBtn,
                   dynamicStyles?.button?.loginBtn,
                 ]}
-                onClick={handleLoginClick}
+                onClick={isTokenActive ? handleLogoutClick : handleLoginClick}
               >
-                Login
+                {isTokenActive ? "Logout" : "Login"}
               </Button>
-              <Box
-                component="img"
-                sx={customStaticStyles?.container?.profileImage}
-                src={userDp}
-                alt="Random Image"
-                onClick={() => handleNavigation("/profile", "")}
-              />
+              {isTokenActive && (
+                <Box
+                  component="img"
+                  sx={customStaticStyles?.container?.profileImage}
+                  src={userDp}
+                  alt="Random Image"
+                  onClick={() => handleNavigation("/profile", "")}
+                />
+              )}
             </Box>
 
             <IconButton
@@ -284,12 +319,6 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
         >
           <Box sx={customStaticStyles?.container?.drawer}>
             <Box sx={customStaticStyles?.container?.drawerHeader}>
-              {/* <Typography
-                variant="h6"
-                sx={customStaticStyles?.typography?.drawerHeader}
-              >
-                Live Active
-              </Typography> */}
               <Box component={"img"} src={laLogo} sx={{ width: 60 }} />
               <IconButton onClick={() => toggleDrawer(false)} color="primary">
                 <CloseIcon />
@@ -340,9 +369,9 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
                   customStaticStyles?.button?.drawerLoginBtn,
                   dynamicStyles?.button?.drawerLoginBtn,
                 ]}
-                onClick={handleLoginClick}
+                onClick={isTokenActive ? handleLogoutClick : handleLoginClick}
               >
-                Login
+                {isTokenActive ? "Logout" : "Login"}
               </Button>
             </Box>
           </Box>

@@ -1,6 +1,7 @@
 import UserPreferencesModal from "@features/UserPreferencesModal";
 import { Box, Button, Container, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const staticStyles = {
   container: {
@@ -69,6 +70,24 @@ const dynamicStyles = {
 
 const WellnessHeader: React.FC = () => {
   const [userModalOpen, setUserModalOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const currentUrlLocation = useLocation();
+
+  const handlePreferencesClick = () => {
+    navigate("?user-settings=preferences");
+  };
+  
+  const handleModalClose = () => {
+    const searchParams = new URLSearchParams(currentUrlLocation.search);
+    searchParams.delete("user-settings");
+    navigate({ search: searchParams.toString() }, { replace: true });
+  };
+
+   useEffect(() => {
+      const param = new URLSearchParams(currentUrlLocation.search).get("user-settings");
+      const isLoginModalOpen = param === "preferences";
+      setUserModalOpen(isLoginModalOpen);
+    }, [currentUrlLocation?.search]);
 
   return (
     <Container sx={[staticStyles?.container?.mainContainer]} maxWidth={false}>
@@ -96,13 +115,11 @@ const WellnessHeader: React.FC = () => {
         type="submit"
         variant="contained"
         sx={staticStyles?.buttons?.modalButton}
-        onClick={() => {
-          setUserModalOpen(true);
-        }}
+        onClick={handlePreferencesClick}
       >
         Customize your Preferences
       </Button>
-      <UserPreferencesModal open={userModalOpen} setOpen={setUserModalOpen} />
+      <UserPreferencesModal open={userModalOpen} handleModalClose={handleModalClose} />
     </Container>
   );
 };
