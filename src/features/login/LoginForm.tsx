@@ -1,6 +1,13 @@
-import { Box, Button, Divider, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { postLoginForm } from "@services/userAuthService";
+import { CONSTANTS } from "@utils/constants";
+import { setLocalStorageItem } from "@utils/encrypt";
+import { NotificationTypes } from "@utils/types";
 import { useFormik } from "formik";
-import React from "react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { ClipLoader } from "react-spinners";
 import * as Yup from "yup";
 
 const staticStyles = {
@@ -10,6 +17,7 @@ const staticStyles = {
       flexDirection: "column",
       gap: 2,
       borderRadius: 2,
+      padding: 1,
     },
     form: {
       display: "flex",
@@ -26,7 +34,7 @@ const staticStyles = {
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LoginFormSchema = Yup.object({
-  loginAsset: Yup.string()
+  email: Yup.string()
     .test("is-valid", "Invalid Email", (value: any) => {
       return emailRegex?.test(value);
     })
@@ -34,16 +42,77 @@ const LoginFormSchema = Yup.object({
   password: Yup.string().required("Password is required"),
 });
 
-const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  setOpen: any;
+}
+
+const LoginForm = ({ setOpen }: LoginFormProps) => {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (payload: any, values: any) => {
+    try {
+      setIsLoading(true);
+
+      const postFormResponse = await postLoginForm(payload);
+
+      if (postFormResponse?.success) {
+        setIsLoading(false);
+        await setLocalStorageItem(
+          CONSTANTS?.ACCESS_TOKEN,
+          postFormResponse?.data?.substring(7)
+        );
+        await setLocalStorageItem(CONSTANTS?.USER_EMAIL, values?.email);
+        await dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              postFormResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.LOGIN_SUCCESS,
+            type: NotificationTypes.SUCCESS,
+          })
+        );
+        setOpen(false);
+        formik?.resetForm();
+      } else {
+        setIsLoading(false);
+
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              postFormResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.LOGIN_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.LOGIN_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+  
   const formik = useFormik({
     initialValues: {
-      loginAsset: "",
+      email: "",
       password: "",
     },
     validationSchema: LoginFormSchema,
     onSubmit: (values) => {
-      console.log(values);
-      // Handle login logic here
+      const payload = {
+        username: values?.email,
+        password: values?.password,
+      };
+
+      handleSubmit(payload, values);
     },
   });
 
@@ -53,18 +122,14 @@ const LoginForm: React.FC = () => {
         <Box sx={staticStyles?.container?.form}>
           <TextField
             label="Email"
-            name="loginAsset"
+            name="email"
             variant="outlined"
             fullWidth
-            value={formik?.values?.loginAsset}
+            value={formik?.values?.email}
             onChange={formik?.handleChange}
             onBlur={formik?.handleBlur}
-            error={
-              formik?.touched?.loginAsset && Boolean(formik?.errors?.loginAsset)
-            }
-            helperText={
-              formik?.touched?.loginAsset && formik?.errors?.loginAsset
-            }
+            error={formik?.touched?.email && Boolean(formik?.errors?.email)}
+            helperText={formik?.touched?.email && formik?.errors?.email}
           />
 
           <TextField
@@ -88,9 +153,12 @@ const LoginForm: React.FC = () => {
             fullWidth
             sx={staticStyles?.button?.submitButton}
             type="submit"
-            disabled={formik?.isSubmitting}
           >
-            Login
+            {isLoading ? (
+              <ClipLoader color={"#fff"} loading={isLoading} size={24} />
+            ) : (
+              "Login"
+            )}
           </Button>
         </Box>
       </form>

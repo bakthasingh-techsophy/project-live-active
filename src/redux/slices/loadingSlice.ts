@@ -1,10 +1,11 @@
 // src/redux/slices/loadingSlice.ts
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { NotificationType } from "@utils/types";
 
 interface NotificationProps {
   isOpen: boolean;
-  type?: "error" | "info" | "success" | "warning";
+  type?: NotificationType;
   message?: string;
   handleClose?: () => void;
 }

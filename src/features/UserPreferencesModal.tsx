@@ -19,7 +19,7 @@ import { useState, useEffect } from "react";
 
 interface UserPreferencesModalProps {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  handleModalClose: any;
 }
 
 const preferencesData = [
@@ -150,7 +150,10 @@ const styles = {
   },
 };
 
-const UserPreferencesModal = ({ open, setOpen }: UserPreferencesModalProps) => {
+const UserPreferencesModal = ({
+  open,
+  handleModalClose,
+}: UserPreferencesModalProps) => {
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
@@ -168,7 +171,7 @@ const UserPreferencesModal = ({ open, setOpen }: UserPreferencesModalProps) => {
     } else {
       setError(null);
       console.log("Selected Preferences:", selectedPreferences);
-      setOpen(false);
+      handleModalClose();
     }
   };
 

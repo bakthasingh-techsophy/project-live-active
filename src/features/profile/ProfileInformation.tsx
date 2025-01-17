@@ -85,8 +85,6 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
     phoneNumberRegex[countryCode as keyof typeof phoneNumberRegex]
   );
 
-  const [userModalOpen, setUserModalOpen] = useState<boolean>(false);
-
   return (
     <Box sx={staticStyles?.container?.mainContainer}>
       {/* Header Section */}
@@ -190,20 +188,6 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
             </Form>
           )}
         </Formik>
-
-        {/* Modal Button */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={staticStyles?.container?.modalButton}
-          onClick={() => {
-            setUserModalOpen(true);
-          }}
-        >
-          Test User Modal
-        </Button>
-        <UserPreferencesModal open={userModalOpen} setOpen={setUserModalOpen} />
       </Box>
     </Box>
   );
