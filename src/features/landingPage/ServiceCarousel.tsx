@@ -20,6 +20,42 @@ const styles = {
   }),
 };
 
+export const staticStyles = {
+  container: {},
+  typography: {
+    header: (theme: any) => ({
+      fontWeight: 700,
+      color: theme?.palette?.primary?.main,
+    }),
+  },
+  buttons: {
+    button: (theme: any) => ({
+      padding: "12px 24px",
+      fontWeight: "bold",
+      borderRadius: "8px",
+      textTransform: "none",
+      whiteSpace: "nowrap",
+      background: theme?.palette?.secondary?.main,
+      "&:hover": {
+        background: theme?.palette?.secondary?.dark,
+      },
+    }),
+  },
+};
+export const dynamicStyles = {
+  container: {},
+  typography: {},
+  buttons: {
+    button: {
+      fontSize: {
+        xs: "0.9rem",
+        sm: "1rem",
+      },
+    },
+  },
+};
+
+
 const ServiceCarousel = () => {
   const theme = useTheme();
 

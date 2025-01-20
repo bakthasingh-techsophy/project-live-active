@@ -1,44 +1,11 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button, useTheme } from "@mui/material";
 import Banner from "../../components/Banner";
+import { staticStyles, dynamicStyles } from "./ServiceCarousel";
 
 interface ServiceBanner3Props {
   backgroundImage: string;
 }
-const staticStyles = {
-  container: {},
-  typography: {
-    header: (theme: any) => ({
-      fontWeight: 900,
-      color: theme?.palette?.primary?.main,
-    }),
-  },
-  button: {
-    joinButton: (theme: any) => ({
-      padding: "12px 24px",
-      fontWeight: "bold",
-      borderRadius: "8px",
-      textTransform: "none",
-      whiteSpace: "nowrap",
-      background: theme?.palette?.secondary?.main,
-      "&:hover": {
-        background: theme?.palette?.secondary?.dark,
-      },
-    }),
-  },
-};
-const dynamicStyles = {
-  container: {},
-  typography: {},
-  button: {
-    joinButton: {
-      fontSize: {
-        xs: "0.9rem",
-        sm: "1rem",
-      },
-    },
-  },
-};
 const ServiceBanner3 = ({ backgroundImage }: ServiceBanner3Props) => {
   const theme = useTheme();
 
@@ -61,8 +28,8 @@ const ServiceBanner3 = ({ backgroundImage }: ServiceBanner3Props) => {
             variant="contained"
             color="primary"
             sx={[
-              staticStyles?.button?.joinButton(theme),
-              dynamicStyles?.button?.joinButton,
+              staticStyles?.buttons?.button(theme),
+              dynamicStyles?.buttons?.button,
             ]}
             endIcon={<ChevronRightIcon />}
             // onClick={handleExploreClick}

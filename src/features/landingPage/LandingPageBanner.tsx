@@ -52,7 +52,7 @@ const staticStyles = {
   },
   typography: {
     heading: {
-      fontWeight: 800,
+      fontWeight: 700,
       color: "#fff",
       textShadow: "2px 2px 3px rgba(0, 0, 0, 0.8)",
       marginBottom: 2,
@@ -202,7 +202,7 @@ const LandingPageBanner = () => {
           <>
             <span
               style={{
-                fontWeight: 900,
+                fontWeight: 700,
                 color: theme?.palette?.primary?.main,
               }}
             >
@@ -211,7 +211,7 @@ const LandingPageBanner = () => {
             and join exciting <br />
             <span
               style={{
-                fontWeight: 900,
+                fontWeight: 700,
                 color: theme?.palette?.primary?.main,
               }}
             >

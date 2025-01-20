@@ -47,7 +47,7 @@ const staticStyles = (theme: any, backgroundImage: any) => ({
   },
   typography: {
     heading: {
-      fontWeight: 800,
+      fontWeight: 700,
       color: "#fff",
       textShadow: "2px 2px 4px rgba(0, 0, 0, 0.6)",
       marginBottom: 2,
