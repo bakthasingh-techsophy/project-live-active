@@ -1,44 +1,11 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button, useTheme } from "@mui/material";
 import Banner from "../../components/Banner";
+import { staticStyles, dynamicStyles } from "./ServiceCarousel";
 
 interface ServiceBanner2Props {
   backgroundImage: string;
 }
-const staticStyles = {
-  container: {},
-  typography: {
-    header: (theme: any) => ({
-      fontWeight: 900,
-      color: theme?.palette?.primary?.main,
-    }),
-  },
-  button: {
-    personalizeButton: (theme: any) => ({
-      padding: "12px 24px",
-      fontWeight: "bold",
-      borderRadius: "8px",
-      textTransform: "none",
-      whiteSpace: "nowrap",
-      background: theme?.palette?.secondary?.main,
-      "&:hover": {
-        background: theme?.palette?.secondary?.dark,
-      },
-    }),
-  },
-};
-const dynamicStyles = {
-  container: {},
-  typography: {},
-  button: {
-    personalizeButton: {
-      fontSize: {
-        xs: "0.9rem",
-        sm: "1rem",
-      },
-    },
-  },
-};
 
 const ServiceBanner2 = ({ backgroundImage }: ServiceBanner2Props) => {
   const theme = useTheme();
@@ -62,8 +29,8 @@ const ServiceBanner2 = ({ backgroundImage }: ServiceBanner2Props) => {
             variant="contained"
             color="primary"
             sx={[
-              staticStyles?.button?.personalizeButton(theme),
-              dynamicStyles?.button?.personalizeButton,
+              staticStyles?.buttons?.button(theme),
+              dynamicStyles?.buttons?.button,
             ]}
             endIcon={<ChevronRightIcon />}
           >
