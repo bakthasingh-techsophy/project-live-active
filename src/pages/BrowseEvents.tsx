@@ -1,6 +1,6 @@
-import BrowseEventsComponent from "@features/browseEvents/BrowseEventsComponent";
 import Options from "@features/browseEvents/Options";
 import TagsDisplay from "@features/browseEvents/TagsRow";
+import ExploreEvents from "@features/common/ExploreEvents";
 import { Box } from "@mui/material";
 
 const BrowseEvents = () => {
@@ -13,7 +13,8 @@ const BrowseEvents = () => {
     >
       <Options />
       <TagsDisplay />
-      <BrowseEventsComponent />
+      {/* <BrowseEventsComponent /> */}
+      <ExploreEvents viewMode="browse" />
     </Box>
   );
 };
