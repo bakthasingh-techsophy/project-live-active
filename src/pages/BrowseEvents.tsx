@@ -21,7 +21,7 @@ const BrowseEvents = () => {
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
       />
-      <BrowseEventsComponent selectedTags={selectedTags} searchText={searchText}/>
+      <ExploreEvents viewMode="browse" selectedTags={selectedTags} searchText={searchText}/>
     </Box>
   );
 };

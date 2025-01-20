@@ -7,6 +7,9 @@ export const AppRoutes = {
   PROGRESS: "/progress",
   OTHERS: "*",
 };
+export const AppRoutesCombination = {
+  DASHBOARD_EXPLORE_EVENTS: AppRoutes.DASHBOARD + "/explore-events",
+};
 export const AppRouteQueries = {
   AUTH_LOGIN: "?auth=login",
   AUTH_REGISTER: "?auth=register",
@@ -26,5 +29,6 @@ export const AppRouteQueryValues = {
   PREFERENCES: "preferences",
   EXPLORE_EVENTS: "explore-events",
   PROFILE: "profile",
+  DETAILS: "details",
   SETTINGS: "settings",
 };

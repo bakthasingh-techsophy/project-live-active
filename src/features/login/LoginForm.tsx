@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { postLoginForm } from "@services/userAuthService";
-import { AppRoutes } from "@utils/AppRoutes";
+import { AppRouteQueries, AppRoutes, AppRoutesCombination } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { setLocalStorageItem } from "@utils/encrypt";
 import { NotificationTypes } from "@utils/types";
@@ -75,9 +75,13 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
         setIsLoading(false);
         await setLocalStorageItem(
           CONSTANTS?.ACCESS_TOKEN,
-          postFormResponse?.data?.substring(7)
+          postFormResponse?.data?.token?.substring(7)
         );
         await setLocalStorageItem(CONSTANTS?.USER_EMAIL, values?.email);
+        await setLocalStorageItem(
+          CONSTANTS?.USER_ID,
+          postFormResponse?.data?.userId
+        );
         await dispatch(
           pushNotification({
             isOpen: true,
@@ -89,7 +93,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
         );
         setOpen(false);
         formik?.resetForm();
-        navigate(`${AppRoutes?.DASHBOARD}`);
+        navigate(`${AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS}`);
       } else {
         setIsLoading(false);
 

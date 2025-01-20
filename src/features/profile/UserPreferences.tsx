@@ -1,4 +1,3 @@
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   Box,
   Button,
@@ -7,7 +6,15 @@ import {
   FormGroup,
   Typography,
 } from "@mui/material";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { getUserDetails, updateUser } from "@services/userManagementService";
+import { CONSTANTS } from "@utils/constants";
+import { getLocalStorageItem } from "@utils/encrypt";
+import { NotificationTypes } from "@utils/types";
 import { Form, Formik } from "formik";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { ClipLoader } from "react-spinners";
 import * as Yup from "yup";
 
 interface UserPreferencesProps {
@@ -64,6 +71,16 @@ const dynamicStyles = {
 };
 
 const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>();
+  const [initialPreferences, setInitialPreferences] = useState<any>({
+    yoga: false,
+    meditation: false,
+    nutrition: false,
+    equipment: false,
+  });
+
   const validationSchema = Yup.object().shape({
     preferences: Yup.object().test(
       "at-least-three-selected",
@@ -77,11 +94,103 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
     ),
   });
 
+  useEffect(() => {
+    const temp = {
+      ...initialPreferences,
+    };
+    if (userDetails?.preferences?.length) {
+      userDetails?.preferences?.forEach((preference: string) => {
+        if (temp?.hasOwnProperty(preference)) {
+          temp[preference] = true;
+        }
+      });
+    }
+    setInitialPreferences(temp);
+  }, [userDetails]);
+
+  const handleSubmit = async (payload: any) => {
+    try {
+      setIsLoading(true);
+
+      const updateUserResponse = await updateUser(payload);
+
+      if (updateUserResponse?.success) {
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              updateUserResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_SUCCESS,
+            type: NotificationTypes.SUCCESS,
+          })
+        );
+      } else {
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              updateUserResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
+  const fetchUserDetails = async () => {
+    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    try {
+      setIsLoading(true);
+
+      const getUserResponse = await getUserDetails(userId || "");
+      if (getUserResponse?.success) {
+        setIsLoading(false);
+        setUserDetails(getUserResponse?.data);
+      } else {
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              getUserResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
   return (
     <Box sx={staticStyles?.container?.mainContainer}>
       <Box sx={staticStyles?.container?.headerContainer}>
-        <Typography variant="h6">Settings</Typography>
-        <ChevronRightIcon />
         <Typography variant="h6" color={"primary.main"}>
           {subHeading}
         </Typography>
@@ -89,18 +198,20 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
       <Box id="formBox">
         <Formik
           initialValues={{
-            preferences: {
-              gymAndWellness: false,
-              yoga: false,
-              meditation: false,
-              nutrition: false,
-              equipment: false,
-            },
+            preferences: initialPreferences,
           }}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
-            console.log("Form Values:", values);
+          onSubmit={(values: any) => {
+            const payload = {
+              preferences: Object.keys(values.preferences)
+                .filter((key) => values.preferences[key])
+                .map((key) => key),
+              userName: getLocalStorageItem(CONSTANTS?.USER_EMAIL),
+              userId: getLocalStorageItem(CONSTANTS?.USER_ID),
+            };
+            handleSubmit(payload);
           }}
+          enableReinitialize={true}
         >
           {({ values, handleChange, errors, touched }) => (
             <Form>
@@ -112,16 +223,6 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
                   ]}
                 >
                   <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={values?.preferences?.gymAndWellness}
-                          onChange={handleChange}
-                          name="preferences.gymAndWellness"
-                        />
-                      }
-                      label="Gym and Wellness"
-                    />
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -175,7 +276,11 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
 
               <Box sx={staticStyles?.container?.submitButtonContainer}>
                 <Button type="submit" variant="contained" color="primary">
-                  Update
+                  {isLoading ? (
+                    <ClipLoader color={"#fff"} loading={isLoading} size={24} />
+                  ) : (
+                    "Update"
+                  )}
                 </Button>
               </Box>
             </Form>

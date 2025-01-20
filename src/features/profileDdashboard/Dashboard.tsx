@@ -2,6 +2,8 @@ import lightTheme from "@customThemes/lightTheme";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
 import {
   AppProvider,
   NavigateOptions,
@@ -11,10 +13,19 @@ import {
 } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { AppRouteQueryValues, AppRoutes } from "@utils/AppRoutes";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LiveActiveBrand } from "./Branding";
 import ExploreEvents from "../common/ExploreEvents";
+import ProfileInformation from "@features/profile/ProfileInformation";
+import UserPreferences from "@features/profile/UserPreferences";
+import { getUserDetails } from "@services/userManagementService";
+import { getLocalStorageItem } from "@utils/encrypt";
+import { CONSTANTS } from "@utils/constants";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { NotificationTypes } from "@utils/types";
+import { useDispatch } from "react-redux";
+import { ClipLoader } from "react-spinners";
 
 // Define the navigation items
 const NAVIGATION: Navigation = [
@@ -33,6 +44,18 @@ const NAVIGATION: Navigation = [
     segment: AppRouteQueryValues.PROFILE,
     title: "Profile",
     icon: <PersonIcon />,
+    children: [
+      {
+        segment: "details",
+        title: "Details",
+        icon: <ManageAccountsIcon />,
+      },
+      {
+        segment: "preferences",
+        title: "Preferences",
+        icon: <SettingsAccessibilityIcon />,
+      },
+    ],
   },
   {
     kind: "page",
@@ -60,34 +83,74 @@ const useCustomRouter = (initialPath: string): Router => {
   };
 };
 
+const getCurrentLocation = (): string => {
+  const location = useLocation();
+  let currentPath = location.pathname;
+
+  if (currentPath.includes("/dashboard/explore-events")) {
+    currentPath = currentPath.replace("/dashboard", "") || "/explore-events";
+  } else if (currentPath.includes("/dashboard/profile")) {
+    currentPath = currentPath.replace("/dashboard", "") || "/profile";
+  } else if (currentPath.includes("/dashboard/settings")) {
+    currentPath = currentPath.replace("/dashboard", "") || "/settings";
+  }
+
+  return currentPath;
+};
+
 const Dashboard = () => {
-  const demoSession = {
+  const sampleSession = {
     user: {
       name: "Bharat Kashyap",
       email: "bharatkashyap@outlook.com",
-      image: "https://avatars.githubusercontent.com/u/19550456",
+      image: "",
     },
   };
-  const [session, setSession] = React.useState<Session | null>(demoSession);
+  const dispatch = useDispatch();
+  const userId = getLocalStorageItem(CONSTANTS?.USER_ID) || "";
+  const [session, setSession] = React.useState<Session | null>(sampleSession);
+  const [userDetails, setUserDetails] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession(demoSession);
+        setSession(sampleSession);
       },
       signOut: () => {
+        localStorage.clear();
+        navigate(AppRoutes?.HOME);
         setSession(null);
       },
     };
   }, []);
-  // Use the custom router
-  const dashboardRouter = useCustomRouter("/explore-events");
+
+  const dashboardRouter = useCustomRouter(getCurrentLocation());
   const navigate = useNavigate();
   const getCurrentPage = () => {
     switch (dashboardRouter.pathname) {
       case "/" + AppRouteQueryValues.EXPLORE_EVENTS:
-        return <ExploreEvents viewMode="browse" />;
-      case "/" + AppRouteQueryValues.PROFILE:
-        return <>PRofile</>;
+        return (
+          <ExploreEvents viewMode="explore" selectedTags={[]} searchText={""} />
+        );
+      case "/" +
+        AppRouteQueryValues.PROFILE +
+        "/" +
+        AppRouteQueryValues.DETAILS:
+        return (
+          <ProfileInformation
+            subHeading={"Profile Details"}
+          />
+        );
+      case "/" +
+        AppRouteQueryValues.PROFILE +
+        "/" +
+        AppRouteQueryValues.PREFERENCES:
+        return (
+          <UserPreferences
+            subHeading={"User Preferences"}
+          />
+        );
       case "/" + AppRouteQueryValues.SETTINGS:
         return <>Settings</>;
       case "/":
@@ -95,6 +158,58 @@ const Dashboard = () => {
         return <></>;
     }
   };
+
+  const fetchUserDetails = async () => {
+    try {
+      setIsLoading(true);
+
+      const getUserResponse = await getUserDetails(userId);
+
+      if (getUserResponse?.success) {
+        setIsLoading(false);
+        setUserDetails(getUserResponse?.data);
+      } else {
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              getUserResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  useEffect(() => {
+    if (userDetails) {
+      const updatedSession = {
+        user: {
+          name: `${userDetails?.firstName} ${userDetails?.lastName}`,
+          email: userDetails?.emailId,
+          image: userDetails?.photoUrl || "",
+        },
+      };
+
+      setSession(updatedSession);
+    }
+  }, [userDetails]);
 
   return (
     <AppProvider
@@ -105,7 +220,13 @@ const Dashboard = () => {
       authentication={authentication}
       session={session}
     >
-      <DashboardLayout>{getCurrentPage()}</DashboardLayout>
+      <DashboardLayout sx={{ padding: 4 }}>
+        {isLoading ? (
+          <ClipLoader color={"primary.main"} loading={isLoading} size={24} />
+        ) : (
+          getCurrentPage()
+        )}
+      </DashboardLayout>
     </AppProvider>
   );
 };
