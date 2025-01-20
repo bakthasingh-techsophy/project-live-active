@@ -134,5 +134,6 @@ export const CONSTANTS = {
     LOGIN_FAILURE: "Login Failed",
     REGISTRATION_SUCCESS: "Registration Successful. Please Login",
     REGISTRATION_FAILURE: "Registration Failed",
+    EVENTS_FETCH_FAILURE: "Failed to Fetch Events",
   },
 };

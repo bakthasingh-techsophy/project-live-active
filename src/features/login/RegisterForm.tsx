@@ -1,17 +1,18 @@
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Box,
   Button,
-  Divider,
   Grid,
+  IconButton,
+  InputAdornment,
   TextField,
-  Typography,
 } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { postRegisterForm } from "@services/userAuthService";
 import { CONSTANTS } from "@utils/constants";
 import { NotificationTypes } from "@utils/types";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import * as Yup from "yup";
@@ -66,6 +67,11 @@ interface RegisterFormProps {
 const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowConfirmPassword((prev) => !prev);
+  };
 
   const handleSubmit = async (payload: any) => {
     try {
@@ -225,7 +231,7 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
             name="confirmPassword"
             variant="outlined"
             fullWidth
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             value={formik?.values?.confirmPassword}
             onChange={formik?.handleChange}
             onBlur={formik?.handleBlur}
@@ -237,6 +243,21 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
               formik?.touched?.confirmPassword &&
               formik?.errors?.confirmPassword
             }
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleTogglePasswordVisibility}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
           <Button
             variant="contained"

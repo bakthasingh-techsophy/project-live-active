@@ -10,14 +10,26 @@ import {
   Rating,
   Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 
-const events = [
+interface Event {
+  id: number;
+  title: string;
+  host: string;
+  rating: number;
+  scheduledTime: string;
+  description: string;
+  category: string[];
+  image: string;
+}
+
+const events: Event[] = [
   {
     id: 1,
     title: "Morning Yoga",
     host: "Sarah Lee",
     rating: 4.5,
-    scheduledTime: "2025-01-20T07:30:00",
+    scheduledTime: "2025-01-20T16:00:00",
     description: "Start your day with a calming and energizing yoga session.",
     category: ["Yoga", "Morning", "Beginner", "Relaxation", "Breathwork"],
     image: preferencePic3,
@@ -51,6 +63,26 @@ const events = [
       "Nutrition",
       "Wellness",
     ],
+    image: preferencePic4,
+  },
+  {
+    id: 4,
+    title: "Test 1",
+    host: "Emma Green",
+    rating: 4.2,
+    scheduledTime: "2025-01-21T16:00:00",
+    description: "Join us for a cooking class with healthy meal ideas.",
+    category: ["Healthy"],
+    image: preferencePic4,
+  },
+  {
+    id: 5,
+    title: "Test 2",
+    host: "Emma Green",
+    rating: 4.2,
+    scheduledTime: "2025-01-21T16:00:00",
+    description: "Join us for a cooking class with healthy meal ideas.",
+    category: ["Cooking"],
     image: preferencePic4,
   },
 ];
@@ -177,6 +209,22 @@ const dynamicStyles = {
 };
 
 const PreferencePrograms = () => {
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+
+  const getUpcomingEvents = () => {
+    const currentDate = new Date();
+
+    const sortedUpcomingEvents = [...events]
+      .filter((event) => new Date(event.scheduledTime) > currentDate)
+      .sort(
+        (a, b) =>
+          new Date(a.scheduledTime).getTime() -
+          new Date(b.scheduledTime).getTime()
+      );
+
+    setUpcomingEvents(sortedUpcomingEvents.slice(0, 3));
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date?.toLocaleString("en-US", {
@@ -189,6 +237,10 @@ const PreferencePrograms = () => {
     });
   };
 
+  useEffect(() => {
+    getUpcomingEvents();
+  }, []);
+
   return (
     <Container sx={[staticStyles?.container?.mainContainer]} maxWidth={false}>
       <Typography
@@ -198,12 +250,12 @@ const PreferencePrograms = () => {
           fontWeight: 600,
         }}
       >
-        Our Recommendations
+        Upcoming Events
       </Typography>
       <Grid container spacing={2} sx={dynamicStyles?.container?.grid}>
         {/* Map through events and render each card */}
 
-        {[...events]?.map((event) => (
+        {[...upcomingEvents]?.map((event) => (
           <Grid item xs={12} sm={12} md={6} lg={4} key={event?.id}>
             <Card
               sx={[

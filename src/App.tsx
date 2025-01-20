@@ -13,10 +13,19 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const menuItems = [
-  { label: "My Wellness", link: AppRoutes.WELLNESS },
-  { label: "Browse Events", link: AppRoutes.BROWSE_EVENTS },
-  { label: "Coaches & Nutrition", link: AppRoutes.COACHES_AND_NUTRITION },
-  // { label: "My Progress", link: "/progress" },
+  { label: "My Dashboard", link: AppRoutes.DASHBOARD, isLoginRequired: true },
+  { label: "My Wellness", link: AppRoutes.WELLNESS, isLoginRequired: true },
+  {
+    label: "Browse Events",
+    link: AppRoutes.BROWSE_EVENTS,
+    isLoginRequired: false,
+  },
+  {
+    label: "Coaches & Nutrition",
+    link: AppRoutes.COACHES_AND_NUTRITION,
+    isLoginRequired: false,
+  },
+  // { label: "My Progress", link: "/progress", isLoginRequired: false },
 ];
 
 function AppContent() {

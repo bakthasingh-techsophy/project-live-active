@@ -1,10 +1,6 @@
 import { ApiResponse } from "@utils/types";
 import wretch from "wretch";
 
-interface ErrorResponse {
-  message: string;
-}
-
 export const postLoginForm = async (payload: object): Promise<ApiResponse> => {
   const gatewayUrl = "http://localhost:8080/api/live-active";
   const endpoint = `${gatewayUrl}/auth/login`;

@@ -1,13 +1,12 @@
+import Dashboard from "@features/profileDdashboard/Dashboard";
 import BrowseEvents from "@pages/BrowseEvents";
-import EventManagementPage from "@pages/EventManagementPage";
 import LandingPage from "@pages/LandingPage";
 import MyProgress from "@pages/MyProgress";
 import MyWellness from "@pages/MyWellness";
 import Nutrition from "@pages/Nutrition";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { AppRoutes } from "@utils/AppRoutes";
+import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import { AppRouteQueries, AppRoutes } from "@utils/AppRoutes";
-import Dashboard from "@features/profileDdashboard/Dashboard";
 const Navigator = () => {
   return (
     <Routes>
@@ -17,8 +16,15 @@ const Navigator = () => {
         element={<Navigate to={AppRoutes.PROFILE_DASHBOARD} />}
       /> */}
       {/* Optionally, you can define a default route */}
+      <Route
+        path={AppRoutes.WELLNESS}
+        element={
+          <ProtectedRoute>
+            <MyWellness />
+          </ProtectedRoute>
+        }
+      />
       <Route path={AppRoutes.BROWSE_EVENTS} element={<BrowseEvents />} />
-      <Route path={AppRoutes.WELLNESS} element={<MyWellness />} />
       <Route path={AppRoutes.COACHES_AND_NUTRITION} element={<Nutrition />} />
       <Route path={AppRoutes.PROGRESS} element={<MyProgress />} />
       {/* <Route

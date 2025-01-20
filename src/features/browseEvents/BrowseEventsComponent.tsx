@@ -14,10 +14,33 @@ import {
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React, { useState } from "react";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { searchEvents } from "@services/eventsService";
+import { AppRouteQueries } from "@utils/AppRoutes";
+import { CONSTANTS } from "@utils/constants";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { NotificationTypes } from "@utils/types";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { ClipLoader } from "react-spinners";
+
+interface Event {
+  id: number;
+  title: string;
+  host: string;
+  rating: number;
+  scheduledTime: string;
+  description: string;
+  tags: string[];
+  image: string;
+  isEnrolled: boolean;
+  isStarted: boolean;
+  isExpired: boolean;
+}
 
 // Sample data
-const events = [
+const events: Event[] = [
   {
     id: 1,
     title: "Morning Yoga",
@@ -149,10 +172,30 @@ const dynamicStyles = {
   },
 };
 
-const BrowseEventsComponent: React.FC = () => {
+interface BrowseEventsComponentProps {
+  selectedTags: any;
+  searchText: any;
+}
+const BrowseEventsComponent = ({
+  selectedTags,
+  searchText,
+}: BrowseEventsComponentProps) => {
   const theme = useTheme();
+  const [isLoading, setIsLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
+  const isTokenActive = !isTokenExpired();
+  const [browsedEvents, setBrowsedEvents] = useState<Event[]>(events);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const filteredEvents =
+    selectedTags?.length === 0
+      ? browsedEvents
+      : browsedEvents?.filter((event) => {
+          return event?.tags?.some((tag) => selectedTags?.includes(tag));
+        });
 
   const handlePopoverOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -167,6 +210,14 @@ const BrowseEventsComponent: React.FC = () => {
     setPopoverTags([]);
   };
 
+  const handleEnrollClick = () => {
+    if (isTokenActive) {
+      console.log("Enroll Clicked");
+      return;
+    }
+    navigate(AppRouteQueries?.AUTH_LOGIN);
+  };
+
   const open = Boolean(anchorEl);
 
   const formatDate = (dateString: string) => {
@@ -174,104 +225,152 @@ const BrowseEventsComponent: React.FC = () => {
     return date?.toLocaleString();
   };
 
+  const handleSearch = async (payload: any) => {
+    try {
+      setIsLoading(true);
+
+      const searchFormResponse = await searchEvents(payload);
+
+      if (searchFormResponse?.success) {
+        setIsLoading(false);
+        setBrowsedEvents(searchFormResponse?.data)
+      } else {
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              searchFormResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    const payload = {
+      searchText: searchText,
+    };
+    handleSearch(payload);
+  }, [searchText]);
+
   return (
     <Container sx={staticStyles?.container?.mainContainer} maxWidth={false}>
       {/* Container for the event cards */}
-      <Grid container spacing={2} sx={staticStyles?.container?.grid}>
-        {/* Map through events and render each card */}
-        {[...events, ...events, ...events].map((event) => (
-          <Grid item xs={12} sm={14} md={6} key={event?.id}>
-            <Card
-              sx={[
-                staticStyles?.container?.cardContainer(theme),
-                dynamicStyles?.container?.cardContainer,
-              ]}
-            >
-              <Box
-                component="img"
+      {isLoading ? (
+        <ClipLoader color={"#fff"} loading={isLoading} size={24} />
+      ) : (
+        <Grid container spacing={2} sx={staticStyles?.container?.grid}>
+          {/* Map through events and render each card */}
+          {[...filteredEvents]?.map((event) => (
+            <Grid item xs={12} sm={14} md={6} key={event?.id}>
+              <Card
                 sx={[
-                  staticStyles?.container?.cardMediaContainer,
-                  dynamicStyles?.container?.cardMediaContainer,
+                  staticStyles?.container?.cardContainer(theme),
+                  dynamicStyles?.container?.cardContainer,
                 ]}
-                src={event?.image}
-              />
-              <CardContent sx={staticStyles?.container?.cardContentContainer}>
-                {/* Event Title */}
-                <Box sx={staticStyles?.container?.contentHeader}>
-                  <Typography
-                    variant="h6"
-                    sx={staticStyles?.typography?.boldText}
-                  >
-                    {event?.title}
+              >
+                <Box
+                  component="img"
+                  sx={[
+                    staticStyles?.container?.cardMediaContainer,
+                    dynamicStyles?.container?.cardMediaContainer,
+                  ]}
+                  src={event?.image}
+                />
+                <CardContent sx={staticStyles?.container?.cardContentContainer}>
+                  {/* Event Title */}
+                  <Box sx={staticStyles?.container?.contentHeader}>
+                    <Typography
+                      variant="h6"
+                      sx={staticStyles?.typography?.boldText}
+                    >
+                      {event?.title}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      sx={staticStyles?.button?.enrollButton}
+                      onClick={handleEnrollClick}
+                    >
+                      Enroll
+                    </Button>
+                  </Box>
+
+                  {/* Host Name */}
+                  <Typography variant="body2" color="text.secondary">
+                    Hosted by: {event?.host}
                   </Typography>
-                  <Button
-                    variant="contained"
-                    sx={staticStyles?.button?.enrollButton}
-                  >
-                    Enroll
-                  </Button>
-                </Box>
 
-                {/* Host Name */}
-                <Typography variant="body2" color="text.secondary">
-                  Hosted by: {event?.host}
-                </Typography>
+                  {/* Rating */}
+                  <Box sx={staticStyles?.container?.ratingContainer}>
+                    <Rating value={event?.rating} precision={0.1} readOnly />
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={staticStyles?.typography?.ratingText}
+                    >
+                      ({event?.rating})
+                    </Typography>
+                  </Box>
 
-                {/* Rating */}
-                <Box sx={staticStyles?.container?.ratingContainer}>
-                  <Rating value={event?.rating} precision={0.1} readOnly />
+                  {/* Scheduled Time */}
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={staticStyles?.typography?.ratingText}
+                    sx={staticStyles?.typography.scheduleText}
                   >
-                    ({event?.rating})
+                    Scheduled for: {formatDate(event?.scheduledTime)}
                   </Typography>
-                </Box>
 
-                {/* Scheduled Time */}
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={staticStyles?.typography.scheduleText}
-                >
-                  Scheduled for: {formatDate(event?.scheduledTime)}
-                </Typography>
+                  {/* Event Description */}
+                  <Typography
+                    variant="body2"
+                    sx={staticStyles?.typography?.scheduleText}
+                  >
+                    {event?.description}
+                  </Typography>
 
-                {/* Event Description */}
-                <Typography
-                  variant="body2"
-                  sx={staticStyles?.typography?.scheduleText}
-                >
-                  {event?.description}
-                </Typography>
-
-                {/* Tags */}
-                <Box sx={staticStyles?.container?.tagsContainer}>
-                  {event?.tags?.slice(0, 3).map((tag, index) => (
-                    <Chip
-                      key={index}
-                      label={tag}
-                      size="small"
-                      variant="outlined"
-                      color="primary"
-                    />
-                  ))}
-                  {event?.tags?.length > 3 && (
-                    <Button
-                      onClick={(e) => handlePopoverOpen(e, event?.tags)}
-                      sx={staticStyles?.button?.moreButton}
-                      color="primary"
-                    >
-                      ...More
-                    </Button>
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                  {/* Tags */}
+                  <Box sx={staticStyles?.container?.tagsContainer}>
+                    {event?.tags
+                      ?.slice(0, 3)
+                      .map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          size="small"
+                          variant="outlined"
+                          color="primary"
+                        />
+                      ))}
+                    {event?.tags?.length > 3 && (
+                      <Button
+                        onClick={(e) => handlePopoverOpen(e, event?.tags)}
+                        sx={staticStyles?.button?.moreButton}
+                        color="primary"
+                      >
+                        ...More
+                      </Button>
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       {/* Popover for Tags */}
       <Popover
