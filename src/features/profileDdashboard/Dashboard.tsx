@@ -7,18 +7,14 @@ import {
   NavigateOptions,
   Navigation,
   Router,
-  Session
+  Session,
 } from "@toolpad/core/AppProvider";
-import {
-  DashboardLayout
-} from "@toolpad/core/DashboardLayout";
-import {
-  AppRouteQueryValues,
-  AppRoutes
-} from "@utils/AppRoutes";
+import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import { AppRouteQueryValues, AppRoutes } from "@utils/AppRoutes";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LiveActiveBrand } from "./Branding";
+import ExploreEvents from "../common/ExploreEvents";
 
 // Define the navigation items
 const NAVIGATION: Navigation = [
@@ -89,7 +85,7 @@ const Dashboard = () => {
   const getCurrentPage = () => {
     switch (dashboardRouter.pathname) {
       case "/" + AppRouteQueryValues.EXPLORE_EVENTS:
-        return <>Dashboard</>;
+        return <ExploreEvents viewMode="browse" />;
       case "/" + AppRouteQueryValues.PROFILE:
         return <>PRofile</>;
       case "/" + AppRouteQueryValues.SETTINGS:
