@@ -1,13 +1,22 @@
-import { Box, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { postLoginForm } from "@services/userAuthService";
+import { AppRoutes } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { setLocalStorageItem } from "@utils/encrypt";
 import { NotificationTypes } from "@utils/types";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as Yup from "yup";
 
 const staticStyles = {
@@ -49,6 +58,12 @@ interface LoginFormProps {
 const LoginForm = ({ setOpen }: LoginFormProps) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const handleSubmit = async (payload: any, values: any) => {
     try {
@@ -74,6 +89,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
         );
         setOpen(false);
         formik?.resetForm();
+        navigate(`${AppRoutes?.DASHBOARD}`);
       } else {
         setIsLoading(false);
 
@@ -99,7 +115,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
       );
     }
   };
-  
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -137,7 +153,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
             name="password"
             variant="outlined"
             fullWidth
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={formik?.values?.password}
             onChange={formik?.handleChange}
             onBlur={formik?.handleBlur}
@@ -145,6 +161,21 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
               formik?.touched?.password && Boolean(formik?.errors?.password)
             }
             helperText={formik?.touched?.password && formik?.errors?.password}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleTogglePasswordVisibility}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
 
           <Button

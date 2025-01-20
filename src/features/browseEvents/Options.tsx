@@ -1,5 +1,5 @@
 import { Box, Container, TextField, Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 
 const staticStyles = {
   container: {
@@ -51,7 +51,24 @@ const dynamicStyles = {
   },
 };
 
-const Options: React.FC = () => {
+interface OptionsProps {
+  searchText: any;
+  setSearchText: any;
+}
+
+const Options = ({ searchText, setSearchText }: OptionsProps) => {
+  const [localSearchText, setLocalSearchText] = useState(searchText);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalSearchText(event.target.value);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      setSearchText(localSearchText);
+    }
+  };
+
   return (
     <Container
       sx={[
@@ -90,6 +107,9 @@ const Options: React.FC = () => {
           placeholder="Search for events..."
           fullWidth
           sx={staticStyles?.container?.textField}
+          value={localSearchText}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyPress}
         />
       </Box>
     </Container>

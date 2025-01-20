@@ -8,6 +8,11 @@ interface TagsRowProps {
   toggleTag: (tag: string) => void;
 }
 
+interface TagsDisplayProps {
+  selectedTags: any;
+  setSelectedTags: any;
+}
+
 const staticStyles = {
   container: {
     mainContainer: {
@@ -83,8 +88,7 @@ const TagsRow: React.FC<TagsRowProps> = ({ tags, selectedTags, toggleTag }) => {
   );
 };
 
-export default function TagsDisplay() {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+const TagsDisplay = ({ selectedTags, setSelectedTags }: TagsDisplayProps) => {
   const tags = [
     "Yoga",
     "Morning",
@@ -106,9 +110,9 @@ export default function TagsDisplay() {
 
   // Toggle the selection state of a tag
   const toggleTag = (tag: string) => {
-    setSelectedTags((prevSelectedTags) => {
+    setSelectedTags((prevSelectedTags: any) => {
       if (prevSelectedTags?.includes(tag)) {
-        return prevSelectedTags?.filter((t) => t !== tag);
+        return prevSelectedTags?.filter((t: any) => t !== tag);
       } else {
         return [...prevSelectedTags, tag];
       }
@@ -120,4 +124,6 @@ export default function TagsDisplay() {
       <TagsRow tags={tags} selectedTags={selectedTags} toggleTag={toggleTag} />
     </Container>
   );
-}
+};
+
+export default TagsDisplay;

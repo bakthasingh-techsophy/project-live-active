@@ -25,7 +25,7 @@ import {
 } from "@utils/AppRoutes";
 
 interface ResponsiveToolbarProps {
-  menuItems: { label: string; link: string }[];
+  menuItems: { label: string; link: string; isLoginRequired: boolean }[];
 }
 
 const staticStyles = (theme: any) => ({
@@ -263,23 +263,25 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
               dynamicStyles?.container?.toolbarItems,
             ]}
           >
-            {menuItems?.map((item) => (
-              <Button
-                key={item?.label}
-                sx={[
-                  customStaticStyles?.button?.toolbarItem,
-                  {
-                    backgroundColor:
-                      selectedMenu === item?.label
-                        ? "rgb(22, 151, 87,0.2)"
-                        : "transparent",
-                  },
-                ]}
-                onClick={() => handleNavigation(item?.link, item?.label)}
-              >
-                {item?.label}
-              </Button>
-            ))}
+            {menuItems?.map((item) =>
+              item?.isLoginRequired && !isTokenActive ? null : (
+                <Button
+                  key={item?.label}
+                  sx={[
+                    customStaticStyles?.button?.toolbarItem,
+                    {
+                      backgroundColor:
+                        selectedMenu === item?.label
+                          ? "rgb(22, 151, 87,0.2)"
+                          : "transparent",
+                    },
+                  ]}
+                  onClick={() => handleNavigation(item?.link, item?.label)}
+                >
+                  {item?.label}
+                </Button>
+              )
+            )}
           </Box>
 
           <Box sx={customStaticStyles?.container?.actionButtonsContainer}>
@@ -300,20 +302,6 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
               >
                 {isTokenActive ? "Logout" : "Login"}
               </Button>
-              {isTokenActive && (
-                <Box
-                  component="img"
-                  sx={customStaticStyles?.container?.profileImage}
-                  src={userDp}
-                  alt="Random Image"
-                  onClick={() =>
-                    handleNavigation(
-                      AppRouteQueries.DASHBOARD_EXPLORE_EVENTS,
-                      ""
-                    )
-                  }
-                />
-              )}
             </Box>
 
             <IconButton
