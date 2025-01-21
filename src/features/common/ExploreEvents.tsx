@@ -1,19 +1,5 @@
-import CloseIcon from "@mui/icons-material/Close";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Container,
-  Grid,
-  IconButton,
-  Popover,
-  Rating,
-  Theme,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import MoreInfoPopover from "@components/MoreInfoPopover";
+import { Box, Container, Grid, useTheme } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
 import { getUserDetails } from "@services/userManagementService";
@@ -26,15 +12,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { defaultEventPic } from "@assets/index";
-import MoreInfoPopover from "@components/MoreInfoPopover";
+import EventCard from "./EventCard";
+import EventDetailsDrawer from "@features/administration/EventDetailsModal";
+import EventDetailsModal from "@features/administration/EventDetailsModal";
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date?.toLocaleString();
-};
-
-interface Event {
+export interface Event {
   id: number;
   title: string;
   hosts: string[];
@@ -47,6 +29,7 @@ interface Event {
   isStarted: boolean;
   isExpired: boolean;
   loading?: boolean;
+  updated?: boolean;
 }
 
 // Sample data
@@ -93,7 +76,12 @@ const staticStyles = {
     closeButton: { marginTop: 1, textAlign: "right" },
   },
   typography: {
-    boldText: { fontWeight: "bold" },
+    boldText: {
+      fontWeight: "bold",
+      maxWidth: "20rem", // Adjust based on your container width
+      overflow: "hidden", // Hide overflowed content
+      textOverflow: "ellipsis", // Add ellipsis when the text overflows
+    },
     ratingText: { marginLeft: 1 },
     scheduleText: { marginTop: 1 },
   },
@@ -133,11 +121,11 @@ const dynamicStyles = {
 const staticStylesExploreEvents = {
   boxContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", // Auto-fill grid with responsive column size
+    gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))", // Auto-fill grid with responsive column size
     gap: "16px", // Gap between items
     paddding: "0px",
   },
-  cardStyle: { display: "flex", flexDirection: "column" },
+  cardStyle: { display: "flex", flexDirection: "column", position: "relative" },
   cardImage: {
     width: "100%",
     height: "200px", // Fixed height for the image
@@ -147,14 +135,24 @@ const staticStylesExploreEvents = {
 
 interface ExploreEventsProps {
   viewMode: "explore" | "browse";
-  selectedTags?: any;
-  searchText?: any;
+  selectedTags: string[];
+  searchText: string;
+  isOnAdministrationPage?: boolean;
+  handleEditEvent: (event: Event) => void;
+  selectedEvent: Event | null | undefined;
+  setSelectedEvent: (event: Event | undefined | null) => void;
+  setIsEmpty?: (value: boolean) => void;
 }
 
 const ExploreEvents = ({
   viewMode,
   selectedTags,
-  searchText,
+  searchText = "",
+  isOnAdministrationPage = false,
+  selectedEvent = undefined,
+  handleEditEvent = () => {},
+  setSelectedEvent,
+  setIsEmpty,
 }: ExploreEventsProps) => {
   const theme = useTheme();
   const isTokenActive = !isTokenExpired();
@@ -164,9 +162,11 @@ const ExploreEvents = ({
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [browsedEvents, setBrowsedEvents] = useState<Event[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<
+  const [openEventDetails, setOpenEventDetails] = useState(false);
+  const [localEventDetails, setLocalEventDetails] = useState<
     Event | undefined | null
   >();
+
   const [userDetails, setUserDetails] = useState<any>();
 
   const filteredEvents =
@@ -194,55 +194,6 @@ const ExploreEvents = ({
     setPopoverTags([]);
   };
 
-  const handleEnrollClick = async (event: any) => {
-    setSelectedEvent({
-      ...event,
-      loading: true,
-    });
-    const payload = {
-      enrollList: [getLocalStorageItem(CONSTANTS?.USER_EMAIL)],
-    };
-
-    if (isTokenActive) {
-      try {
-        const enrollFormResponse = await enrollOrJoinEvent(payload, event?.id);
-        setSelectedEvent(null);
-        if (enrollFormResponse?.success) {
-          dispatch(
-            pushNotification({
-              isOpen: true,
-              message:
-                enrollFormResponse?.message ||
-                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
-              type: NotificationTypes.SUCCESS,
-            })
-          );
-        } else {
-          dispatch(
-            pushNotification({
-              isOpen: true,
-              message:
-                enrollFormResponse?.message ||
-                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-              type: NotificationTypes.ERROR,
-            })
-          );
-        }
-      } catch (error) {
-        console.error(error);
-        dispatch(
-          pushNotification({
-            isOpen: true,
-            message: CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-            type: NotificationTypes.ERROR,
-          })
-        );
-      }
-      return;
-    }
-    navigate(AppRouteQueries?.AUTH_LOGIN);
-  };
-
   const open = Boolean(anchorEl);
   // const viewMode = "explore";
 
@@ -255,6 +206,7 @@ const ExploreEvents = ({
       if (searchFormResponse?.success) {
         setIsLoading(false);
         setBrowsedEvents(searchFormResponse?.data);
+        setIsEmpty?.(searchFormResponse?.data?.length === 0);
       } else {
         setIsLoading(false);
         dispatch(
@@ -308,6 +260,11 @@ const ExploreEvents = ({
       );
     }
   };
+  const handleReload = () => {
+    handleSearch({
+      searchText: "",
+    });
+  };
 
   useEffect(() => {
     if (isTokenActive) {
@@ -321,6 +278,11 @@ const ExploreEvents = ({
     };
     handleSearch(payload);
   }, [searchText]);
+
+  const handleCardClick = (eventDetails: Event) => {
+    setLocalEventDetails(eventDetails);
+    setOpenEventDetails(true);
+  };
 
   return (
     <Container
@@ -339,17 +301,24 @@ const ExploreEvents = ({
           {isLoading ? (
             <ClipLoader color={"#fff"} loading={isLoading} size={24} />
           ) : (
-            filteredEvents?.map((event) =>
-              getCard(
-                event,
-                handlePopoverOpen,
-                handleEnrollClick,
-                viewMode,
-                theme,
-                selectedEvent,
-                userDetails?.eventIds
-              )
-            )
+            filteredEvents?.map((event) => (
+              <EventCard
+                event={event}
+                handlePopoverOpen={handlePopoverOpen}
+                viewMode={viewMode}
+                theme={theme}
+                selectedEvent={selectedEvent}
+                isOnAdministrationPage={isOnAdministrationPage}
+                staticStyles={staticStyles}
+                staticStylesExploreEvents={staticStylesExploreEvents}
+                dynamicStyles={dynamicStyles}
+                enrolledEventIds={userDetails?.eventIds} // Assuming event IDs are from userDetails
+                handleEditEvent={handleEditEvent}
+                setSelectedEvent={setSelectedEvent}
+                handleReload={handleReload}
+                handleCardClick={handleCardClick}
+              />
+            ))
           )}
         </Box>
       ) : (
@@ -359,21 +328,29 @@ const ExploreEvents = ({
           ) : (
             filteredEvents?.map((event) => (
               <Grid item xs={12} sm={6} md={4} key={event?.id}>
-                {getCard(
-                  event,
-                  handlePopoverOpen,
-                  handleEnrollClick,
-                  viewMode,
-                  theme,
-                  selectedEvent,
-                  userDetails?.eventIds
-                )}
+                <EventCard
+                  event={event}
+                  handlePopoverOpen={handlePopoverOpen}
+                  viewMode={viewMode}
+                  theme={theme}
+                  selectedEvent={selectedEvent}
+                  isOnAdministrationPage={isOnAdministrationPage}
+                  staticStyles={staticStyles}
+                  staticStylesExploreEvents={staticStylesExploreEvents}
+                  dynamicStyles={dynamicStyles}
+                  enrolledEventIds={userDetails?.eventIds} // Assuming event IDs are from userDetails
+                  handleEditEvent={function (event: Event): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                  setSelectedEvent={setSelectedEvent}
+                  handleReload={handleReload}
+                  handleCardClick={handleCardClick}
+                />
               </Grid>
             ))
           )}
         </Grid>
       )}
-
 
       <MoreInfoPopover
         open={open}
@@ -381,190 +358,17 @@ const ExploreEvents = ({
         items={popoverTags}
         onClose={handlePopoverClose}
       />
+      <EventDetailsModal
+        selectedEvent={localEventDetails}
+        open={openEventDetails}
+        onClose={() => setOpenEventDetails(false)}
+        onEnroll={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+        loading={false}
+      />
     </Container>
   );
 };
 
 export default ExploreEvents;
-function getCard(
-  event: {
-    id: number;
-    title: string;
-    hosts: string[];
-    rating: number;
-    description: string;
-    tags: string[];
-    photoUrl: string;
-    scheduledTime: string;
-    isEnrolled: boolean;
-    isStarted: boolean;
-    isExpired: boolean;
-    loading?: boolean;
-  },
-  handlePopoverOpen: (
-    event: React.MouseEvent<HTMLElement>,
-    tags: string[]
-  ) => void,
-  handleEnrollClick: (event: Event) => void,
-  viewMode: string,
-  theme: Theme,
-  selectedEvent: Event | undefined | null,
-  enrolledEventIds?: string[]
-) {
-  const isEnrolled = enrolledEventIds?.includes(event.id.toString());
-  return (
-    <Card
-      key={event.id}
-      sx={
-        viewMode === "explore"
-          ? staticStylesExploreEvents?.cardStyle
-          : [
-              staticStyles?.container?.cardContainer(theme),
-              dynamicStyles?.container?.cardContainer,
-            ]
-      }
-    >
-      <Box
-        component="img"
-        src={event.photoUrl || defaultEventPic}
-        sx={
-          viewMode === "explore"
-            ? staticStylesExploreEvents?.cardImage
-            : [
-                staticStyles?.container?.cardMediaContainer,
-                dynamicStyles?.container?.cardMediaContainer,
-              ]
-        }
-      />
-      <CardContent sx={staticStyles?.container?.cardContentContainer}>
-        {/* Event Title */}
-        <Box sx={staticStyles?.container?.contentHeader}>
-          <Typography variant="h6" sx={staticStyles?.typography?.boldText}>
-            {event?.title}
-          </Typography>
-          <Button
-            variant="contained"
-            sx={staticStyles?.button?.enrollButton}
-            onClick={() => {
-              handleEnrollClick(event);
-              // setLoading(true);
-            }}
-          >
-            {selectedEvent?.id === event?.id && selectedEvent?.loading ? (
-              <ClipLoader
-                color={"#fff"}
-                loading={
-                  selectedEvent?.id === event?.id && selectedEvent?.loading
-                }
-                size={24}
-              />
-            ) : isEnrolled ? (
-              "Join"
-            ) : (
-              "Enroll"
-            )}
-          </Button>
-        </Box>
-        {/* <Typography variant="h6">{event.title}</Typography> */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "start",
-            alignItems: "start",
-            gap: 1,
-            flexDirection: "column",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            Hosted By:
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "start",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 1,
-            }}
-          >
-            {event.hosts.slice(0, 4).map((tag, index) => (
-              <Chip
-                key={index}
-                label={tag}
-                size="small"
-                variant="outlined"
-                color="primary"
-              />
-            ))}
-            {event.hosts.length > 4 && (
-              <Button
-                onClick={(e) => handlePopoverOpen(e, event.hosts)}
-                sx={{ textTransform: "none", fontSize: "12px" }}
-                color="primary"
-              >
-                ...More
-              </Button>
-            )}
-          </Box>
-        </Box>
-
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={staticStyles?.typography.scheduleText}
-        >
-          Scheduled for: {formatDate(event?.scheduledTime)}
-        </Typography>
-        {/* Event Rating */}
-        <Box sx={staticStyles?.container?.ratingContainer}>
-          <Rating value={event?.rating} precision={0.1} readOnly />
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={staticStyles?.typography?.ratingText}
-          >
-            ({event?.rating})
-          </Typography>
-        </Box>
-
-        {/* Event Description */}
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ marginTop: "8px" }}
-        >
-          {event.description}
-        </Typography>
-
-        {/* Tags */}
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "8px",
-            marginTop: "8px",
-          }}
-        >
-          {event.tags.slice(0, 5).map((tag, index) => (
-            <Chip
-              key={index}
-              label={tag}
-              size="small"
-              variant="outlined"
-              color="primary"
-            />
-          ))}
-          {event.tags.length > 5 && (
-            <Button
-              onClick={(e) => handlePopoverOpen(e, event.tags)}
-              sx={{ textTransform: "none", fontSize: "12px" }}
-              color="primary"
-            >
-              ...More
-            </Button>
-          )}
-        </Box>
-      </CardContent>
-    </Card>
-  );
-}
