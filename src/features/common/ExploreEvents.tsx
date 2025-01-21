@@ -374,6 +374,7 @@ const ExploreEvents = ({
         </Grid>
       )}
 
+
       <MoreInfoPopover
         open={open}
         anchorEl={anchorEl}
