@@ -15,7 +15,14 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { getUserDetails, updateUser } from "@services/userManagementService";
+import { CONSTANTS } from "@utils/constants";
+import { getLocalStorageItem } from "@utils/encrypt";
+import { NotificationTypes } from "@utils/types";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { ClipLoader } from "react-spinners";
 
 interface UserPreferencesModalProps {
   open: boolean;
@@ -23,11 +30,6 @@ interface UserPreferencesModalProps {
 }
 
 const preferencesData = [
-  {
-    id: "gymAndWellness",
-    title: "Gym & Wellness",
-    image: preferencePic1,
-  },
   {
     id: "yoga",
     title: "Yoga",
@@ -157,6 +159,9 @@ const UserPreferencesModal = ({
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>();
 
   const handleCardClick = (id: string) => {
     setSelectedPreferences((prev) =>
@@ -164,16 +169,105 @@ const UserPreferencesModal = ({
     );
   };
 
-  const handleSave = () => {
+  const handleSubmit = async () => {
+    const payload = {
+      preferences: selectedPreferences,
+      userName: getLocalStorageItem(CONSTANTS?.USER_EMAIL),
+      userId: getLocalStorageItem(CONSTANTS?.USER_ID),
+    };
     setHasAttemptedSave(true);
+
     if (selectedPreferences?.length < 3) {
       setError("Please select at least 3 preferences.");
     } else {
       setError(null);
+      try {
+        setIsLoading(true);
+
+        const updateUserResponse = await updateUser(payload);
+
+        if (updateUserResponse?.success) {
+          setIsLoading(false);
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                updateUserResponse?.message ||
+                CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_PREFERENCES_SUCCESS,
+              type: NotificationTypes.SUCCESS,
+            })
+          );
+        } else {
+          setIsLoading(false);
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                updateUserResponse?.message ||
+                CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_PREFERENCES_FAILURE,
+              type: NotificationTypes.ERROR,
+            })
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message: CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_PREFERENCES_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
       console.log("Selected Preferences:", selectedPreferences);
       handleModalClose();
     }
   };
+
+  const fetchUserDetails = async () => {
+    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    try {
+      setIsLoading(true);
+
+      const getUserResponse = await getUserDetails(userId || "");
+      if (getUserResponse?.success) {
+        setIsLoading(false);
+        setUserDetails(getUserResponse?.data);
+      } else {
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              getUserResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  useEffect(() => {
+    if (userDetails?.preferences) {
+      setSelectedPreferences(userDetails.preferences);
+    }
+  }, [userDetails]);
 
   useEffect(() => {
     if (hasAttemptedSave && selectedPreferences?.length < 3) {
@@ -229,10 +323,14 @@ const UserPreferencesModal = ({
           <Button
             variant="contained"
             color="primary"
-            onClick={handleSave}
+            onClick={handleSubmit}
             sx={styles?.saveButton}
           >
-            Save
+            {isLoading ? (
+              <ClipLoader color={"#fff"} loading={isLoading} size={24} />
+            ) : (
+              "Save"
+            )}
           </Button>
         </Box>
       </Box>

@@ -97,8 +97,10 @@ const CustomizeNutrition: React.FC = () => {
         onClick={() => {
           console.log("Get Plan Clicked");
         }}
+        disabled
       >
-        Get Customized Plan
+        Coming Soon
+        {/* Get Customized Plan */}
       </Button>
     </Container>
   );

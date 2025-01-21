@@ -6,6 +6,7 @@ const MyProgress = () => {
       sx={{
         background:
           "linear-gradient(180deg, rgb(234, 255, 210,0.5) 0%, rgb(245, 253, 238,0.5) 33%, rgb(252, 253, 243,0.5) 66%, rgb(255, 255, 255) 100%)",
+        minHeight: "80vh",
       }}
     >
       <Typography sx={{ textAlign: "center", py: 33 }}>

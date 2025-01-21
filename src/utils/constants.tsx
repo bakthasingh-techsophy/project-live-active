@@ -138,5 +138,11 @@ export const CONSTANTS = {
     USER_DETAILS_FETCH_FAILURE: "Failed to Fetch User Details",
     UPDATE_USER_SUCCESS: "User Details Updated Successfully",
     UPDATE_USER_FAILURE: "Failed to Update User Details",
+    UPDATE_DP_SUCCESS: "Profile Picture Updated Successfully",
+    UPDATE_DP_FAILURE: "Failed to Update Profile Picture",
+    UPDATE_PREFERENCES_SUCCESS: "User Preferences Updated Successfully",
+    UPDATE_PREFERENCES_FAILURE: "Failed to Update User Preferences",
+    EVENT_ENROLL_SUCCESS: "User Enrolled Successfully",
+    EVENT_ENROLL_FAILURE: "Failed to Enroll User",
   },
 };

@@ -1,4 +1,5 @@
 import { profilePic } from "@assets/index";
+import ImagePicker from "@components/ImagePicker";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { getUserDetails, updateUser } from "@services/userManagementService";
@@ -32,13 +33,14 @@ const staticStyles = {
     headingContainer: {
       display: "flex",
       justifyContent: "flex-start",
-      alignItems: "center",
+      alignItems: "flex-start",
       gap: 2,
       px: 1,
     },
     userInfoContainer: {
       display: "flex",
       flexDirection: "column",
+      mt: 3.5
     },
     submitButtonContainer: {
       display: "flex",
@@ -113,8 +115,8 @@ const validationSchema = () => {
 
 const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState<any>();
   const dispatch = useDispatch();
+  const [userDetails, setUserDetails] = useState<any>();
   const currentDate = new Date();
   const timeInIST = currentDate?.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
@@ -213,11 +215,8 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
   return (
     <Box sx={staticStyles?.container?.mainContainer}>
       <Box sx={staticStyles?.container?.headingContainer}>
-        <Box
-          component="img"
-          sx={staticStyles?.container?.profileImage}
-          src={userDetails?.photoUrl || profilePic}
-          alt="Random Image"
+        <ImagePicker
+          userDetails={userDetails}
         />
         <Box sx={staticStyles?.container?.userInfoContainer}>
           <Typography

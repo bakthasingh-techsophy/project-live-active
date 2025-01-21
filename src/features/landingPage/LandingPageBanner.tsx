@@ -5,8 +5,15 @@ import {
   CssThemeVariables,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
 } from "@mui/material";
+import {
+  AppRouteQueries,
+  AppRoutes,
+  AppRoutesCombination,
+} from "@utils/AppRoutes";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { useNavigate } from "react-router-dom";
 
 const staticStyles = {
   container: {
@@ -137,11 +144,13 @@ const dynamicStyles = {
   videoStyle: (isSmallScreen: boolean, isMediumScreen: boolean) =>
     ({
       width: isSmallScreen ? "100%" : isMediumScreen ? "50%" : "34%",
-    } as CssThemeVariables),
+    }) as CssThemeVariables,
 };
 
 const LandingPageBanner = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const isTokenActive = !isTokenExpired();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -151,6 +160,11 @@ const LandingPageBanner = () => {
   //   width: isSmallScreen ? "100%" : isMediumScreen ? "50%" : "34%",
   //   filter: "grayscale(100%)",
   // } as CssThemeVariables;
+
+  const handleNavigation = (route: string) => {
+    navigate(route);
+  };
+
   return (
     <Box sx={staticStyles?.container?.mainContainer}>
       <Box sx={staticStyles?.container?.videoContainer}>
@@ -161,7 +175,7 @@ const LandingPageBanner = () => {
           muted
           style={{
             ...staticStyles.videoStyle,
-            ...dynamicStyles.videoStyle(isSmallScreen,isMediumScreen),
+            ...dynamicStyles.videoStyle(isSmallScreen, isMediumScreen),
           }}
         />
         <video
@@ -171,7 +185,7 @@ const LandingPageBanner = () => {
           muted
           style={{
             ...staticStyles.videoStyle,
-            ...dynamicStyles.videoStyle(isSmallScreen,isMediumScreen),
+            ...dynamicStyles.videoStyle(isSmallScreen, isMediumScreen),
           }}
         />
         <video
@@ -181,7 +195,7 @@ const LandingPageBanner = () => {
           muted
           style={{
             ...staticStyles.videoStyle,
-            ...dynamicStyles.videoStyle(isSmallScreen,isMediumScreen),
+            ...dynamicStyles.videoStyle(isSmallScreen, isMediumScreen),
           }}
         />
         <Box sx={staticStyles?.container?.overlay} />
@@ -238,10 +252,25 @@ const LandingPageBanner = () => {
               variant="contained"
               color="primary"
               sx={staticStyles?.button?.buttonOne}
+              onClick={() =>
+                isTokenActive
+                  ? handleNavigation(
+                      AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS
+                    )
+                  : handleNavigation(AppRoutes?.BROWSE_EVENTS)
+              }
             >
               Explore Now
             </Button>
-            <Button variant="outlined" sx={staticStyles?.button?.buttonTwo}>
+            <Button
+              variant="outlined"
+              sx={staticStyles?.button?.buttonTwo}
+              onClick={() =>
+                isTokenActive
+                  ? handleNavigation(AppRoutes?.WELLNESS)
+                  : handleNavigation(AppRouteQueries?.AUTH_LOGIN)
+              }
+            >
               Get Started
             </Button>
           </>
