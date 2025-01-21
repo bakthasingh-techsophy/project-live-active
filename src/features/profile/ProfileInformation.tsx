@@ -1,3 +1,4 @@
+import { profilePic } from "@assets/index";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { getUserDetails, updateUser } from "@services/userManagementService";
@@ -33,6 +34,7 @@ const staticStyles = {
       justifyContent: "flex-start",
       alignItems: "center",
       gap: 2,
+      px: 1,
     },
     userInfoContainer: {
       display: "flex",
@@ -54,8 +56,8 @@ const staticStyles = {
       width: 80,
       height: 80,
       maxWidth: 400,
-      borderRadius: 2,
-      boxShadow: 3,
+      borderRadius: 500,
+      boxShadow: 1,
       objectFit: "cover",
     },
   },
@@ -109,9 +111,7 @@ const validationSchema = () => {
   });
 };
 
-const ProfileInformation = ({
-  subHeading,
-}: ProfileInformationProps) => {
+const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userDetails, setUserDetails] = useState<any>();
   const dispatch = useDispatch();
@@ -216,7 +216,7 @@ const ProfileInformation = ({
         <Box
           component="img"
           sx={staticStyles?.container?.profileImage}
-          src={userDetails?.photoUrl || ""}
+          src={userDetails?.photoUrl || profilePic}
           alt="Random Image"
         />
         <Box sx={staticStyles?.container?.userInfoContainer}>
@@ -338,7 +338,7 @@ const ProfileInformation = ({
                         : ""
                     }
                     sx={staticStyles?.typography?.textField}
-                    disabled={isLoading}
+                    disabled
                   />
                 </Box>
                 <Box
