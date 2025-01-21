@@ -1,28 +1,30 @@
-import React, { useEffect, useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
   Container,
-  Typography,
-  Button,
-  Popover,
-  IconButton,
-  Rating,
-  useTheme,
-  Theme,
   Grid,
+  IconButton,
+  Popover,
+  Rating,
+  Theme,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
+import { getUserDetails } from "@services/userManagementService";
+import { AppRouteQueries } from "@utils/AppRoutes";
+import { CONSTANTS } from "@utils/constants";
+import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
+import { NotificationTypes } from "@utils/types";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { AppRouteQueries } from "@utils/AppRoutes";
-import { searchEvents } from "@services/eventsService";
-import { pushNotification } from "@redux/slices/loadingSlice";
-import { CONSTANTS } from "@utils/constants";
-import { NotificationTypes } from "@utils/types";
 import { ClipLoader } from "react-spinners";
 import { defaultEventPic } from "@assets/index";
 import MoreInfoPopover from "@components/MoreInfoPopover";
@@ -44,6 +46,7 @@ interface Event {
   isEnrolled: boolean;
   isStarted: boolean;
   isExpired: boolean;
+  loading?: boolean;
 }
 
 // Sample data
@@ -161,6 +164,10 @@ const ExploreEvents = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
   const [browsedEvents, setBrowsedEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<
+    Event | undefined | null
+  >();
+  const [userDetails, setUserDetails] = useState<any>();
 
   const filteredEvents =
     selectedTags?.length === 0
@@ -187,9 +194,50 @@ const ExploreEvents = ({
     setPopoverTags([]);
   };
 
-  const handleEnrollClick = () => {
+  const handleEnrollClick = async (event: any) => {
+    setSelectedEvent({
+      ...event,
+      loading: true,
+    });
+    const payload = {
+      enrollList: [getLocalStorageItem(CONSTANTS?.USER_EMAIL)],
+    };
+
     if (isTokenActive) {
-      console.log("Enroll Clicked");
+      try {
+        const enrollFormResponse = await enrollOrJoinEvent(payload, event?.id);
+        setSelectedEvent(null);
+        if (enrollFormResponse?.success) {
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                enrollFormResponse?.message ||
+                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
+              type: NotificationTypes.SUCCESS,
+            })
+          );
+        } else {
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                enrollFormResponse?.message ||
+                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
+              type: NotificationTypes.ERROR,
+            })
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message: CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
       return;
     }
     navigate(AppRouteQueries?.AUTH_LOGIN);
@@ -232,6 +280,41 @@ const ExploreEvents = ({
     }
   };
 
+  const fetchUserDetails = async () => {
+    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    try {
+      const getUserResponse = await getUserDetails(userId || "");
+      if (getUserResponse?.success) {
+        setUserDetails(getUserResponse?.data);
+      } else {
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              getUserResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (isTokenActive) {
+      fetchUserDetails();
+    }
+  }, []);
+
   useEffect(() => {
     const payload = {
       searchText: searchText,
@@ -262,7 +345,9 @@ const ExploreEvents = ({
                 handlePopoverOpen,
                 handleEnrollClick,
                 viewMode,
-                theme
+                theme,
+                selectedEvent,
+                userDetails?.eventIds
               )
             )
           )}
@@ -279,7 +364,9 @@ const ExploreEvents = ({
                   handlePopoverOpen,
                   handleEnrollClick,
                   viewMode,
-                  theme
+                  theme,
+                  selectedEvent,
+                  userDetails?.eventIds
                 )}
               </Grid>
             ))
@@ -287,13 +374,12 @@ const ExploreEvents = ({
         </Grid>
       )}
 
-      {/* Popover for Tags */}
+
       <MoreInfoPopover
         open={open}
         anchorEl={anchorEl}
         items={popoverTags}
         onClose={handlePopoverClose}
-        // buttonText={""}
       />
     </Container>
   );
@@ -313,15 +399,19 @@ function getCard(
     isEnrolled: boolean;
     isStarted: boolean;
     isExpired: boolean;
+    loading?: boolean;
   },
   handlePopoverOpen: (
     event: React.MouseEvent<HTMLElement>,
     tags: string[]
   ) => void,
-  handleEnrollClick: () => void,
+  handleEnrollClick: (event: Event) => void,
   viewMode: string,
-  theme: Theme
+  theme: Theme,
+  selectedEvent: Event | undefined | null,
+  enrolledEventIds?: string[]
 ) {
+  const isEnrolled = enrolledEventIds?.includes(event.id.toString());
   return (
     <Card
       key={event.id}
@@ -355,13 +445,27 @@ function getCard(
           <Button
             variant="contained"
             sx={staticStyles?.button?.enrollButton}
-            onClick={handleEnrollClick}
+            onClick={() => {
+              handleEnrollClick(event);
+              // setLoading(true);
+            }}
           >
-            Enroll
+            {selectedEvent?.id === event?.id && selectedEvent?.loading ? (
+              <ClipLoader
+                color={"#fff"}
+                loading={
+                  selectedEvent?.id === event?.id && selectedEvent?.loading
+                }
+                size={24}
+              />
+            ) : isEnrolled ? (
+              "Join"
+            ) : (
+              "Enroll"
+            )}
           </Button>
         </Box>
         {/* <Typography variant="h6">{event.title}</Typography> */}
-
         <Box
           sx={{
             display: "flex",

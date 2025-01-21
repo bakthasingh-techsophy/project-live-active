@@ -1,5 +1,8 @@
 import { Box, Button, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { AppRouteQueries, AppRoutes } from "@utils/AppRoutes";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { useNavigate } from "react-router-dom";
 
 interface CTABannerProps {
   backgroundImage: string;
@@ -99,7 +102,13 @@ const dynamicStyles = {
 
 const CTABanner = ({ backgroundImage }: CTABannerProps) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme?.breakpoints?.down("sm"));
+  const isTokenActive = !isTokenExpired();
+
+  const handleNavigation = (route: string) => {
+    navigate(route);
+  };
 
   return (
     <Box
@@ -149,9 +158,11 @@ const CTABanner = ({ backgroundImage }: CTABannerProps) => {
             staticStyles?.button?.startButton(theme),
             dynamicStyles?.button?.startButton(isSmallScreen),
           ]}
-          onClick={() => {
-            console.log("CTA Button Clicked!");
-          }}
+          onClick={() =>
+            isTokenActive
+              ? handleNavigation(AppRoutes?.WELLNESS)
+              : handleNavigation(AppRouteQueries?.AUTH_LOGIN)
+          }
         >
           Get Started Now
         </Button>

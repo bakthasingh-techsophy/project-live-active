@@ -1,7 +1,4 @@
-import {
-  preferencePic2,
-  preferencePic3
-} from "@assets/index";
+import { preferencePic2, preferencePic3 } from "@assets/index";
 import {
   Box,
   Button,
@@ -10,14 +7,14 @@ import {
   CardMedia,
   Container,
   Grid,
-  Typography
+  Typography,
 } from "@mui/material";
 
 const events = [
   {
     id: 1,
     title: "HIIT Bootcamp",
-    host: "John Doe",
+    hosts: ["Cooper"],
     rating: 4.8,
     scheduledTime: "2025-01-21T10:00:00",
     description: "High-intensity interval training for ultimate fitness!",
@@ -27,7 +24,7 @@ const events = [
   {
     id: 2,
     title: "Morning Yoga",
-    host: "Sarah Lee",
+    hosts: ["Sarah Lee", "Cooper"],
     rating: 4.5,
     scheduledTime: "2025-01-20T07:30:00",
     description: "Start your day with a calming and energizing yoga session.",
@@ -170,7 +167,10 @@ const QuickLinks = () => {
                     {event?.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Hosted by: {event?.host}
+                    Hosted by:{" "}
+                    {event?.hosts?.length > 0
+                      ? event?.hosts?.join(", ")
+                      : "No hosts available"}
                   </Typography>
                 </Box>
 

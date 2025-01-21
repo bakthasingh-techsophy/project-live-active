@@ -1,9 +1,14 @@
 import lightTheme from "@customThemes/lightTheme";
+import AdminEventManagement from "@features/administration/AdminEventManagement";
+import ProfileInformation from "@features/profile/ProfileInformation";
+import UserPreferences from "@features/profile/UserPreferences";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { getUserDetails } from "@services/userManagementService";
 import {
   AppProvider,
   NavigateOptions,
@@ -13,20 +18,15 @@ import {
 } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { AppRouteQueryValues, AppRoutes } from "@utils/AppRoutes";
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { LiveActiveBrand } from "./Branding";
-import ExploreEvents from "../common/ExploreEvents";
-import ProfileInformation from "@features/profile/ProfileInformation";
-import UserPreferences from "@features/profile/UserPreferences";
-import { getUserDetails } from "@services/userManagementService";
-import { getLocalStorageItem } from "@utils/encrypt";
 import { CONSTANTS } from "@utils/constants";
-import { pushNotification } from "@redux/slices/loadingSlice";
+import { getLocalStorageItem } from "@utils/encrypt";
 import { NotificationTypes } from "@utils/types";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import AdminEventManagement from "@features/administration/AdminEventManagement";
+import ExploreEvents from "../common/ExploreEvents";
+import { LiveActiveBrand } from "./Branding";
 
 // Define the navigation items
 const NAVIGATION: Navigation = [
@@ -104,7 +104,7 @@ const Dashboard = () => {
     user: {
       name: "Bharat Kashyap",
       email: "bharatkashyap@outlook.com",
-      image: "",
+      image: "https://cdn-icons-png.flaticon.com/128/5530/5530933.png",
     },
   };
   const dispatch = useDispatch();
@@ -212,6 +212,14 @@ const Dashboard = () => {
       router={dashboardRouter}
       authentication={authentication}
       session={session}
+      sx={{
+        "& .MuiSvgIcon-root": {
+          display: "none",
+        },
+        "& .MuiButtonBase-root": {
+          background: "black",
+        },
+      }}
     >
       <DashboardLayout sx={{ padding: 4 }}>
         {isLoading ? (

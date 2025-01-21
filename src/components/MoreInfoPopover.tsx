@@ -1,13 +1,12 @@
-import React from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
-  Popover,
   Box,
   Chip,
   IconButton,
-  Typography,
-  Button,
+  Popover
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import React from "react";
+
 
 interface MoreInfoPopoverProps {
   open: boolean;
