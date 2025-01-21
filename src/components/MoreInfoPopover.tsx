@@ -23,7 +23,6 @@ const MoreInfoPopover: React.FC<MoreInfoPopoverProps> = ({
   onClose,
   //   buttonText,
 }) => {
-  console.log("tags here", items);
   return (
     <Popover
       open={open}

@@ -1,4 +1,4 @@
-import { preferencePic2, preferencePic3, preferencePic4 } from "@assets/index";
+import { defaultEventPic } from "@assets/index";
 import {
   Box,
   Button,
@@ -10,7 +10,14 @@ import {
   Rating,
   Typography,
 } from "@mui/material";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { enrollOrJoinEvent } from "@services/eventsService";
+import { CONSTANTS } from "@utils/constants";
+import { getLocalStorageItem } from "@utils/encrypt";
+import { NotificationTypes } from "@utils/types";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { ClipLoader } from "react-spinners";
 
 interface Event {
   id: number;
@@ -19,53 +26,13 @@ interface Event {
   rating: number;
   scheduledTime: string;
   description: string;
-  category: string[];
-  image: string;
+  tags: string[];
+  photoUrl: string;
+  isEnrolled: boolean;
+  isStarted: boolean;
+  isExpired: boolean;
+  loading?: boolean;
 }
-
-const events: Event[] = [
-  {
-    id: 1,
-    title: "Morning Yoga",
-    hosts: ["Sarah Lee", "Lee Cooper"],
-    rating: 4.5,
-    scheduledTime: "2025-01-20T16:00:00",
-    description: "Start your day with a calming and energizing yoga session.",
-    category: ["Yoga", "Morning", "Beginner", "Relaxation", "Breathwork"],
-    image: preferencePic3,
-  },
-  {
-    id: 2,
-    title: "HIIT Bootcamp",
-    hosts: ["Lee Cooper"],
-    rating: 4.8,
-    scheduledTime: "2025-01-21T10:00:00",
-    description: "High-intensity interval training for ultimate fitness!",
-    category: ["HIIT", "Strength", "Cardio", "Fitness", "Endurance"],
-    image: preferencePic2,
-  },
-  {
-    id: 3,
-    title: "Healthy Cooking Class",
-    hosts: ["Green"],
-    rating: 4.2,
-    scheduledTime: "2025-01-22T16:00:00",
-    description: "Join us for a cooking class with healthy meal ideas.",
-    category: [
-      "Cooking",
-      "Healthy",
-      "Meal Prep",
-      "Nutrition",
-      "Wellness",
-      "Cooking",
-      "Healthy",
-      "Meal Prep",
-      "Nutrition",
-      "Wellness",
-    ],
-    image: preferencePic4,
-  },
-];
 
 const staticStyles = {
   container: {
@@ -88,6 +55,13 @@ const staticStyles = {
       position: "relative",
       height: "100%",
       overflow: "hidden",
+    },
+    headerContainer: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 1,
     },
     cardMediaContainer: {
       width: "100%",
@@ -188,21 +162,40 @@ const dynamicStyles = {
   },
 };
 
-const PreferencePrograms = () => {
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+interface PreferenceProps {
+  isLoading: any;
+  browsedEvents: any;
+  userDetails: any;
+}
 
-  const getUpcomingEvents = () => {
+const PreferencePrograms = ({
+  isLoading,
+  browsedEvents,
+  userDetails,
+}: PreferenceProps) => {
+  const dispatch = useDispatch();
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<
+    Event | undefined | null
+  >();
+
+  const getTopUpcomingEvents = () => {
     const currentDate = new Date();
 
-    const sortedUpcomingEvents = [...events]
-      .filter((event) => new Date(event.scheduledTime) > currentDate)
-      .sort(
-        (a, b) =>
-          new Date(a.scheduledTime).getTime() -
-          new Date(b.scheduledTime).getTime()
-      );
+    const filteredEvents = browsedEvents
+      ?.filter((event: Event) => {
+        const hasMatchingTags = event?.tags?.some((tag) =>
+          userDetails?.preferences?.includes(tag)
+        );
+        return (
+          !userDetails?.eventIds?.includes(event?.id) &&
+          hasMatchingTags &&
+          new Date(event.scheduledTime) > currentDate
+        );
+      })
+      ?.sort((a: Event, b: Event) => b?.rating - a?.rating);
 
-    setUpcomingEvents(sortedUpcomingEvents.slice(0, 3));
+    setUpcomingEvents(filteredEvents.slice(0, 3));
   };
 
   const formatDate = (dateString: string) => {
@@ -217,98 +210,169 @@ const PreferencePrograms = () => {
     });
   };
 
+  const handleEnrollClick = async (event: any) => {
+    setSelectedEvent({
+      ...event,
+      loading: true,
+    });
+    const payload = {
+      enrollList: [getLocalStorageItem(CONSTANTS?.USER_EMAIL)],
+    };
+
+    try {
+      const enrollFormResponse = await enrollOrJoinEvent(payload, event?.id);
+      setSelectedEvent(null);
+      if (enrollFormResponse?.success) {
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              enrollFormResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
+            type: NotificationTypes.SUCCESS,
+          })
+        );
+      } else {
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              enrollFormResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
   useEffect(() => {
-    getUpcomingEvents();
-  }, []);
+    getTopUpcomingEvents();
+  }, [userDetails, browsedEvents]);
 
   return (
     <Container sx={[staticStyles?.container?.mainContainer]} maxWidth={false}>
-      <Typography
-        variant="h5"
-        sx={{
-          color: "text.secondary",
-          fontWeight: 600,
-        }}
-      >
-        Upcoming Events
-      </Typography>
+      <Box sx={staticStyles?.container?.headerContainer}>
+        <Typography
+          variant="h5"
+          sx={{
+            color: "text.secondary",
+            fontWeight: 600,
+          }}
+        >
+          Top Upcoming Events
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: "text.secondary",
+            fontWeight: 400,
+          }}
+        >
+          Based on Preferences
+        </Typography>
+      </Box>
       <Grid container spacing={2} sx={dynamicStyles?.container?.grid}>
         {/* Map through events and render each card */}
-
-        {[...upcomingEvents]?.map((event) => (
-          <Grid item xs={12} sm={12} md={6} lg={4} key={event?.id}>
-            <Card
-              sx={[
-                staticStyles?.container?.cardContainer,
-                dynamicStyles?.container?.cardContainer,
-              ]}
-            >
-              <Box sx={staticStyles?.container?.cardMediaContainer}>
-                <CardMedia
-                  component="img"
-                  sx={[
-                    staticStyles?.container?.cardMediaContainer,
-                    dynamicStyles?.container?.cardMediaContainer,
-                  ]}
-                  image={event?.image}
-                  alt={event?.title}
-                />
-                <Box
-                  sx={[
-                    staticStyles?.container?.overlayContainer,
-                    dynamicStyles?.container?.overlayContainer,
-                  ]}
-                >
-                  <Typography
-                    variant="h6"
+        {isLoading ? (
+          <ClipLoader color={"#fff"} loading={isLoading} size={24} />
+        ) : (
+          [...upcomingEvents]?.map((event) => (
+            <Grid item xs={12} sm={12} md={6} lg={4} key={event?.id}>
+              <Card
+                sx={[
+                  staticStyles?.container?.cardContainer,
+                  dynamicStyles?.container?.cardContainer,
+                ]}
+              >
+                <Box sx={staticStyles?.container?.cardMediaContainer}>
+                  <CardMedia
+                    component="img"
                     sx={[
-                      staticStyles?.typography?.description,
-                      dynamicStyles?.typography?.description,
+                      staticStyles?.container?.cardMediaContainer,
+                      dynamicStyles?.container?.cardMediaContainer,
+                    ]}
+                    image={event?.photoUrl || defaultEventPic}
+                    alt={event?.title}
+                  />
+                  <Box
+                    sx={[
+                      staticStyles?.container?.overlayContainer,
+                      dynamicStyles?.container?.overlayContainer,
                     ]}
                   >
-                    {event?.description}
-                  </Typography>
-                  <Typography variant="body2">
-                    Scheduled for: {formatDate(event?.scheduledTime)}
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      console.log("Explore Clicked");
-                    }}
-                    sx={staticStyles?.button?.exploreButton}
-                  >
-                    Explore
-                  </Button>
+                    <Typography
+                      variant="h6"
+                      sx={[
+                        staticStyles?.typography?.description,
+                        dynamicStyles?.typography?.description,
+                      ]}
+                    >
+                      {event?.description}
+                    </Typography>
+                    <Typography variant="body2">
+                      Scheduled for: {formatDate(event?.scheduledTime)}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        handleEnrollClick(event);
+                      }}
+                      sx={staticStyles?.button?.exploreButton}
+                    >
+                      {selectedEvent?.id === event?.id &&
+                      selectedEvent?.loading ? (
+                        <ClipLoader
+                          color={"#fff"}
+                          loading={
+                            selectedEvent?.id === event?.id &&
+                            selectedEvent?.loading
+                          }
+                          size={24}
+                        />
+                      ) : (
+                        "Enroll"
+                      )}
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-              <CardContent sx={staticStyles?.container?.cardContentContainer}>
-                {/* Event Title */}
-                <Box sx={staticStyles?.container?.contentHeader}>
-                  <Typography
-                    variant="h6"
-                    sx={staticStyles?.typography?.boldText}
-                  >
-                    {event?.title}
-                  </Typography>
-                </Box>
+                <CardContent sx={staticStyles?.container?.cardContentContainer}>
+                  {/* Event Title */}
+                  <Box sx={staticStyles?.container?.contentHeader}>
+                    <Typography
+                      variant="h6"
+                      sx={staticStyles?.typography?.boldText}
+                    >
+                      {event?.title}
+                    </Typography>
+                  </Box>
 
-                {/* Host Name */}
-                <Typography variant="body2" color="text.secondary">
-                  Hosted by:{" "}
-                  {event?.hosts?.length > 0
-                    ? event?.hosts?.join(", ")
-                    : "No hosts available"}
-                </Typography>
+                  {/* Host Name */}
+                  <Typography variant="body2" color="text.secondary">
+                    Hosted by:{" "}
+                    {event?.hosts?.length > 0
+                      ? event?.hosts?.join(", ")
+                      : "No hosts available"}
+                  </Typography>
 
-                {/* Rating */}
-                <Box sx={staticStyles?.container?.ratingContainer}>
-                  <Rating value={event?.rating} precision={0.1} readOnly />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+                  {/* Rating */}
+                  <Box sx={staticStyles?.container?.ratingContainer}>
+                    <Rating value={event?.rating} precision={0.1} readOnly />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        )}
       </Grid>
     </Container>
   );

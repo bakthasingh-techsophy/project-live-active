@@ -160,9 +160,9 @@ const ExploreEvents = ({
   const isTokenActive = !isTokenExpired();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [browsedEvents, setBrowsedEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<
     Event | undefined | null
