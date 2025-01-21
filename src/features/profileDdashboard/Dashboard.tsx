@@ -92,8 +92,8 @@ const getCurrentLocation = (): string => {
     currentPath = currentPath.replace("/dashboard", "") || "/explore-events";
   } else if (currentPath.includes("/dashboard/profile")) {
     currentPath = currentPath.replace("/dashboard", "") || "/profile";
-  } else if (currentPath.includes("/dashboard/settings")) {
-    currentPath = currentPath.replace("/dashboard", "") || "/settings";
+  } else if (currentPath.includes("/dashboard/admin")) {
+    currentPath = currentPath.replace("/dashboard", "") || "/admin";
   }
 
   return currentPath;

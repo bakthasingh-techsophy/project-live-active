@@ -24,6 +24,8 @@ import { pushNotification } from "@redux/slices/loadingSlice";
 import { CONSTANTS } from "@utils/constants";
 import { NotificationTypes } from "@utils/types";
 import { ClipLoader } from "react-spinners";
+import { defaultEventPic } from "@assets/index";
+import MoreInfoPopover from "@components/MoreInfoPopover";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -33,7 +35,7 @@ const formatDate = (dateString: string) => {
 interface Event {
   id: number;
   title: string;
-  host: string;
+  hosts: string[];
   rating: number;
   scheduledTime: string;
   description: string;
@@ -286,39 +288,13 @@ const ExploreEvents = ({
       )}
 
       {/* Popover for Tags */}
-      <Popover
-        id="tag-popover"
+      <MoreInfoPopover
         open={open}
         anchorEl={anchorEl}
+        items={popoverTags}
         onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-      >
-        <Box sx={{ padding: 2, maxWidth: 300 }}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {popoverTags.map((tag, index) => (
-              <Chip
-                key={index}
-                label={tag}
-                size="small"
-                variant="outlined"
-                color="primary"
-              />
-            ))}
-          </Box>
-          <Box sx={{ textAlign: "right", marginTop: "8px" }}>
-            <IconButton onClick={handlePopoverClose} size="small">
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </Box>
-      </Popover>
+        // buttonText={""}
+      />
     </Container>
   );
 };
@@ -328,7 +304,7 @@ function getCard(
   event: {
     id: number;
     title: string;
-    host: string;
+    hosts: string[];
     rating: number;
     description: string;
     tags: string[];
@@ -360,7 +336,7 @@ function getCard(
     >
       <Box
         component="img"
-        src={event.photoUrl}
+        src={event.photoUrl || defaultEventPic}
         sx={
           viewMode === "explore"
             ? staticStylesExploreEvents?.cardImage
@@ -385,9 +361,48 @@ function getCard(
           </Button>
         </Box>
         {/* <Typography variant="h6">{event.title}</Typography> */}
-        <Typography variant="body2" color="text.secondary">
-          Hosted by: {event.host}
-        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "start",
+            gap: 1,
+            flexDirection: "column",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Hosted By:
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            {event.hosts.slice(0, 4).map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                size="small"
+                variant="outlined"
+                color="primary"
+              />
+            ))}
+            {event.hosts.length > 4 && (
+              <Button
+                onClick={(e) => handlePopoverOpen(e, event.hosts)}
+                sx={{ textTransform: "none", fontSize: "12px" }}
+                color="primary"
+              >
+                ...More
+              </Button>
+            )}
+          </Box>
+        </Box>
 
         <Typography
           variant="body2"
