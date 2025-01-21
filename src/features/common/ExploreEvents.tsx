@@ -1,31 +1,33 @@
-import React, { useEffect, useMemo, useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
   Container,
-  Typography,
-  Button,
-  Popover,
-  IconButton,
-  Rating,
-  useTheme,
-  Theme,
   Grid,
+  IconButton,
+  Popover,
+  Rating,
+  Theme,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
+import { getUserDetails } from "@services/userManagementService";
+import { AppRouteQueries } from "@utils/AppRoutes";
+import { CONSTANTS } from "@utils/constants";
+import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
+import { NotificationTypes } from "@utils/types";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { AppRouteQueries } from "@utils/AppRoutes";
-import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
-import { pushNotification } from "@redux/slices/loadingSlice";
-import { CONSTANTS } from "@utils/constants";
-import { NotificationTypes } from "@utils/types";
 import { ClipLoader } from "react-spinners";
-import { getLocalStorageItem } from "@utils/encrypt";
-import { getUserDetails } from "@services/userManagementService";
+import { defaultEventPic } from "@assets/index";
+import MoreInfoPopover from "@components/MoreInfoPopover";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -372,40 +374,12 @@ const ExploreEvents = ({
         </Grid>
       )}
 
-      {/* Popover for Tags */}
-      <Popover
-        id="tag-popover"
+      <MoreInfoPopover
         open={open}
         anchorEl={anchorEl}
+        items={popoverTags}
         onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-      >
-        <Box sx={{ padding: 2, maxWidth: 300 }}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {popoverTags.map((tag, index) => (
-              <Chip
-                key={index}
-                label={tag}
-                size="small"
-                variant="outlined"
-                color="primary"
-              />
-            ))}
-          </Box>
-          <Box sx={{ textAlign: "right", marginTop: "8px" }}>
-            <IconButton onClick={handlePopoverClose} size="small">
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </Box>
-      </Popover>
+      />
     </Container>
   );
 };
@@ -451,7 +425,7 @@ function getCard(
     >
       <Box
         component="img"
-        src={event.photoUrl}
+        src={event.photoUrl || defaultEventPic}
         sx={
           viewMode === "explore"
             ? staticStylesExploreEvents?.cardImage
@@ -491,12 +465,47 @@ function getCard(
           </Button>
         </Box>
         {/* <Typography variant="h6">{event.title}</Typography> */}
-        <Typography variant="body2" color="text.secondary">
-          Hosted by:{" "}
-          {event?.hosts?.length > 0
-            ? event?.hosts?.join(", ")
-            : "No hosts available"}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "start",
+            gap: 1,
+            flexDirection: "column",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Hosted By:
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            {event.hosts.slice(0, 4).map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                size="small"
+                variant="outlined"
+                color="primary"
+              />
+            ))}
+            {event.hosts.length > 4 && (
+              <Button
+                onClick={(e) => handlePopoverOpen(e, event.hosts)}
+                sx={{ textTransform: "none", fontSize: "12px" }}
+                color="primary"
+              >
+                ...More
+              </Button>
+            )}
+          </Box>
+        </Box>
 
         <Typography
           variant="body2"

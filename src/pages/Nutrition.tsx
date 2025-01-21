@@ -1,4 +1,3 @@
-import CoachesSection from "@features/coachNutrition/CoachesSection";
 import CustomizeNutrition from "@features/coachNutrition/CustomizeNutrition";
 import HeaderSection from "@features/coachNutrition/HeaderSection";
 import NutritionFaqSection from "@features/coachNutrition/NutritionFaqSection";
