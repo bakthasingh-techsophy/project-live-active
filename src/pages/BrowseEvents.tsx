@@ -1,6 +1,6 @@
 import Options from "@features/browseEvents/Options";
 import TagsDisplay from "@features/browseEvents/TagsRow";
-import ExploreEvents from "@features/common/ExploreEvents";
+import ExploreEvents, { Event } from "@features/common/ExploreEvents";
 import { Box } from "@mui/material";
 import { useState } from "react";
 
@@ -25,6 +25,9 @@ const BrowseEvents = () => {
         viewMode="browse"
         selectedTags={selectedTags}
         searchText={searchText}
+        handleEditEvent={() => {}}
+        selectedEvent={undefined}
+        setSelectedEvent={() => {}}
       />
     </Box>
   );

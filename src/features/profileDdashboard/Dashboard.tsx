@@ -25,7 +25,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import ExploreEvents from "../common/ExploreEvents";
+import ExploreEvents, { Event } from "../common/ExploreEvents";
 import { LiveActiveBrand } from "./Branding";
 
 // Define the navigation items
@@ -132,7 +132,16 @@ const Dashboard = () => {
     switch (dashboardRouter.pathname) {
       case "/" + AppRouteQueryValues.EXPLORE_EVENTS:
         return (
-          <ExploreEvents viewMode="explore" selectedTags={[]} searchText={""} />
+          <ExploreEvents
+            viewMode="explore"
+            selectedTags={[]}
+            searchText={""}
+            handleEditEvent={function (event: Event): void {
+              throw new Error("Function not implemented.");
+            }}
+            selectedEvent={undefined}
+            setSelectedEvent={() => {}}
+          />
         );
       case "/" +
         AppRouteQueryValues.PROFILE +

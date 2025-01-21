@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -20,6 +20,17 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
+import { defaultEventPic } from "@assets/index";
+import { Event } from "@features/common/ExploreEvents";
+import { deleteEvent, getEventDetailsById } from "@services/eventsService";
+import { AppRouteQueries } from "@utils/AppRoutes";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { AppDispatch } from "@redux/store";
+import { CONSTANTS } from "@utils/constants";
+import { NotificationTypes, ApiResponse } from "@utils/types";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 interface AddEventModalProps {
   open: boolean;
@@ -30,8 +41,7 @@ interface AddEventModalProps {
   availableTags: string[];
   availableHosts: string[];
   availableParticipants: string[]; // New prop for available participants
-  defaultEventPic: string;
-  emptyBinPic: string;
+  selectedEvent: Event | undefined | null;
 }
 
 const AddEventModal: React.FC<AddEventModalProps> = ({
@@ -43,48 +53,58 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   availableTags,
   availableHosts,
   availableParticipants, // Access available participants
-  defaultEventPic,
-  emptyBinPic,
+  selectedEvent, // Access available participants
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [cropper, setCropper] = useState<any>(null);
   const [openCropperModal, setOpenCropperModal] = useState(false);
+  const [eventDetails, setEventDetails] = useState<any>();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const theme = useTheme();
   const formik = useFormik({
     initialValues: {
-      title: "",
-      description: "",
-      hosts: [],
-      scheduledTime: "",
-      tags: [],
+      title: selectedEvent?.title || "",
+      description: selectedEvent?.description || "",
+      hosts: selectedEvent?.hosts || [],
+      scheduledTime: selectedEvent?.scheduledTime || "",
+      tags: selectedEvent?.tags || [],
       enrollList: [], // Add enrollList to initialValues
-      photoUrl: "",
+      photoUrl: selectedEvent?.photoUrl || "",
     },
-    validationSchema: Yup.object({
-      title: Yup.string().required("Title is required"),
-      scheduledTime: Yup.string().required("Scheduled Time is required"),
-      tags: Yup.array().of(Yup.string()).min(1, "At least one tag is required"),
-      hosts: Yup.array()
-        .of(Yup.string())
+    validationSchema: Yup?.object({
+      title: Yup?.string().required("Title is required"),
+      scheduledTime: Yup?.string().required("Scheduled Time is required"),
+      tags: Yup?.array()
+        .of(Yup?.string())
+        .min(1, "At least one tag is required"),
+      hosts: Yup?.array()
+        .of(Yup?.string())
         .min(1, "At least one host is required"),
-      enrollList: Yup.array(),
+      enrollList: Yup?.array(),
     }),
     onSubmit: (values) => {
-      onSave(values);
+      const payload = {
+        ...selectedEvent,
+        ...values,
+      };
+      console.log("valueshere", payload);
+      onSave(payload);
     },
+    enableReinitialize: true,
   });
 
   // Handle File Upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    if (e?.target?.files && e?.target?.files[0]) {
+      setFile(e?.target?.files[0]);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        setImage(reader?.result as string);
         setOpenCropperModal(true);
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader?.readAsDataURL(e?.target?.files[0]);
     }
   };
 
@@ -93,11 +113,36 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
 
   const handleApplyCrop = () => {
     if (cropper) {
-      const croppedImage = cropper.getCroppedCanvas().toDataURL();
-      formik.setFieldValue("photoUrl", croppedImage);
+      const croppedImage = cropper?.getCroppedCanvas().toDataURL();
+      formik?.setFieldValue("photoUrl", croppedImage);
     }
     handleCloseCropper();
   };
+  const fetchEventDetails = async () => {
+    if (!selectedEvent) return;
+    if (!isTokenExpired()) {
+      try {
+        const fetchEventResponse = await getEventDetailsById(selectedEvent?.id);
+        console.log("fetchEventresponse", fetchEventResponse);
+        if (fetchEventResponse?.success) {
+          setEventDetails(fetchEventResponse?.data || null);
+          formik?.setFieldValue(
+            "enrollList",
+            fetchEventResponse?.data?.enrollList || []
+          );
+        }
+
+        handleResponseMessage(fetchEventResponse, dispatch);
+      } catch (error: any) {
+        handleNotification(dispatch, error);
+      }
+      return;
+    }
+    navigate(AppRouteQueries?.AUTH_LOGIN);
+  };
+  useEffect(() => {
+    fetchEventDetails();
+  }, [selectedEvent]);
 
   return (
     <Modal open={open} onClose={onClose} disableAutoFocus>
@@ -119,12 +164,12 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         <Typography variant="h6" gutterBottom>
           Create Event
         </Typography>
-        <form onSubmit={formik.handleSubmit}>
+        <form onSubmit={formik?.handleSubmit}>
           {/* Image Upload Section */}
           <Box sx={{ marginBottom: 2, position: "relative" }}>
             <Box
               component={"img"}
-              src={formik.values.photoUrl || defaultEventPic}
+              src={formik?.values?.photoUrl || defaultEventPic}
               alt="Event"
               style={{
                 width: "100%",
@@ -140,18 +185,18 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 position: "absolute",
                 bottom: "16px",
                 right: "16px",
-                background: theme.palette.background.default,
+                background: theme?.palette?.background?.default,
                 padding: 2,
                 borderRadius: "50%",
                 boxShadow: 2,
                 "&:hover": {
-                  background: theme.palette.background.default,
+                  background: theme?.palette?.background?.default,
                   transform: "scale(1.1)",
                 },
               }}
               color="primary"
               onClick={() =>
-                document.getElementById("icon-button-file")?.click()
+                document?.getElementById("icon-button-file")?.click()
               }
             >
               <PhotoCamera />
@@ -171,9 +216,9 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             label="Title"
             variant="outlined"
             margin="normal"
-            {...formik.getFieldProps("title")}
-            error={formik.touched.title && Boolean(formik.errors.title)}
-            helperText={formik.touched.title && formik.errors.title}
+            {...formik?.getFieldProps("title")}
+            error={formik?.touched?.title && Boolean(formik?.errors?.title)}
+            helperText={formik?.touched?.title && formik?.errors?.title}
           />
 
           {/* Description Field */}
@@ -184,7 +229,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             margin="normal"
             multiline
             rows={4}
-            {...formik.getFieldProps("description")}
+            {...formik?.getFieldProps("description")}
           />
 
           {/* Hosts Autocomplete */}
@@ -193,9 +238,9 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             fullWidth
             options={availableHosts}
             getOptionLabel={(option) => option}
-            value={formik.values.hosts}
+            value={formik?.values?.hosts}
             onChange={(event, newValue) =>
-              formik.setFieldValue("hosts", newValue || [])
+              formik?.setFieldValue("hosts", newValue || [])
             }
             renderInput={(params) => (
               <TextField
@@ -206,7 +251,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               />
             )}
             renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
+              value?.map((option, index) => (
                 <Chip
                   variant="outlined"
                   label={option}
@@ -221,12 +266,12 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             <DateTimePicker
               label="Scheduled Time"
               value={
-                formik.values.scheduledTime
-                  ? new Date(formik.values.scheduledTime)
+                formik?.values?.scheduledTime
+                  ? new Date(formik?.values?.scheduledTime)
                   : null
               }
               onChange={(newValue) =>
-                formik.setFieldValue(
+                formik?.setFieldValue(
                   "scheduledTime",
                   newValue?.toISOString() || ""
                 )
@@ -235,10 +280,12 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               slotProps={{
                 textField: {
                   error: Boolean(
-                    formik.touched.scheduledTime && formik.errors.scheduledTime
+                    formik?.touched?.scheduledTime &&
+                      formik?.errors?.scheduledTime
                   ),
                   helperText:
-                    formik.touched.scheduledTime && formik.errors.scheduledTime,
+                    formik?.touched?.scheduledTime &&
+                    formik?.errors?.scheduledTime,
                   fullWidth: true,
                   disabled: true,
                 },
@@ -255,9 +302,9 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             fullWidth
             options={availableTags}
             getOptionLabel={(option) => option}
-            value={formik.values.tags}
+            value={formik?.values?.tags}
             onChange={(event, newValue) =>
-              formik.setFieldValue("tags", newValue || [])
+              formik?.setFieldValue("tags", newValue || [])
             }
             renderInput={(params) => (
               <TextField
@@ -268,7 +315,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               />
             )}
             renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
+              value?.map((option, index) => (
                 <Chip
                   variant="outlined"
                   label={option}
@@ -283,9 +330,9 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             fullWidth
             options={availableParticipants} // Use the available participants here
             getOptionLabel={(option) => option}
-            value={formik.values.enrollList}
+            value={formik?.values?.enrollList}
             onChange={(event, newValue) =>
-              formik.setFieldValue("enrollList", newValue || [])
+              formik?.setFieldValue("enrollList", newValue || [])
             }
             renderInput={(params) => (
               <TextField
@@ -296,7 +343,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               />
             )}
             renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
+              value?.map((option, index) => (
                 <Chip
                   variant="outlined"
                   label={option}
@@ -319,7 +366,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               variant="contained"
               color="secondary"
               size="large"
-              onClick={() => onStart(formik.values)}
+              onClick={() => onStart(formik?.values)}
               disabled={loading}
             >
               {loading ? <CircularProgress size={24} /> : "Start Event"}
@@ -400,3 +447,42 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
 };
 
 export default AddEventModal;
+
+function handleNotification(dispatch: AppDispatch, error: any) {
+  dispatch(
+    pushNotification({
+      isOpen: true,
+      message:
+        error?.message ||
+        CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE,
+      type: NotificationTypes?.ERROR,
+    })
+  );
+}
+
+function handleResponseMessage(
+  enrollFormResponse: ApiResponse,
+  dispatch: AppDispatch
+) {
+  if (enrollFormResponse?.success) {
+    dispatch(
+      pushNotification({
+        isOpen: true,
+        message:
+          enrollFormResponse?.message ||
+          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_SUCCESS,
+        type: NotificationTypes?.SUCCESS,
+      })
+    );
+  } else {
+    dispatch(
+      pushNotification({
+        isOpen: true,
+        message:
+          enrollFormResponse?.message ||
+          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE,
+        type: NotificationTypes?.ERROR,
+      })
+    );
+  }
+}
