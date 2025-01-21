@@ -1,4 +1,4 @@
-import { TestProfile1, TestProfile2, TestProfile3 } from "@assets/index";
+import { TestProfile1, TestProfile2, TestProfile3, TestProfile4, TestProfile5 } from "@assets/index";
 import {
   Box,
   Button,
@@ -42,30 +42,21 @@ const coaches = [
   },
   {
     id: 4,
-    title: "Ravindra Kiran",
-    level: "Professional",
-    rating: 4.8,
-    sessionsNo: 212,
-    description: "Experienced with Zumba, Nutrition, Cardio",
-    image: TestProfile3,
+    title: "Baktha Singh",
+    level: "Beginner",
+    rating: 4.1,
+    sessionsNo: 12,
+    description: "Experienced with Cardio",
+    image: TestProfile4,
   },
   {
     id: 5,
-    title: "Sushma Pandey",
-    level: "Amateur",
-    rating: 4.1,
-    sessionsNo: 68,
-    description: "Experienced with Yoga, Nutrition",
-    image: TestProfile1,
-  },
-  {
-    id: 6,
-    title: "Poornima Thakur",
-    level: "Beginner",
-    rating: 4.0,
-    sessionsNo: 22,
-    description: "Specialized in Nutrition",
-    image: TestProfile2,
+    title: "Rashmika R",
+    level: "Trainee",
+    rating: 4.6,
+    sessionsNo: 2,
+    description: "Trained with Dietary Plans",
+    image: TestProfile5,
   },
 ];
 
@@ -197,7 +188,7 @@ const CoachesSection = () => {
     return Math.floor(sessionNo / 10) * 10;
   };
 
-  const visibleCoaches = showAll ? coaches : coaches.slice(0, 3);
+  const visibleCoaches = showAll ? coaches : coaches?.slice(0, 3);
 
   return (
     <Container sx={[staticStyles?.container?.mainContainer]} maxWidth={false}>
@@ -212,7 +203,7 @@ const CoachesSection = () => {
       </Typography>
       <Grid container spacing={2} sx={dynamicStyles?.container?.grid}>
         {/* Map through visible coaches and render each card */}
-        {visibleCoaches.map((event) => (
+        {visibleCoaches?.map((event) => (
           <Grid item xs={12} sm={6} md={3} lg={3.5} key={event?.id}>
             <Card sx={[staticStyles?.container?.cardContainer]}>
               <CardMedia
@@ -278,8 +269,10 @@ const CoachesSection = () => {
                     console.log("Join Clicked");
                   }}
                   sx={staticStyles?.button?.subscribeButton}
+                  disabled
                 >
-                  Subscribe
+                  Coming Soon
+                  {/* Subscribe */}
                 </Button>
               </CardContent>
             </Card>

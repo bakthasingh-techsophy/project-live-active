@@ -128,7 +128,6 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               alt="Event"
               style={{
                 width: "100%",
-                height: "200px",
                 borderRadius: "8px",
                 objectFit: "cover",
                 objectPosition: "center top",
