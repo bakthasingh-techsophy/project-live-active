@@ -26,6 +26,7 @@ import { pushNotification } from "@redux/slices/loadingSlice";
 import { NotificationTypes } from "@utils/types";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
+import AdminEventManagement from "@features/administration/AdminEventManagement";
 
 // Define the navigation items
 const NAVIGATION: Navigation = [
@@ -59,8 +60,8 @@ const NAVIGATION: Navigation = [
   },
   {
     kind: "page",
-    segment: AppRouteQueryValues.SETTINGS,
-    title: "Settings",
+    segment: AppRouteQueryValues.ADMIN,
+    title: "Admin",
     icon: <SettingsIcon />,
   },
 ];
@@ -137,22 +138,14 @@ const Dashboard = () => {
         AppRouteQueryValues.PROFILE +
         "/" +
         AppRouteQueryValues.DETAILS:
-        return (
-          <ProfileInformation
-            subHeading={"Profile Details"}
-          />
-        );
+        return <ProfileInformation subHeading={"Profile Details"} />;
       case "/" +
         AppRouteQueryValues.PROFILE +
         "/" +
         AppRouteQueryValues.PREFERENCES:
-        return (
-          <UserPreferences
-            subHeading={"User Preferences"}
-          />
-        );
-      case "/" + AppRouteQueryValues.SETTINGS:
-        return <>Settings</>;
+        return <UserPreferences subHeading={"User Preferences"} />;
+      case "/" + AppRouteQueryValues.ADMIN:
+        return <AdminEventManagement />;
       case "/":
         navigate(AppRoutes.HOME);
         return <></>;

@@ -22,6 +22,7 @@ import {
   AppRouteQueryParams,
   AppRouteQueryValues,
   AppRoutes,
+  AppRoutesCombination,
 } from "@utils/AppRoutes";
 
 interface ResponsiveToolbarProps {
@@ -191,7 +192,13 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
 
   const handleNavigation = (link: string, label: string) => {
     setSelectedMenu(label);
-    navigate(link);
+    console.log("linkhere", link);
+    let tempLink = link;
+    if (tempLink?.includes(AppRoutes?.DASHBOARD)) {
+      tempLink = AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS;
+    }
+
+    navigate(tempLink);
   };
 
   const handleLoginClick = () => {

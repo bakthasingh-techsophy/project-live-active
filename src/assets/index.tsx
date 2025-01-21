@@ -32,3 +32,4 @@ export { default as eventPic2 } from "./even2.jpg";
 export { default as TestProfile1 } from "./TestProfile1.jpg";
 export { default as TestProfile2 } from "./TestProfile2.jpg";
 export { default as TestProfile3 } from "./TestProfile3.jpg";
+export { default as emptyBinPic } from "./empty-bin.svg";

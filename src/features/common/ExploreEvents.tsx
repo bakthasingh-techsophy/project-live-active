@@ -49,7 +49,8 @@ const staticStyles = {
   container: {
     mainContainer: { padding: 4 },
     grid: {
-      px: 2,
+      py: 3,
+      px: 1,
     },
     cardContainer: (theme: any) => ({
       display: "flex",
@@ -129,6 +130,7 @@ const staticStylesExploreEvents = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", // Auto-fill grid with responsive column size
     gap: "16px", // Gap between items
+    paddding: "0px",
   },
   cardStyle: { display: "flex", flexDirection: "column" },
   cardImage: {
@@ -236,7 +238,16 @@ const ExploreEvents = ({
   }, [searchText]);
 
   return (
-    <Container maxWidth={false}>
+    <Container
+      maxWidth={false}
+      sx={
+        viewMode === "explore"
+          ? {
+              padding: "0px 0px !important",
+            }
+          : {}
+      }
+    >
       {/* Masonry Grid Container */}
       {viewMode === "explore" ? (
         <Box sx={[staticStylesExploreEvents?.boxContainer]}>

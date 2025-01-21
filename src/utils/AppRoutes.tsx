@@ -31,4 +31,5 @@ export const AppRouteQueryValues = {
   PROFILE: "profile",
   DETAILS: "details",
   SETTINGS: "settings",
+  ADMIN: "admin",
 };
