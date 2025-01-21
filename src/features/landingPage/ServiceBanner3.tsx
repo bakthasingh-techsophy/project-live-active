@@ -2,12 +2,21 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button, useTheme } from "@mui/material";
 import Banner from "../../components/Banner";
 import { staticStyles, dynamicStyles } from "./ServiceCarousel";
+import { AppRoutesCombination, AppRoutes } from "@utils/AppRoutes";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { useNavigate } from "react-router-dom";
 
 interface ServiceBanner3Props {
   backgroundImage: string;
 }
 const ServiceBanner3 = ({ backgroundImage }: ServiceBanner3Props) => {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const isTokenActive = !isTokenExpired();
+
+  const handleNavigation = (route: string) => {
+    navigate(route);
+  };
 
   return (
     <Banner
@@ -32,7 +41,13 @@ const ServiceBanner3 = ({ backgroundImage }: ServiceBanner3Props) => {
               dynamicStyles?.buttons?.button,
             ]}
             endIcon={<ChevronRightIcon />}
-            // onClick={handleExploreClick}
+            onClick={() =>
+              isTokenActive
+                ? handleNavigation(
+                    AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS
+                  )
+                : handleNavigation(AppRoutes?.BROWSE_EVENTS)
+            }
           >
             Join Now
           </Button>

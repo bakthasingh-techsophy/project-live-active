@@ -192,7 +192,6 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
 
   const handleNavigation = (link: string, label: string) => {
     setSelectedMenu(label);
-    console.log("linkhere", link);
     let tempLink = link;
     if (tempLink?.includes(AppRoutes?.DASHBOARD)) {
       tempLink = AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS;

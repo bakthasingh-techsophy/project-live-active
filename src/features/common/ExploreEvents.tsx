@@ -1,29 +1,33 @@
-import React, { useEffect, useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
   Container,
-  Typography,
-  Button,
-  Popover,
-  IconButton,
-  Rating,
-  useTheme,
-  Theme,
   Grid,
+  IconButton,
+  Popover,
+  Rating,
+  Theme,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
+import { getUserDetails } from "@services/userManagementService";
+import { AppRouteQueries } from "@utils/AppRoutes";
+import { CONSTANTS } from "@utils/constants";
+import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
+import { NotificationTypes } from "@utils/types";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { AppRouteQueries } from "@utils/AppRoutes";
-import { searchEvents } from "@services/eventsService";
-import { pushNotification } from "@redux/slices/loadingSlice";
-import { CONSTANTS } from "@utils/constants";
-import { NotificationTypes } from "@utils/types";
 import { ClipLoader } from "react-spinners";
+import { defaultEventPic } from "@assets/index";
+import MoreInfoPopover from "@components/MoreInfoPopover";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -33,7 +37,7 @@ const formatDate = (dateString: string) => {
 interface Event {
   id: number;
   title: string;
-  host: string;
+  hosts: string[];
   rating: number;
   scheduledTime: string;
   description: string;
@@ -42,6 +46,7 @@ interface Event {
   isEnrolled: boolean;
   isStarted: boolean;
   isExpired: boolean;
+  loading?: boolean;
 }
 
 // Sample data
@@ -159,6 +164,10 @@ const ExploreEvents = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
   const [browsedEvents, setBrowsedEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<
+    Event | undefined | null
+  >();
+  const [userDetails, setUserDetails] = useState<any>();
 
   const filteredEvents =
     selectedTags?.length === 0
@@ -185,9 +194,50 @@ const ExploreEvents = ({
     setPopoverTags([]);
   };
 
-  const handleEnrollClick = () => {
+  const handleEnrollClick = async (event: any) => {
+    setSelectedEvent({
+      ...event,
+      loading: true,
+    });
+    const payload = {
+      enrollList: [getLocalStorageItem(CONSTANTS?.USER_EMAIL)],
+    };
+
     if (isTokenActive) {
-      console.log("Enroll Clicked");
+      try {
+        const enrollFormResponse = await enrollOrJoinEvent(payload, event?.id);
+        setSelectedEvent(null);
+        if (enrollFormResponse?.success) {
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                enrollFormResponse?.message ||
+                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
+              type: NotificationTypes.SUCCESS,
+            })
+          );
+        } else {
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                enrollFormResponse?.message ||
+                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
+              type: NotificationTypes.ERROR,
+            })
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message: CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
       return;
     }
     navigate(AppRouteQueries?.AUTH_LOGIN);
@@ -230,6 +280,41 @@ const ExploreEvents = ({
     }
   };
 
+  const fetchUserDetails = async () => {
+    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    try {
+      const getUserResponse = await getUserDetails(userId || "");
+      if (getUserResponse?.success) {
+        setUserDetails(getUserResponse?.data);
+      } else {
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              getUserResponse?.message ||
+              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes.ERROR,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (isTokenActive) {
+      fetchUserDetails();
+    }
+  }, []);
+
   useEffect(() => {
     const payload = {
       searchText: searchText,
@@ -260,7 +345,9 @@ const ExploreEvents = ({
                 handlePopoverOpen,
                 handleEnrollClick,
                 viewMode,
-                theme
+                theme,
+                selectedEvent,
+                userDetails?.eventIds
               )
             )
           )}
@@ -277,7 +364,9 @@ const ExploreEvents = ({
                   handlePopoverOpen,
                   handleEnrollClick,
                   viewMode,
-                  theme
+                  theme,
+                  selectedEvent,
+                  userDetails?.eventIds
                 )}
               </Grid>
             ))
@@ -285,40 +374,12 @@ const ExploreEvents = ({
         </Grid>
       )}
 
-      {/* Popover for Tags */}
-      <Popover
-        id="tag-popover"
+      <MoreInfoPopover
         open={open}
         anchorEl={anchorEl}
+        items={popoverTags}
         onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-      >
-        <Box sx={{ padding: 2, maxWidth: 300 }}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {popoverTags.map((tag, index) => (
-              <Chip
-                key={index}
-                label={tag}
-                size="small"
-                variant="outlined"
-                color="primary"
-              />
-            ))}
-          </Box>
-          <Box sx={{ textAlign: "right", marginTop: "8px" }}>
-            <IconButton onClick={handlePopoverClose} size="small">
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </Box>
-      </Popover>
+      />
     </Container>
   );
 };
@@ -328,7 +389,7 @@ function getCard(
   event: {
     id: number;
     title: string;
-    host: string;
+    hosts: string[];
     rating: number;
     description: string;
     tags: string[];
@@ -337,15 +398,19 @@ function getCard(
     isEnrolled: boolean;
     isStarted: boolean;
     isExpired: boolean;
+    loading?: boolean;
   },
   handlePopoverOpen: (
     event: React.MouseEvent<HTMLElement>,
     tags: string[]
   ) => void,
-  handleEnrollClick: () => void,
+  handleEnrollClick: (event: Event) => void,
   viewMode: string,
-  theme: Theme
+  theme: Theme,
+  selectedEvent: Event | undefined | null,
+  enrolledEventIds?: string[]
 ) {
+  const isEnrolled = enrolledEventIds?.includes(event.id.toString());
   return (
     <Card
       key={event.id}
@@ -360,7 +425,7 @@ function getCard(
     >
       <Box
         component="img"
-        src={event.photoUrl}
+        src={event.photoUrl || defaultEventPic}
         sx={
           viewMode === "explore"
             ? staticStylesExploreEvents?.cardImage
@@ -379,15 +444,68 @@ function getCard(
           <Button
             variant="contained"
             sx={staticStyles?.button?.enrollButton}
-            onClick={handleEnrollClick}
+            onClick={() => {
+              handleEnrollClick(event);
+              // setLoading(true);
+            }}
           >
-            Enroll
+            {selectedEvent?.id === event?.id && selectedEvent?.loading ? (
+              <ClipLoader
+                color={"#fff"}
+                loading={
+                  selectedEvent?.id === event?.id && selectedEvent?.loading
+                }
+                size={24}
+              />
+            ) : isEnrolled ? (
+              "Join"
+            ) : (
+              "Enroll"
+            )}
           </Button>
         </Box>
         {/* <Typography variant="h6">{event.title}</Typography> */}
-        <Typography variant="body2" color="text.secondary">
-          Hosted by: {event.host}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "start",
+            gap: 1,
+            flexDirection: "column",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Hosted By:
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            {event.hosts.slice(0, 4).map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                size="small"
+                variant="outlined"
+                color="primary"
+              />
+            ))}
+            {event.hosts.length > 4 && (
+              <Button
+                onClick={(e) => handlePopoverOpen(e, event.hosts)}
+                sx={{ textTransform: "none", fontSize: "12px" }}
+                color="primary"
+              >
+                ...More
+              </Button>
+            )}
+          </Box>
+        </Box>
 
         <Typography
           variant="body2"

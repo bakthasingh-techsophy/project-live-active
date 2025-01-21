@@ -39,6 +39,13 @@ export const staticStyles = {
       "&:hover": {
         background: theme?.palette?.secondary?.dark,
       },
+      "&.Mui-disabled": {
+        background: "rgb(255, 255, 255,0.5)",
+        color:'#555',
+        "&:hover": {
+          background: "red",
+        },
+      },
     }),
   },
 };
@@ -54,7 +61,6 @@ export const dynamicStyles = {
     },
   },
 };
-
 
 const ServiceCarousel = () => {
   const theme = useTheme();

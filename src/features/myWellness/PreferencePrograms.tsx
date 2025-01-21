@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 interface Event {
   id: number;
   title: string;
-  host: string;
+  hosts: string[];
   rating: number;
   scheduledTime: string;
   description: string;
@@ -27,7 +27,7 @@ const events: Event[] = [
   {
     id: 1,
     title: "Morning Yoga",
-    host: "Sarah Lee",
+    hosts: ["Sarah Lee", "Lee Cooper"],
     rating: 4.5,
     scheduledTime: "2025-01-20T16:00:00",
     description: "Start your day with a calming and energizing yoga session.",
@@ -37,7 +37,7 @@ const events: Event[] = [
   {
     id: 2,
     title: "HIIT Bootcamp",
-    host: "John Doe",
+    hosts: ["Lee Cooper"],
     rating: 4.8,
     scheduledTime: "2025-01-21T10:00:00",
     description: "High-intensity interval training for ultimate fitness!",
@@ -47,7 +47,7 @@ const events: Event[] = [
   {
     id: 3,
     title: "Healthy Cooking Class",
-    host: "Emma Green",
+    hosts: ["Green"],
     rating: 4.2,
     scheduledTime: "2025-01-22T16:00:00",
     description: "Join us for a cooking class with healthy meal ideas.",
@@ -63,26 +63,6 @@ const events: Event[] = [
       "Nutrition",
       "Wellness",
     ],
-    image: preferencePic4,
-  },
-  {
-    id: 4,
-    title: "Test 1",
-    host: "Emma Green",
-    rating: 4.2,
-    scheduledTime: "2025-01-21T16:00:00",
-    description: "Join us for a cooking class with healthy meal ideas.",
-    category: ["Healthy"],
-    image: preferencePic4,
-  },
-  {
-    id: 5,
-    title: "Test 2",
-    host: "Emma Green",
-    rating: 4.2,
-    scheduledTime: "2025-01-21T16:00:00",
-    description: "Join us for a cooking class with healthy meal ideas.",
-    category: ["Cooking"],
     image: preferencePic4,
   },
 ];
@@ -315,7 +295,10 @@ const PreferencePrograms = () => {
 
                 {/* Host Name */}
                 <Typography variant="body2" color="text.secondary">
-                  Hosted by: {event?.host}
+                  Hosted by:{" "}
+                  {event?.hosts?.length > 0
+                    ? event?.hosts?.join(", ")
+                    : "No hosts available"}
                 </Typography>
 
                 {/* Rating */}

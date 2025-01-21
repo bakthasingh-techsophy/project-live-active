@@ -32,9 +32,11 @@ const ServiceBanner2 = ({ backgroundImage }: ServiceBanner2Props) => {
               staticStyles?.buttons?.button(theme),
               dynamicStyles?.buttons?.button,
             ]}
-            endIcon={<ChevronRightIcon />}
+            disabled
+            // endIcon={<ChevronRightIcon />}
           >
-            Personalize Now
+            Coming Soon
+            {/* Personalize Now */}
           </Button>
         </>
       }
