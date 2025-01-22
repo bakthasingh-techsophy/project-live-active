@@ -12,7 +12,27 @@ import { NotificationTypes } from "@utils/types";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-const MyWellness = () => {
+interface Event {
+  id: number;
+  title: string;
+  hosts: string[];
+  rating: number;
+  scheduledTime: string;
+  description: string;
+  tags: string[];
+  photoUrl: string;
+  isEnrolled: boolean;
+  isStarted: boolean;
+  isExpired: boolean;
+  loading?: boolean;
+  updated?: boolean;
+}
+
+interface MyWellnessProps {
+  viewMode: "explore" | "browse";
+  timePeriod: "upcoming" | "past";
+}
+const MyWellness = ({ viewMode, timePeriod }: MyWellnessProps) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [browsedEvents, setBrowsedEvents] = useState<Event[]>([]);
@@ -86,6 +106,13 @@ const MyWellness = () => {
     }
   };
 
+  const handleReload = () => {
+    fetchUserDetails();
+    handleSearch({
+      searchText: "",
+    });
+  };
+
   useEffect(() => {
     const payload = {
       searchText: "",
@@ -96,24 +123,36 @@ const MyWellness = () => {
 
   return (
     <Box
-      sx={{
-        background:
-          "linear-gradient(180deg, rgb(210, 245, 255) 0%, rgb(238, 253, 248) 33%, rgb(246, 253, 243) 66%, rgb(255, 255, 255) 100%)",
-        minHeight: "80vh",
-      }}
+      sx={
+        viewMode === "browse"
+          ? {
+              background:
+                "linear-gradient(180deg, rgb(210, 245, 255) 0%, rgb(238, 253, 248) 33%, rgb(246, 253, 243) 66%, rgb(255, 255, 255) 100%)",
+              minHeight: "80vh",
+            }
+          : {}
+      }
     >
-      <WellnessHeader />
+      {viewMode === "browse" && <WellnessHeader />}
       <MyEnrollments
         isLoading={isLoading}
         browsedEvents={browsedEvents}
         userDetails={userDetails}
+        viewMode={viewMode}
+        timePeriod={timePeriod}
+        handleReload={handleReload}
       />
-      <PreferencePrograms
-        isLoading={isLoading}
-        browsedEvents={browsedEvents}
-        userDetails={userDetails}
-      />
-      <QuoteSection />
+      {viewMode === "browse" && (
+        <>
+          <PreferencePrograms
+            isLoading={isLoading}
+            browsedEvents={browsedEvents}
+            userDetails={userDetails}
+            handleReload={handleReload}
+          />
+          <QuoteSection />
+        </>
+      )}
     </Box>
   );
 };

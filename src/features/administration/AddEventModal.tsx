@@ -31,6 +31,7 @@ import { CONSTANTS } from "@utils/constants";
 import { NotificationTypes, ApiResponse } from "@utils/types";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { handleNotification } from "@utils/dispatchNotification";
 
 interface AddEventModalProps {
   open: boolean;
@@ -89,7 +90,6 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         ...selectedEvent,
         ...values,
       };
-      console.log("valueshere", payload);
       onSave(payload);
     },
     enableReinitialize: true,
@@ -123,18 +123,29 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
     if (!isTokenExpired()) {
       try {
         const fetchEventResponse = await getEventDetailsById(selectedEvent?.id);
-        console.log("fetchEventresponse", fetchEventResponse);
         if (fetchEventResponse?.success) {
           setEventDetails(fetchEventResponse?.data || null);
           formik?.setFieldValue(
             "enrollList",
             fetchEventResponse?.data?.enrollList || []
           );
+        } else {
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                fetchEventResponse?.message ||
+                CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE,
+              type: NotificationTypes?.ERROR,
+            })
+          );
         }
-
-        handleResponseMessage(fetchEventResponse, dispatch);
       } catch (error: any) {
-        handleNotification(dispatch, error);
+        handleNotification(
+          dispatch,
+          error,
+          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE
+        );
       }
       return;
     }
@@ -446,42 +457,3 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
 };
 
 export default AddEventModal;
-
-function handleNotification(dispatch: AppDispatch, error: any) {
-  dispatch(
-    pushNotification({
-      isOpen: true,
-      message:
-        error?.message ||
-        CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE,
-      type: NotificationTypes?.ERROR,
-    })
-  );
-}
-
-function handleResponseMessage(
-  enrollFormResponse: ApiResponse,
-  dispatch: AppDispatch
-) {
-  if (enrollFormResponse?.success) {
-    dispatch(
-      pushNotification({
-        isOpen: true,
-        message:
-          enrollFormResponse?.message ||
-          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_SUCCESS,
-        type: NotificationTypes?.SUCCESS,
-      })
-    );
-  } else {
-    dispatch(
-      pushNotification({
-        isOpen: true,
-        message:
-          enrollFormResponse?.message ||
-          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE,
-        type: NotificationTypes?.ERROR,
-      })
-    );
-  }
-}

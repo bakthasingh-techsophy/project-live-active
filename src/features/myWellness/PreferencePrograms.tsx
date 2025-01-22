@@ -166,12 +166,14 @@ interface PreferenceProps {
   isLoading: any;
   browsedEvents: any;
   userDetails: any;
+  handleReload: any;
 }
 
 const PreferencePrograms = ({
   isLoading,
   browsedEvents,
   userDetails,
+  handleReload,
 }: PreferenceProps) => {
   const dispatch = useDispatch();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
@@ -223,6 +225,7 @@ const PreferencePrograms = ({
       const enrollFormResponse = await enrollOrJoinEvent(payload, event?.id);
       setSelectedEvent(null);
       if (enrollFormResponse?.success) {
+        handleReload();
         dispatch(
           pushNotification({
             isOpen: true,
@@ -261,26 +264,28 @@ const PreferencePrograms = ({
 
   return (
     <Container sx={[staticStyles?.container?.mainContainer]} maxWidth={false}>
-      <Box sx={staticStyles?.container?.headerContainer}>
-        <Typography
-          variant="h5"
-          sx={{
-            color: "text.secondary",
-            fontWeight: 600,
-          }}
-        >
-          Top Upcoming Events
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            color: "text.secondary",
-            fontWeight: 400,
-          }}
-        >
-          Based on Preferences
-        </Typography>
-      </Box>
+      {upcomingEvents?.length > 0 && (
+        <Box sx={staticStyles?.container?.headerContainer}>
+          <Typography
+            variant="h5"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 600,
+            }}
+          >
+            Top Upcoming Events
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 400,
+            }}
+          >
+            Based on Preferences
+          </Typography>
+        </Box>
+      )}
       <Grid container spacing={2} sx={dynamicStyles?.container?.grid}>
         {/* Map through events and render each card */}
         {isLoading ? (

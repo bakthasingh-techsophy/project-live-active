@@ -1,20 +1,17 @@
 import MoreInfoPopover from "@components/MoreInfoPopover";
+import EventDetailsModal from "@features/administration/EventDetailsModal";
 import { Box, Container, Grid, useTheme } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
-import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
+import { searchEvents } from "@services/eventsService";
 import { getUserDetails } from "@services/userManagementService";
-import { AppRouteQueries } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
 import { NotificationTypes } from "@utils/types";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import EventCard from "./EventCard";
-import EventDetailsDrawer from "@features/administration/EventDetailsModal";
-import EventDetailsModal from "@features/administration/EventDetailsModal";
 
 export interface Event {
   id: number;
@@ -123,7 +120,7 @@ const staticStylesExploreEvents = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))", // Auto-fill grid with responsive column size
     gap: "16px", // Gap between items
-    paddding: "0px",
+    padding: 3,
   },
   cardStyle: { display: "flex", flexDirection: "column", position: "relative" },
   cardImage: {
@@ -157,7 +154,6 @@ const ExploreEvents = ({
   const theme = useTheme();
   const isTokenActive = !isTokenExpired();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -171,15 +167,31 @@ const ExploreEvents = ({
 
   const filteredEvents =
     selectedTags?.length === 0
-      ? browsedEvents
+      ? browsedEvents?.filter((event) => {
+          const isUpcoming =
+            new Date(event?.scheduledTime).getTime() > new Date().getTime();
+
+          return isUpcoming;
+        })
       : browsedEvents?.filter((event) => {
-          return event?.tags?.some((tag) =>
+          const tagsMatch = event?.tags?.some((tag) =>
             selectedTags?.some(
               (selectedTag: any) =>
                 tag.toLowerCase() === selectedTag.toLowerCase()
             )
           );
+          const isUpcoming =
+            new Date(event?.scheduledTime).getTime() > new Date().getTime();
+
+          return tagsMatch && isUpcoming;
         });
+
+  const sortedFilteredEvents = filteredEvents?.sort((a, b) => {
+    const dateA: any = new Date(a?.scheduledTime);
+    const dateB: any = new Date(b?.scheduledTime);
+
+    return dateA - dateB; // Latest first
+  });
 
   const handlePopoverOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -261,6 +273,7 @@ const ExploreEvents = ({
     }
   };
   const handleReload = () => {
+    fetchUserDetails();
     handleSearch({
       searchText: "",
     });
@@ -301,7 +314,7 @@ const ExploreEvents = ({
           {isLoading ? (
             <ClipLoader color={"#fff"} loading={isLoading} size={24} />
           ) : (
-            filteredEvents?.map((event) => (
+            sortedFilteredEvents?.map((event) => (
               <EventCard
                 event={event}
                 handlePopoverOpen={handlePopoverOpen}
@@ -326,7 +339,7 @@ const ExploreEvents = ({
           {isLoading ? (
             <ClipLoader color={"#fff"} loading={isLoading} size={24} />
           ) : (
-            filteredEvents?.map((event) => (
+            sortedFilteredEvents?.map((event) => (
               <Grid item xs={12} sm={6} md={4} key={event?.id}>
                 <EventCard
                   event={event}
@@ -339,7 +352,7 @@ const ExploreEvents = ({
                   staticStylesExploreEvents={staticStylesExploreEvents}
                   dynamicStyles={dynamicStyles}
                   enrolledEventIds={userDetails?.eventIds} // Assuming event IDs are from userDetails
-                  handleEditEvent={function (event: Event): void {
+                  handleEditEvent={function (): void {
                     throw new Error("Function not implemented.");
                   }}
                   setSelectedEvent={setSelectedEvent}
@@ -365,7 +378,8 @@ const ExploreEvents = ({
         onEnroll={function (): void {
           throw new Error("Function not implemented.");
         }}
-        loading={false}
+        loading={isLoading}
+        userDetails={userDetails}
       />
     </Container>
   );

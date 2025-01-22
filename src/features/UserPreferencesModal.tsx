@@ -220,7 +220,6 @@ const UserPreferencesModal = ({
           })
         );
       }
-      console.log("Selected Preferences:", selectedPreferences);
       handleModalClose();
     }
   };

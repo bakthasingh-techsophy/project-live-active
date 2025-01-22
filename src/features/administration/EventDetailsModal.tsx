@@ -5,11 +5,9 @@ import {
   Button,
   Chip,
   CircularProgress,
-  Modal,
-  Typography,
-  Avatar,
-  useTheme,
   Grid,
+  Modal,
+  Typography
 } from "@mui/material";
 import { format } from "date-fns";
 import React, { useEffect } from "react";
@@ -20,6 +18,8 @@ interface EventDetailsModalProps {
   loading: boolean;
   selectedEvent: Event | undefined | null;
   onEnroll: () => void;
+  userDetails: any;
+  timePeriod?: "upcoming" | "past";
 }
 
 const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
@@ -28,12 +28,14 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   loading,
   selectedEvent,
   onEnroll,
+  userDetails,
+  timePeriod = "upcoming",
 }) => {
-  const theme = useTheme();
-
   useEffect(() => {
     // Any logic to fetch event details if needed, like selectedEvent changes
   }, [selectedEvent]);
+
+  const isUserEnrolled = userDetails?.eventIds?.includes(selectedEvent?.id);
 
   return (
     <Modal open={open} onClose={onClose} disableAutoFocus>
@@ -48,7 +50,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           borderRadius: 2,
           width: "90%",
           maxWidth: "800px",
-          maxHeight: "80vh", // Limit the height of the modal
+          maxHeight: "80vh",
           overflowY: "auto",
           boxShadow: 2,
         }}
@@ -57,9 +59,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           Event Details
         </Typography>
 
-        {/* Grid layout: Image on the left, content on the right */}
         <Grid container spacing={2}>
-          {/* Image Section */}
           <Grid item xs={12} sm={4} sx={{ textAlign: "center" }}>
             <img
               src={selectedEvent?.photoUrl || defaultEventPic}
@@ -77,35 +77,40 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           {/* Content Section */}
           <Grid item xs={12} sm={8}>
             {/* Event Title and Enroll Button */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography variant="h5" sx={{ fontWeight: "bold", flex: 1 }}>
                 {selectedEvent?.title}
               </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={onEnroll}
-                disabled={loading}
-                sx={{ alignSelf: "flex-start" }}
-              >
-                {loading ? <CircularProgress size={24} /> : "Enroll"}
-              </Button>
+              {timePeriod === "upcoming" && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={onEnroll}
+                  disabled={loading}
+                  sx={{ alignSelf: "flex-start" }}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} />
+                  ) : isUserEnrolled ? (
+                    "Join"
+                  ) : (
+                    "Enroll"
+                  )}
+                </Button>
+              )}
             </Box>
 
             {/* Event Hosts */}
             <Box sx={{ mb: 2 }}>
               <Typography variant="body1" sx={{ fontWeight: "bold", mb: 1 }}>
-                Hosts:
+                Hosts:{" "}
               </Typography>
-              <Grid container spacing={1}>
-                {selectedEvent?.hosts?.map((host, index) => (
-                  <Grid item key={index} sx={{ display: "flex", alignItems: "center" }}>
-                    <Avatar sx={{ width: 32, height: 32, mr: 1 }} />
-                    <Typography variant="body2">{host}</Typography>
-                  </Grid>
-                ))}
-              </Grid>
+              <Typography variant="body2" color="text.secondary">
+                {(selectedEvent?.hosts ?? [])?.length > 0
+                  ? selectedEvent?.hosts?.join(", ")
+                  : "No hosts available"}
+              </Typography>
             </Box>
 
             {/* Scheduled Date and Time */}
@@ -115,7 +120,10 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               </Typography>
               <Typography variant="body2" color="textSecondary">
                 {selectedEvent?.scheduledTime &&
-                  format(new Date(selectedEvent?.scheduledTime), "MMMM dd, yyyy h:mm a")}
+                  format(
+                    new Date(selectedEvent?.scheduledTime),
+                    "MMMM dd, yyyy h:mm a"
+                  )}
               </Typography>
             </Box>
 
@@ -124,7 +132,11 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <Typography variant="body1" sx={{ fontWeight: "bold", mb: 1 }}>
                 Description:
               </Typography>
-              <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: "pre-wrap" }}>
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                sx={{ whiteSpace: "pre-wrap" }}
+              >
                 {selectedEvent?.description}
               </Typography>
             </Box>
@@ -136,7 +148,13 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               </Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 {selectedEvent?.tags?.map((tag, index) => (
-                  <Chip key={index} label={tag} size="small" variant="outlined" color="primary" />
+                  <Chip
+                    key={index}
+                    label={tag}
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                  />
                 ))}
               </Box>
             </Box>

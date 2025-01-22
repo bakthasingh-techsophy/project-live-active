@@ -64,7 +64,6 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
       setCroppedImage(croppedDataUrl);
       setSelectedImage(null);
       setIsDialogOpen(false);
-      console.log("Cropped Image URL:", croppedDataUrl);
     }
   };
 
@@ -91,6 +90,7 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
               type: NotificationTypes.SUCCESS,
             })
           );
+          setCroppedImage(null);
         } else {
           setIsLoading(false);
           dispatch(

@@ -28,8 +28,11 @@ export const AppRouteQueryValues = {
   REGISTER: "register",
   PREFERENCES: "preferences",
   EXPLORE_EVENTS: "explore-events",
+  MY_EVENTS: "my-events",
   PROFILE: "profile",
   DETAILS: "details",
+  UPCOMING: "upcoming",
+  PAST: "past",
   SETTINGS: "settings",
   ADMIN: "admin",
 };

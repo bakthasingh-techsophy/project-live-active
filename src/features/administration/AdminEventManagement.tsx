@@ -1,19 +1,21 @@
 // AdminEventManagement.tsx
-import React, { useEffect, useState } from "react";
-import { Box, Button, Typography, Container } from "@mui/material";
-import { defaultEventPic, emptyBinPic } from "@assets/index";
-import AddEventModal from "./AddEventModal"; // Import the new AddEventModal component
+import { emptyBinPic } from "@assets/index";
+import ExploreEvents, { Event } from "@features/common/ExploreEvents";
+import { Box, Button, Container, Typography } from "@mui/material";
+import { pushNotification } from "@redux/slices/loadingSlice";
+import { AppDispatch } from "@redux/store";
 import {
   saveEventInDataBase,
   searchEvents,
   updateEventInDatabase,
 } from "@services/eventsService";
-import { useDispatch } from "react-redux";
-import { pushNotification } from "@redux/slices/loadingSlice";
 import { CONSTANTS } from "@utils/constants";
 import { ApiResponse, NotificationTypes } from "@utils/types";
-import { AppDispatch } from "@redux/store";
-import ExploreEvents, { Event } from "@features/common/ExploreEvents";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import AddEventModal from "./AddEventModal"; // Import the new AddEventModal component
+import AddIcon from "@mui/icons-material/Add";
+import { handleResponseMessage } from "@utils/dispatchNotification";
 
 const AdminEventManagement: React.FC = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -39,7 +41,7 @@ const AdminEventManagement: React.FC = () => {
 
   const handleSaveEvent = async (eventData: Event) => {
     setLoading(true);
-    let response; // = await saveEventInDataBase(eventData);
+    let response;
 
     if (eventData?.id) {
       const eventId = eventData?.id;
@@ -58,7 +60,12 @@ const AdminEventManagement: React.FC = () => {
       });
     }
 
-    handleResponseMessage(response, dispatch);
+    handleResponseMessage(
+      response,
+      dispatch,
+      CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_SAVE_SUCCESS,
+      CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_SAVE_FAILURE
+    );
 
     setLoading(false);
     handleCloseModal();
@@ -66,7 +73,6 @@ const AdminEventManagement: React.FC = () => {
 
   const handleStartEvent = (eventData: any) => {
     setLoading(true);
-    console.log("Starting event", eventData);
     setLoading(false);
     handleCloseModal();
   };
@@ -115,13 +121,6 @@ const AdminEventManagement: React.FC = () => {
       searchText: "",
     });
   }, []);
-  useEffect(() => {
-    console.log("allevents", allEvents?.length);
-  }, [allEvents]);
-
-  useEffect(() => {
-    console.log("selectedEvent", selectedEvent);
-  }, [selectedEvent]);
 
   return (
     <Container
@@ -130,6 +129,7 @@ const AdminEventManagement: React.FC = () => {
         display: "flex",
         height: "100vh",
         position: "relative",
+        p: 3,
       }}
     >
       {isEmpty && (
@@ -168,7 +168,6 @@ const AdminEventManagement: React.FC = () => {
               fontSize: "16px",
               boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
               "&:hover": {
-                backgroundColor: "#0069d9",
                 boxShadow: "0px 6px 8px rgba(0, 0, 0, 0.2)",
               },
             }}
@@ -179,16 +178,41 @@ const AdminEventManagement: React.FC = () => {
       )}
 
       {!isEmpty && (
-        <ExploreEvents
-          viewMode="explore"
-          selectedTags={[]}
-          searchText={""}
-          handleEditEvent={handleEditEvent}
-          isOnAdministrationPage={true}
-          selectedEvent={selectedEvent}
-          setSelectedEvent={setSelectedEvent}
-          setIsEmpty={setIsEmpty}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={handleOpenModal}
+            sx={{
+              alignSelf: "flex-end",
+              fontSize: "16px",
+              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+              mr: 3,
+              "&:hover": {
+                boxShadow: "0px 6px 8px rgba(0, 0, 0, 0.2)",
+              },
+            }}
+          >
+            <AddIcon /> Add Event
+          </Button>
+          <ExploreEvents
+            viewMode="explore"
+            selectedTags={[]}
+            searchText={""}
+            handleEditEvent={handleEditEvent}
+            isOnAdministrationPage={true}
+            selectedEvent={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+            setIsEmpty={setIsEmpty}
+          />
+        </Box>
       )}
       <AddEventModal
         open={openAddModal}
@@ -206,41 +230,3 @@ const AdminEventManagement: React.FC = () => {
 };
 
 export default AdminEventManagement;
-
-function handleNotification(dispatch: AppDispatch, error: any) {
-  dispatch(
-    pushNotification({
-      isOpen: true,
-      message:
-        error?.message || CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-      type: NotificationTypes.ERROR,
-    })
-  );
-}
-
-function handleResponseMessage(
-  enrollFormResponse: ApiResponse,
-  dispatch: AppDispatch
-) {
-  if (enrollFormResponse?.success) {
-    dispatch(
-      pushNotification({
-        isOpen: true,
-        message:
-          enrollFormResponse?.message ||
-          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
-        type: NotificationTypes.SUCCESS,
-      })
-    );
-  } else {
-    dispatch(
-      pushNotification({
-        isOpen: true,
-        message:
-          enrollFormResponse?.message ||
-          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-        type: NotificationTypes.ERROR,
-      })
-    );
-  }
-}

@@ -22,6 +22,7 @@ const staticStyles = {
       display: "flex",
       flexDirection: "column",
       gap: 4,
+      p: 3,
     },
     formBox: {
       display: "flex",
@@ -40,7 +41,7 @@ const staticStyles = {
     userInfoContainer: {
       display: "flex",
       flexDirection: "column",
-      mt: 3.5
+      mt: 3.5,
     },
     submitButtonContainer: {
       display: "flex",
@@ -215,9 +216,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
   return (
     <Box sx={staticStyles?.container?.mainContainer}>
       <Box sx={staticStyles?.container?.headingContainer}>
-        <ImagePicker
-          userDetails={userDetails}
-        />
+        <ImagePicker userDetails={userDetails} />
         <Box sx={staticStyles?.container?.userInfoContainer}>
           <Typography
             variant="body2"

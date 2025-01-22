@@ -3,10 +3,14 @@ import AdminEventManagement from "@features/administration/AdminEventManagement"
 import ProfileInformation from "@features/profile/ProfileInformation";
 import UserPreferences from "@features/profile/UserPreferences";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
+import HistoryIcon from "@mui/icons-material/History";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
+import UpdateIcon from "@mui/icons-material/Update";
+import MyWellness from "@pages/MyWellness";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { getUserDetails } from "@services/userManagementService";
 import {
@@ -25,7 +29,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import ExploreEvents, { Event } from "../common/ExploreEvents";
+import ExploreEvents from "../common/ExploreEvents";
 import { LiveActiveBrand } from "./Branding";
 
 // Define the navigation items
@@ -39,6 +43,24 @@ const NAVIGATION: Navigation = [
     segment: AppRouteQueryValues.EXPLORE_EVENTS,
     title: "Explore Events",
     icon: <DashboardIcon />,
+  },
+  {
+    kind: "page",
+    segment: AppRouteQueryValues.MY_EVENTS,
+    title: "My Events",
+    icon: <DashboardCustomizeIcon />,
+    children: [
+      {
+        segment: "upcoming",
+        title: "Upcoming Events",
+        icon: <UpdateIcon />,
+      },
+      {
+        segment: "past",
+        title: "Past Events",
+        icon: <HistoryIcon />,
+      },
+    ],
   },
   {
     kind: "page",
@@ -92,6 +114,8 @@ const getCurrentLocation = (): string => {
     currentPath = currentPath.replace("/dashboard", "") || "/explore-events";
   } else if (currentPath.includes("/dashboard/profile")) {
     currentPath = currentPath.replace("/dashboard", "") || "/profile";
+  } else if (currentPath.includes("/dashboard/my-events")) {
+    currentPath = currentPath.replace("/dashboard", "") || "/my-events";
   } else if (currentPath.includes("/dashboard/admin")) {
     currentPath = currentPath.replace("/dashboard", "") || "/admin";
   }
@@ -102,9 +126,9 @@ const getCurrentLocation = (): string => {
 const Dashboard = () => {
   const sampleSession = {
     user: {
-      name: "Bharat Kashyap",
-      email: "bharatkashyap@outlook.com",
-      image: "https://cdn-icons-png.flaticon.com/128/5530/5530933.png",
+      name: "",
+      email: "",
+      image: "",
     },
   };
   const dispatch = useDispatch();
@@ -136,13 +160,20 @@ const Dashboard = () => {
             viewMode="explore"
             selectedTags={[]}
             searchText={""}
-            handleEditEvent={function (event: Event): void {
+            handleEditEvent={function (): void {
               throw new Error("Function not implemented.");
             }}
             selectedEvent={undefined}
             setSelectedEvent={() => {}}
           />
         );
+      case "/" +
+        AppRouteQueryValues.MY_EVENTS +
+        "/" +
+        AppRouteQueryValues.UPCOMING:
+        return <MyWellness viewMode="explore" timePeriod="upcoming" />;
+      case "/" + AppRouteQueryValues.MY_EVENTS + "/" + AppRouteQueryValues.PAST:
+        return <MyWellness viewMode="explore" timePeriod="past" />;
       case "/" +
         AppRouteQueryValues.PROFILE +
         "/" +
@@ -230,7 +261,7 @@ const Dashboard = () => {
         },
       }}
     >
-      <DashboardLayout sx={{ padding: 4 }}>
+      <DashboardLayout>
         {isLoading ? (
           <ClipLoader color={"primary.main"} loading={isLoading} size={24} />
         ) : (

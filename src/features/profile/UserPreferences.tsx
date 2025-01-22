@@ -23,7 +23,7 @@ interface UserPreferencesProps {
 
 const staticStyles = {
   container: {
-    mainContainer: { display: "flex", flexDirection: "column", gap: 4 },
+    mainContainer: { display: "flex", flexDirection: "column", gap: 4, p: 3},
     headerContainer: {
       display: "flex",
       justifyContent: "flex-start",

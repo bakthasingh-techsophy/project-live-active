@@ -20,7 +20,7 @@ const Navigator = () => {
         path={AppRoutes.WELLNESS}
         element={
           <ProtectedRoute>
-            <MyWellness />
+            <MyWellness viewMode="browse" timePeriod="upcoming" />
           </ProtectedRoute>
         }
       />

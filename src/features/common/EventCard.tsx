@@ -1,8 +1,7 @@
 import { defaultEventPic } from "@assets/index";
-import {
-  staticStyles,
-  dynamicStyles,
-} from "@features/landingPage/ServiceCarousel";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   Box,
   Button,
@@ -12,11 +11,11 @@ import {
   IconButton,
   Rating,
   Theme,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import { ClipLoader } from "react-spinners";
-import { Event } from "./ExploreEvents";
 import { pushNotification } from "@redux/slices/loadingSlice";
+import { AppDispatch } from "@redux/store";
 import {
   deleteEvent,
   enrollOrJoinEvent,
@@ -25,14 +24,14 @@ import {
 import { AppRouteQueries } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
+import { isTokenExpired } from "@utils/tokenUtils";
 import { ApiResponse, NotificationTypes } from "@utils/types";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { isTokenExpired } from "@utils/tokenUtils";
-import { AppDispatch } from "@redux/store";
-import { useEffect, useState } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { ClipLoader } from "react-spinners";
+import { Event } from "./ExploreEvents";
+import { handleNotification, handleResponseMessage } from "@utils/dispatchNotification";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -76,28 +75,49 @@ const EventCard: React.FC<EventCardProps> = ({
   const [localEvent, setLocalEvent] = useState<Event>(event);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isEnrolled = enrolledEventIds?.includes(localEvent?.id.toString());
+  const [isEnrolled] = useState(
+    enrolledEventIds?.includes(localEvent?.id.toString())
+  );
   const [loading, setLoading] = useState(false);
-  const handleEnrollClick = async () => {
+  const handleEnrollOrJoinClick = async () => {
     //   setSelectedEvent({
     //     ...event,
     //     loading: true,
     //   });
     const payload = {
-      enrollList: [getLocalStorageItem(CONSTANTS?.USER_EMAIL)],
+      [`${isEnrolled ? "join" : "enroll"}List`]: [
+        getLocalStorageItem(CONSTANTS?.USER_EMAIL),
+      ],
     };
 
     if (!isTokenExpired()) {
       setLoading(true);
       try {
-        const enrollFormResponse = await enrollOrJoinEvent(
+        const enrollOrJoinFormResponse = await enrollOrJoinEvent(
           payload,
           localEvent?.id
         );
-        //   setSelectedEvent(null);
-        handleResponseMessage(enrollFormResponse, dispatch);
+        if (enrollOrJoinFormResponse?.success) {
+          handleReload();
+        }
+        handleResponseMessage(
+          enrollOrJoinFormResponse,
+          dispatch,
+          isEnrolled
+            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
+            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
+          isEnrolled
+            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_FAILURE
+            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE
+        );
       } catch (error: any) {
-        handleNotification(dispatch, error);
+        handleNotification(
+          dispatch,
+          error,
+          isEnrolled
+            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
+            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS
+        );
       }
       setLoading(false);
       return;
@@ -113,9 +133,20 @@ const EventCard: React.FC<EventCardProps> = ({
           eventIds: [localEvent?.id],
         });
         if (deleteEventResponse?.success) handleReload();
-        handleResponseMessage(deleteEventResponse, dispatch);
+        handleResponseMessage(
+          deleteEventResponse,
+          dispatch,
+          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_SUCCESS,
+          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_FAILURE
+        );
       } catch (error: any) {
-        handleNotification(dispatch, error);
+        handleNotification(
+          dispatch,
+          error,
+          isEnrolled
+            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_SUCCESS
+            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_FAILURE
+        );
       }
       setLoading(false);
       return;
@@ -127,10 +158,25 @@ const EventCard: React.FC<EventCardProps> = ({
       setLoading(true);
       try {
         const eventResponse = await getEventById(localEvent?.id);
-        if (eventResponse?.success) setLocalEvent(eventResponse?.data);
-        handleResponseMessage(eventResponse, dispatch);
+        if (eventResponse?.success) {
+          setLocalEvent({ ...eventResponse?.data });
+        } else {
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                eventResponse?.message ||
+                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_FETCH_FAILURE,
+              type: NotificationTypes.ERROR,
+            })
+          );
+        }
       } catch (error: any) {
-        handleNotification(dispatch, error);
+        handleNotification(
+          dispatch,
+          error,
+          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_FETCH_FAILURE
+        );
       }
       setLoading(false);
 
@@ -138,18 +184,20 @@ const EventCard: React.FC<EventCardProps> = ({
     }
     navigate(AppRouteQueries?.AUTH_LOGIN);
   };
+  const updateCurrentCard = () => {
+    fetchCurrentUpdatedEvent();
+    setSelectedEvent(null);
+  };
+  
   useEffect(() => {
-    console.log("eventresponse--", selectedEvent);
     if (selectedEvent?.updated) {
-      fetchCurrentUpdatedEvent();
-      setSelectedEvent(null);
+      updateCurrentCard();
     }
   }, [selectedEvent]);
 
   return (
     <Card
       key={localEvent?.id}
-      onClick={() => handleCardClick(localEvent)}
       sx={
         viewMode === "explore"
           ? [
@@ -165,6 +213,9 @@ const EventCard: React.FC<EventCardProps> = ({
               dynamicStyles?.container?.cardContainer,
             ]
       }
+      onClick={() => {
+        !isOnAdministrationPage && handleCardClick(localEvent);
+      }}
     >
       <Box
         component="img"
@@ -196,8 +247,9 @@ const EventCard: React.FC<EventCardProps> = ({
               <Button
                 variant="contained"
                 sx={staticStyles?.button?.enrollButton}
-                onClick={() => {
-                  handleEnrollClick();
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEnrollOrJoinClick();
                 }}
               >
                 {loading ? (
@@ -211,48 +263,64 @@ const EventCard: React.FC<EventCardProps> = ({
             )}
             {/* Admin Edit/Delete Buttons */}
             {isOnAdministrationPage && (
-              <
-                //   sx={{
-                //     position: "absolute",
-                //     right: 8,
-                //     top: 8,
-                //     display: "flex",
-                //     justifyContent: "center",
-                //     alignItems: "center",
-                //     gap: 1,
-                //   }}
-              >
+              <>
                 {/* Edit Icon Button */}
-                <IconButton
-                  color="primary"
-                  onClick={() => handleEditEvent(event)}
-                  sx={{
-                    backgroundColor: theme.palette.primary.light,
-                    padding: 1,
-                    "&:hover": {
+                <Tooltip title="View Event Details" arrow>
+                  <IconButton
+                    color="info"
+                    onClick={() => {
+                      handleCardClick(localEvent);
+                    }}
+                    sx={{
                       backgroundColor: theme.palette.primary.light,
-                      transform: "scale(1.1)",
-                    },
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
+                      padding: 1,
+                      "&:hover": {
+                        backgroundColor: theme.palette.primary.light,
+                        transform: "scale(1.1)",
+                      },
+                    }}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Edit Event" arrow>
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      handleEditEvent(localEvent);
+                    }}
+                    sx={{
+                      backgroundColor: theme.palette.primary.light,
+                      padding: 1,
+                      "&:hover": {
+                        backgroundColor: theme.palette.primary.light,
+                        transform: "scale(1.1)",
+                      },
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
 
                 {/* Delete Icon Button */}
-                <IconButton
-                  color="secondary"
-                  onClick={handleDelete}
-                  sx={{
-                    backgroundColor: theme.palette.primary.light,
-                    padding: 1,
-                    "&:hover": {
+                <Tooltip title="Delete Event" arrow>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => {
+                      handleDelete();
+                    }}
+                    sx={{
                       backgroundColor: theme.palette.primary.light,
-                      transform: "scale(1.1)",
-                    },
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
+                      padding: 1,
+                      "&:hover": {
+                        backgroundColor: theme.palette.primary.light,
+                        transform: "scale(1.1)",
+                      },
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </>
             )}
           </Box>
@@ -367,40 +435,5 @@ const EventCard: React.FC<EventCardProps> = ({
 };
 
 export default EventCard;
-function handleNotification(dispatch: AppDispatch, error: any) {
-  dispatch(
-    pushNotification({
-      isOpen: true,
-      message:
-        error?.message || CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-      type: NotificationTypes.ERROR,
-    })
-  );
-}
 
-function handleResponseMessage(
-  enrollFormResponse: ApiResponse,
-  dispatch: AppDispatch
-) {
-  if (enrollFormResponse?.success) {
-    dispatch(
-      pushNotification({
-        isOpen: true,
-        message:
-          enrollFormResponse?.message ||
-          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
-        type: NotificationTypes.SUCCESS,
-      })
-    );
-  } else {
-    dispatch(
-      pushNotification({
-        isOpen: true,
-        message:
-          enrollFormResponse?.message ||
-          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-        type: NotificationTypes.ERROR,
-      })
-    );
-  }
-}
+

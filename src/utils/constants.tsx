@@ -144,5 +144,12 @@ export const CONSTANTS = {
     UPDATE_PREFERENCES_FAILURE: "Failed to Update User Preferences",
     EVENT_ENROLL_SUCCESS: "User Enrolled Successfully",
     EVENT_ENROLL_FAILURE: "Failed to Enroll User",
+    EVENT_JOINED_SUCCESS: "User Joined Successfully",
+    EVENT_JOINED_FAILURE: "Failed to Join User",
+    EVENT_DELETED_SUCCESS: "Event Deleted Successfully",
+    EVENT_DELETED_FAILURE: "Failed to Delete Event",
+    EVENT_FETCH_FAILURE: "Failed to Fetch Event Details",
+    EVENT_SAVE_SUCCESS: "Event Save Successfully",
+    EVENT_SAVE_FAILURE: "Failed to Save Event",
   },
 };
