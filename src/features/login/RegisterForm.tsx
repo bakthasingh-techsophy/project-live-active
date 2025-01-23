@@ -85,8 +85,8 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
         await dispatch(
           pushNotification({
             isOpen: true,
-            message: CONSTANTS.API_RESPONSE_MESSAGES.REGISTRATION_SUCCESS,
-            type: NotificationTypes.SUCCESS,
+            message: CONSTANTS?.API_RESPONSE_MESSAGES?.REGISTRATION_SUCCESS,
+            type: NotificationTypes?.SUCCESS,
           })
         );
         await toggleForm();
@@ -99,8 +99,8 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
             isOpen: true,
             message:
               postFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.REGISTRATION_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.REGISTRATION_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -110,8 +110,8 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.REGISTRATION_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.REGISTRATION_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }

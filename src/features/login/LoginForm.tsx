@@ -1,3 +1,4 @@
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -7,7 +8,7 @@ import {
 } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { postLoginForm } from "@services/userAuthService";
-import { AppRouteQueries, AppRoutes, AppRoutesCombination } from "@utils/AppRoutes";
+import { AppRoutesCombination } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { setLocalStorageItem } from "@utils/encrypt";
 import { NotificationTypes } from "@utils/types";
@@ -16,7 +17,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as Yup from "yup";
 
 const staticStyles = {
@@ -77,6 +77,12 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
           CONSTANTS?.ACCESS_TOKEN,
           postFormResponse?.data?.token?.substring(7)
         );
+        if (postFormResponse?.data?.roles?.includes(CONSTANTS?.LA_ADMIN_ROLE)) {
+          await setLocalStorageItem(
+            CONSTANTS?.USER_ROLE,
+            CONSTANTS?.LA_ADMIN_ROLE
+          );
+        }
         await setLocalStorageItem(CONSTANTS?.USER_EMAIL, values?.email);
         await setLocalStorageItem(
           CONSTANTS?.USER_ID,
@@ -87,8 +93,8 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
             isOpen: true,
             message:
               postFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.LOGIN_SUCCESS,
-            type: NotificationTypes.SUCCESS,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.LOGIN_SUCCESS,
+            type: NotificationTypes?.SUCCESS,
           })
         );
         setOpen(false);
@@ -102,8 +108,8 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
             isOpen: true,
             message:
               postFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.LOGIN_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.LOGIN_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -113,8 +119,8 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.LOGIN_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.LOGIN_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }

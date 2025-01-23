@@ -15,12 +15,12 @@ import { handleResponseMessage } from "@utils/dispatchNotification";
 import { Event, NotificationTypes } from "@utils/types";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import AddEventModal from "./AddEventModal"; // Import the new AddEventModal component
+import AddEventModal from "./AddEventModal";
 
 const AdminEventManagement: React.FC = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [reloadEvents, setReloadEvents] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<
     Event | undefined | null
   >();
@@ -47,7 +47,7 @@ const AdminEventManagement: React.FC = () => {
   const handleSaveEvent = async (eventData: Event) => {
     setLoading(true);
     let response;
-    const durationInMinutes = eventData.duration * 60;
+    const durationInMinutes = eventData?.duration * 60;
 
     const updatedEventData = {
       ...eventData,
@@ -63,6 +63,7 @@ const AdminEventManagement: React.FC = () => {
           if (prev) prev.updated = true;
           return { ...prev } as Event;
         });
+        setReloadEvents((prev) => !prev);
       }
     } else {
       setSelectedEvent(null);
@@ -70,6 +71,7 @@ const AdminEventManagement: React.FC = () => {
       handleSearch({
         searchText: "",
       });
+      setReloadEvents((prev) => !prev);
     }
 
     handleResponseMessage(
@@ -83,22 +85,12 @@ const AdminEventManagement: React.FC = () => {
     handleCloseModal();
   };
 
-  const handleStartEvent = (eventData: any) => {
-    setLoading(true);
-    setLoading(false);
-    handleCloseModal();
-  };
-
-  useEffect(() => {
-    console.log("------------ here", selectedEvent);
-  }, [selectedEvent]);
   const handleSearch = async (payload: any) => {
     try {
       setLoading(true);
       const searchFormResponse = await searchEvents(payload);
       if (searchFormResponse?.success) {
         setLoading(false);
-        setAllEvents(searchFormResponse?.data);
         setIsEmpty?.(searchFormResponse?.data?.length === 0);
       } else {
         setLoading(false);
@@ -107,8 +99,8 @@ const AdminEventManagement: React.FC = () => {
             isOpen: true,
             message:
               searchFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -118,8 +110,8 @@ const AdminEventManagement: React.FC = () => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -131,11 +123,12 @@ const AdminEventManagement: React.FC = () => {
     setOpenAddModal(true);
   };
 
-  useEffect(() => {
-    handleSearch({
-      searchText: "",
-    });
-  }, []);
+    useEffect(() => {
+      handleSearch({
+        searchText: "",
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
   return (
     <Container
@@ -232,6 +225,7 @@ const AdminEventManagement: React.FC = () => {
             selectedEvent={selectedEvent}
             setSelectedEvent={setSelectedEvent}
             setIsEmpty={setIsEmpty}
+            reloadEvents={reloadEvents}
           />
         </Box>
       )}
@@ -239,7 +233,6 @@ const AdminEventManagement: React.FC = () => {
         open={openAddModal}
         onClose={handleCloseModal}
         onSave={handleSaveEvent}
-        onStart={handleStartEvent}
         loading={loading}
         availableTags={availableTags}
         availableHosts={availableHosts}

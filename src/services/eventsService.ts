@@ -13,16 +13,16 @@ export const searchEvents = async (payload: object): Promise<ApiResponse> => {
       .post(payload)
       .json()) as ApiResponse;
 
-    if (response.success) {
-      const form = response.data as any;
+    if (response?.success) {
+      const form = response?.data as any;
       return {
-        success: response.success,
+        success: response?.success,
         data: form,
-        message: response.message,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -47,15 +47,15 @@ export const enrollOrJoinEvent = async (
       .post(payload)
       .json()) as ApiResponse;
 
-    if (response.success) {
+    if (response?.success) {
       return {
-        success: response.success,
-        data: response.data,
-        message: response.message,
+        success: response?.success,
+        data: response?.data,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -71,7 +71,7 @@ export const saveEventInDataBase = async (
   payload: object
 ): Promise<ApiResponse> => {
   const endpoint = `${gatewayUrl}/events`;
-  const token = getLocalStorageItem(CONSTANTS.ACCESS_TOKEN);
+  const token = getLocalStorageItem(CONSTANTS?.ACCESS_TOKEN);
   try {
     const response = (await wretch(endpoint)
       .headers({
@@ -81,15 +81,15 @@ export const saveEventInDataBase = async (
       .json()) as ApiResponse;
 
     // Return the response as it is (success and message)
-    if (response.success) {
+    if (response?.success) {
       return {
-        success: response.success,
-        data: response.data,
-        message: response.message,
+        success: response?.success,
+        data: response?.data,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -105,7 +105,7 @@ export const updateEventInDatabase = async (
   event: Event
 ): Promise<ApiResponse> => {
   const endpoint = `${gatewayUrl}/events/${eventId}`;
-  const token = getLocalStorageItem(CONSTANTS.ACCESS_TOKEN);
+  const token = getLocalStorageItem(CONSTANTS?.ACCESS_TOKEN);
   try {
     const response = (await wretch(endpoint)
       .headers({
@@ -115,15 +115,15 @@ export const updateEventInDatabase = async (
       .json()) as ApiResponse;
 
     // Return the response as it is (success and message)
-    if (response.success) {
+    if (response?.success) {
       return {
-        success: response.success,
-        data: response.data,
-        message: response.message,
+        success: response?.success,
+        data: response?.data,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -136,7 +136,7 @@ export const updateEventInDatabase = async (
 };
 export const deleteEvent = async (payload: object): Promise<ApiResponse> => {
   const endpoint = `${gatewayUrl}/events/delete`;
-  const token = getLocalStorageItem(CONSTANTS.ACCESS_TOKEN);
+  const token = getLocalStorageItem(CONSTANTS?.ACCESS_TOKEN);
   try {
     const response = (await wretch(endpoint)
       .headers({
@@ -146,15 +146,15 @@ export const deleteEvent = async (payload: object): Promise<ApiResponse> => {
       .json()) as ApiResponse;
 
     // Return the response as it is (success and message)
-    if (response.success) {
+    if (response?.success) {
       return {
-        success: response.success,
-        data: response.data,
-        message: response.message,
+        success: response?.success,
+        data: response?.data,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -169,7 +169,7 @@ export const getEventDetailsById = async (
   evenId: number
 ): Promise<ApiResponse> => {
   const endpoint = `${gatewayUrl}/events/${evenId}/details`;
-  const token = getLocalStorageItem(CONSTANTS.ACCESS_TOKEN);
+  const token = getLocalStorageItem(CONSTANTS?.ACCESS_TOKEN);
   try {
     const response = (await wretch(endpoint)
       .headers({
@@ -179,11 +179,11 @@ export const getEventDetailsById = async (
       .json()) as ApiResponse;
 
     // Return the response as it is (success and message)
-    if (response.success) {
+    if (response?.success) {
       return response;
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -196,7 +196,7 @@ export const getEventDetailsById = async (
 };
 export const getEventById = async (evenId: number): Promise<ApiResponse> => {
   const endpoint = `${gatewayUrl}/events/${evenId}`;
-  const token = getLocalStorageItem(CONSTANTS.ACCESS_TOKEN);
+  const token = getLocalStorageItem(CONSTANTS?.ACCESS_TOKEN);
   try {
     const response = (await wretch(endpoint)
       .headers({
@@ -206,11 +206,11 @@ export const getEventById = async (evenId: number): Promise<ApiResponse> => {
       .json()) as ApiResponse;
 
     // Return the response as it is (success and message)
-    if (response.success) {
+    if (response?.success) {
       return response;
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 

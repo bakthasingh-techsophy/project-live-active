@@ -15,16 +15,16 @@ export const getUserDetails = async (userId: string): Promise<ApiResponse> => {
       .get()
       .json()) as ApiResponse;
 
-    if (response.success) {
-      const form = response.data as any;
+    if (response?.success) {
+      const form = response?.data as any;
       return {
-        success: response.success,
+        success: response?.success,
         data: form,
-        message: response.message,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -47,16 +47,16 @@ export const updateUser = async (payload: object): Promise<ApiResponse> => {
       .put(payload)
       .json()) as ApiResponse;
 
-    if (response.success) {
-      const form = response.data as any;
+    if (response?.success) {
+      const form = response?.data as any;
       return {
-        success: response.success,
+        success: response?.success,
         data: form,
-        message: response.message,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 

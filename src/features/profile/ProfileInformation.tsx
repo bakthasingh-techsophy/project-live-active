@@ -1,4 +1,3 @@
-import { profilePic } from "@assets/index";
 import ImagePicker from "@components/ImagePicker";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
@@ -146,8 +145,8 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
             isOpen: true,
             message:
               updateUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_SUCCESS,
-            type: NotificationTypes.SUCCESS,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_USER_SUCCESS,
+            type: NotificationTypes?.SUCCESS,
           })
         );
       } else {
@@ -157,26 +156,26 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
             isOpen: true,
             message:
               updateUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_USER_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
     } catch (error) {
-      console.error(error);
+      console?.error(error);
       setIsLoading(false);
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_USER_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
   };
 
   const fetchUserDetails = async () => {
-    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    const userId = getLocalStorageItem(CONSTANTS?.USER_ID);
     try {
       setIsLoading(true);
 
@@ -191,8 +190,8 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
             isOpen: true,
             message:
               getUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -202,8 +201,8 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -211,6 +210,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
 
   useEffect(() => {
     fetchUserDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -266,7 +266,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
                     name="firstName"
                     label="First Name"
                     variant="outlined"
-                    value={values.firstName}
+                    value={values?.firstName}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched?.firstName && Boolean(errors?.firstName)}
@@ -283,7 +283,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
                     name="lastName"
                     label="Last Name"
                     variant="outlined"
-                    value={values.lastName}
+                    value={values?.lastName}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched?.lastName && Boolean(errors?.lastName)}
@@ -307,7 +307,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
                     name="mobileNumber"
                     label="Mobile Number"
                     variant="outlined"
-                    value={values.mobileNumber}
+                    value={values?.mobileNumber}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={
@@ -326,7 +326,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
                     name="userName"
                     label="Email Address"
                     variant="outlined"
-                    value={values.userName}
+                    value={values?.userName}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched?.userName && Boolean(errors?.userName)}
@@ -350,7 +350,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
                     name="gender"
                     label="Gender"
                     variant="outlined"
-                    value={values.gender}
+                    value={values?.gender}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched?.gender && Boolean(errors?.gender)}
@@ -370,7 +370,7 @@ const ProfileInformation = ({ subHeading }: ProfileInformationProps) => {
                     name="userId"
                     label="User ID"
                     variant="outlined"
-                    value={values.userId}
+                    value={values?.userId}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched?.userId && Boolean(errors?.userId)}

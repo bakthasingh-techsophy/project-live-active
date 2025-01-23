@@ -146,20 +146,21 @@ const AuthFormModal = ({ open, handleClose }: AuthFormModalProps) => {
   const currentUrlLocation = useLocation();
 
   const toggleForm = async () => {
-    const param = new URLSearchParams(currentUrlLocation.search).get("auth");
+    const param = new URLSearchParams(currentUrlLocation?.search).get("auth");
     const path =
-      param === AppRouteQueryValues.REGISTER
-        ? AppRouteQueryValues.LOGIN
-        : AppRouteQueryValues.REGISTER;
+      param === AppRouteQueryValues?.REGISTER
+        ? AppRouteQueryValues?.LOGIN
+        : AppRouteQueryValues?.REGISTER;
     navigate(`?auth=${path}`);
   };
 
   useEffect(() => {
-    const param = new URLSearchParams(currentUrlLocation.search).get("auth");
-    setIsRegistering(param === AppRouteQueryValues.REGISTER);
-    if (param === AppRouteQueryValues.LOGIN) {
-      navigate(AppRouteQueries.AUTH_LOGIN);
+    const param = new URLSearchParams(currentUrlLocation?.search).get("auth");
+    setIsRegistering(param === AppRouteQueryValues?.REGISTER);
+    if (param === AppRouteQueryValues?.LOGIN) {
+      navigate(AppRouteQueries?.AUTH_LOGIN);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUrlLocation?.search]);
 
   return (

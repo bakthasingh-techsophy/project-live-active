@@ -15,25 +15,22 @@ import {
   Typography,
 } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
-import { AppDispatch } from "@redux/store";
 import {
   deleteEvent,
-  enrollOrJoinEvent,
-  getEventById,
+  getEventById
 } from "@services/eventsService";
 import { AppRouteQueries } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
-import { getLocalStorageItem } from "@utils/encrypt";
-import { isTokenExpired } from "@utils/tokenUtils";
-import { ApiResponse, Event, NotificationTypes } from "@utils/types";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { ClipLoader } from "react-spinners";
 import {
   handleNotification,
   handleResponseMessage,
 } from "@utils/dispatchNotification";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { Event, NotificationTypes } from "@utils/types";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { ClipLoader } from "react-spinners";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -80,7 +77,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isEnrolled] = useState(
-    enrolledEventIds?.includes(localEvent?.id.toString())
+    enrolledEventIds?.includes(localEvent?.id?.toString())
   );
   const [loading, setLoading] = useState(false);
 
@@ -95,16 +92,16 @@ const EventCard: React.FC<EventCardProps> = ({
         handleResponseMessage(
           deleteEventResponse,
           dispatch,
-          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_SUCCESS,
-          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_FAILURE
+          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_DELETED_SUCCESS,
+          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_DELETED_FAILURE
         );
       } catch (error: any) {
         handleNotification(
           dispatch,
           error,
           isEnrolled
-            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_SUCCESS
-            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_DELETED_FAILURE
+            ? CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_DELETED_SUCCESS
+            : CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_DELETED_FAILURE
         );
       }
       setLoading(false);
@@ -125,8 +122,8 @@ const EventCard: React.FC<EventCardProps> = ({
               isOpen: true,
               message:
                 eventResponse?.message ||
-                CONSTANTS.API_RESPONSE_MESSAGES.EVENT_FETCH_FAILURE,
-              type: NotificationTypes.ERROR,
+                CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE,
+              type: NotificationTypes?.ERROR,
             })
           );
         }
@@ -134,7 +131,7 @@ const EventCard: React.FC<EventCardProps> = ({
         handleNotification(
           dispatch,
           error,
-          CONSTANTS.API_RESPONSE_MESSAGES.EVENT_FETCH_FAILURE
+          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE
         );
       }
       setLoading(false);
@@ -152,6 +149,7 @@ const EventCard: React.FC<EventCardProps> = ({
     if (selectedEvent?.updated) {
       updateCurrentCard();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent]);
 
   return (
@@ -173,7 +171,9 @@ const EventCard: React.FC<EventCardProps> = ({
             ]
       }
       onClick={() => {
-        !isOnAdministrationPage && handleCardClick(localEvent);
+        if (!isOnAdministrationPage) {
+          handleCardClick(localEvent);
+        }
       }}
     >
       <Box
@@ -207,7 +207,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 variant="contained"
                 sx={staticStyles?.button?.enrollButton}
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e?.stopPropagation();
                   handleEnrollOrJoinClick(localEvent?.id);
                   if (isEnrolled) {
                     window.open(localEvent?.joinLink, "_blank");
@@ -234,10 +234,10 @@ const EventCard: React.FC<EventCardProps> = ({
                       handleCardClick(localEvent);
                     }}
                     sx={{
-                      backgroundColor: theme.palette.primary.light,
+                      backgroundColor: theme?.palette?.primary?.light,
                       padding: 1,
                       "&:hover": {
-                        backgroundColor: theme.palette.primary.light,
+                        backgroundColor: theme?.palette?.primary?.light,
                         transform: "scale(1.1)",
                       },
                     }}
@@ -252,10 +252,10 @@ const EventCard: React.FC<EventCardProps> = ({
                       handleEditEvent(localEvent);
                     }}
                     sx={{
-                      backgroundColor: theme.palette.primary.light,
+                      backgroundColor: theme?.palette?.primary?.light,
                       padding: 1,
                       "&:hover": {
-                        backgroundColor: theme.palette.primary.light,
+                        backgroundColor: theme?.palette?.primary?.light,
                         transform: "scale(1.1)",
                       },
                     }}
@@ -272,10 +272,10 @@ const EventCard: React.FC<EventCardProps> = ({
                       handleDelete();
                     }}
                     sx={{
-                      backgroundColor: theme.palette.primary.light,
+                      backgroundColor: theme?.palette?.primary?.light,
                       padding: 1,
                       "&:hover": {
-                        backgroundColor: theme.palette.primary.light,
+                        backgroundColor: theme?.palette?.primary?.light,
                         transform: "scale(1.1)",
                       },
                     }}
@@ -320,7 +320,7 @@ const EventCard: React.FC<EventCardProps> = ({
                   color="primary"
                 />
               ))}
-            {localEvent?.hosts.length > 4 && (
+            {localEvent?.hosts?.length > 4 && (
               <Button
                 onClick={(e) => handlePopoverOpen(e, localEvent?.hosts)}
                 sx={{ textTransform: "none", fontSize: "12px" }}
@@ -335,7 +335,7 @@ const EventCard: React.FC<EventCardProps> = ({
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={staticStyles?.typography.scheduleText}
+          sx={staticStyles?.typography?.scheduleText}
         >
           Scheduled for: {formatDate(localEvent?.scheduledTime)}
         </Typography>
@@ -381,7 +381,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 color="primary"
               />
             ))}
-          {localEvent?.tags.length > 5 && (
+          {localEvent?.tags?.length > 5 && (
             <Button
               onClick={(e) => handlePopoverOpen(e, localEvent?.tags)}
               sx={{ textTransform: "none", fontSize: "12px" }}

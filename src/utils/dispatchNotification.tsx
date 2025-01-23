@@ -13,7 +13,7 @@ export function handleResponseMessage(
       pushNotification({
         isOpen: true,
         message: enrollFormResponse?.message || customSuccessMessage,
-        type: NotificationTypes.SUCCESS,
+        type: NotificationTypes?.SUCCESS,
       })
     );
   } else {
@@ -21,7 +21,7 @@ export function handleResponseMessage(
       pushNotification({
         isOpen: true,
         message: enrollFormResponse?.message || customFailureMessage,
-        type: NotificationTypes.ERROR,
+        type: NotificationTypes?.ERROR,
       })
     );
   }
@@ -36,7 +36,7 @@ export function handleNotification(
     pushNotification({
       isOpen: true,
       message: error?.message || customMessage,
-      type: NotificationTypes.ERROR,
+      type: NotificationTypes?.ERROR,
     })
   );
 }

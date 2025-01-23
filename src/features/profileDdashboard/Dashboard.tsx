@@ -15,7 +15,6 @@ import { pushNotification } from "@redux/slices/loadingSlice";
 import { getUserDetails } from "@services/userManagementService";
 import {
   AppProvider,
-  NavigateOptions,
   Navigation,
   Router,
   Session,
@@ -40,13 +39,13 @@ const NAVIGATION: Navigation = [
   },
   {
     kind: "page",
-    segment: AppRouteQueryValues.EXPLORE_EVENTS,
+    segment: AppRouteQueryValues?.EXPLORE_EVENTS,
     title: "Explore Events",
     icon: <DashboardIcon />,
   },
   {
     kind: "page",
-    segment: AppRouteQueryValues.MY_EVENTS,
+    segment: AppRouteQueryValues?.MY_EVENTS,
     title: "My Events",
     icon: <DashboardCustomizeIcon />,
     children: [
@@ -64,7 +63,7 @@ const NAVIGATION: Navigation = [
   },
   {
     kind: "page",
-    segment: AppRouteQueryValues.PROFILE,
+    segment: AppRouteQueryValues?.PROFILE,
     title: "Profile",
     icon: <PersonIcon />,
     children: [
@@ -80,9 +79,12 @@ const NAVIGATION: Navigation = [
       },
     ],
   },
+];
+
+const NAVIGATION_ADMIN: Navigation = [
   {
     kind: "page",
-    segment: AppRouteQueryValues.ADMIN,
+    segment: AppRouteQueryValues?.ADMIN,
     title: "Admin",
     icon: <SettingsIcon />,
   },
@@ -94,8 +96,8 @@ const useCustomRouter = (initialPath: string): Router => {
   const searchParams = new URLSearchParams(); // You can modify this as needed
   const navigate = useNavigate();
 
-  const customNavigation = (url: string | URL, _options?: NavigateOptions) => {
-    navigate(AppRoutes.DASHBOARD + `${url}`);
+  const customNavigation = (url: string | URL) => {
+    navigate(AppRoutes?.DASHBOARD + `${url}`);
     setPathname(url as string); // Update the pathname when navigating
   };
 
@@ -106,18 +108,17 @@ const useCustomRouter = (initialPath: string): Router => {
   };
 };
 
-const getCurrentLocation = (): string => {
-  const location = useLocation();
-  let currentPath = location.pathname;
+const getCurrentLocation = (location: any): string => {
+  let currentPath = location?.pathname;
 
-  if (currentPath.includes("/dashboard/explore-events")) {
-    currentPath = currentPath.replace("/dashboard", "") || "/explore-events";
-  } else if (currentPath.includes("/dashboard/profile")) {
-    currentPath = currentPath.replace("/dashboard", "") || "/profile";
-  } else if (currentPath.includes("/dashboard/my-events")) {
-    currentPath = currentPath.replace("/dashboard", "") || "/my-events";
-  } else if (currentPath.includes("/dashboard/admin")) {
-    currentPath = currentPath.replace("/dashboard", "") || "/admin";
+  if (currentPath?.includes("/dashboard/explore-events")) {
+    currentPath = currentPath?.replace("/dashboard", "") || "/explore-events";
+  } else if (currentPath?.includes("/dashboard/profile")) {
+    currentPath = currentPath?.replace("/dashboard", "") || "/profile";
+  } else if (currentPath?.includes("/dashboard/my-events")) {
+    currentPath = currentPath?.replace("/dashboard", "") || "/my-events";
+  } else if (currentPath?.includes("/dashboard/admin")) {
+    currentPath = currentPath?.replace("/dashboard", "") || "/admin";
   }
 
   return currentPath;
@@ -133,9 +134,12 @@ const Dashboard = () => {
   };
   const dispatch = useDispatch();
   const userId = getLocalStorageItem(CONSTANTS?.USER_ID) || "";
+  const isAdmin =
+    getLocalStorageItem(CONSTANTS?.USER_ROLE) === CONSTANTS?.LA_ADMIN_ROLE;
   const [session, setSession] = React.useState<Session | null>(sampleSession);
   const [userDetails, setUserDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation();
 
   const authentication = React.useMemo(() => {
     return {
@@ -148,13 +152,14 @@ const Dashboard = () => {
         setSession(null);
       },
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const dashboardRouter = useCustomRouter(getCurrentLocation());
+  const dashboardRouter = useCustomRouter(getCurrentLocation(location));
   const navigate = useNavigate();
   const getCurrentPage = () => {
-    switch (dashboardRouter.pathname) {
-      case "/" + AppRouteQueryValues.EXPLORE_EVENTS:
+    switch (dashboardRouter?.pathname) {
+      case "/" + AppRouteQueryValues?.EXPLORE_EVENTS:
         return (
           <ExploreEvents
             viewMode="explore"
@@ -168,26 +173,34 @@ const Dashboard = () => {
           />
         );
       case "/" +
-        AppRouteQueryValues.MY_EVENTS +
+        AppRouteQueryValues?.MY_EVENTS +
         "/" +
-        AppRouteQueryValues.UPCOMING:
+        AppRouteQueryValues?.UPCOMING:
         return <MyWellness viewMode="explore" timePeriod="upcoming" />;
-      case "/" + AppRouteQueryValues.MY_EVENTS + "/" + AppRouteQueryValues.PAST:
+      case "/" +
+        AppRouteQueryValues?.MY_EVENTS +
+        "/" +
+        AppRouteQueryValues?.PAST:
         return <MyWellness viewMode="explore" timePeriod="past" />;
       case "/" +
-        AppRouteQueryValues.PROFILE +
+        AppRouteQueryValues?.PROFILE +
         "/" +
-        AppRouteQueryValues.DETAILS:
+        AppRouteQueryValues?.DETAILS:
         return <ProfileInformation subHeading={"Profile Details"} />;
       case "/" +
-        AppRouteQueryValues.PROFILE +
+        AppRouteQueryValues?.PROFILE +
         "/" +
-        AppRouteQueryValues.PREFERENCES:
+        AppRouteQueryValues?.PREFERENCES:
         return <UserPreferences subHeading={"User Preferences"} />;
-      case "/" + AppRouteQueryValues.ADMIN:
-        return <AdminEventManagement />;
+      case "/" + AppRouteQueryValues?.ADMIN:
+        if (isAdmin) {
+          return <AdminEventManagement />;
+        } else {
+          navigate(AppRoutes?.HOME);
+          return <></>;
+        }
       case "/":
-        navigate(AppRoutes.HOME);
+        navigate(AppRoutes?.HOME);
         return <></>;
     }
   };
@@ -208,8 +221,8 @@ const Dashboard = () => {
             isOpen: true,
             message:
               getUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -219,8 +232,8 @@ const Dashboard = () => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -228,6 +241,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchUserDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -246,7 +260,7 @@ const Dashboard = () => {
 
   return (
     <AppProvider
-      navigation={NAVIGATION}
+      navigation={isAdmin ? [...NAVIGATION, ...NAVIGATION_ADMIN] : NAVIGATION}
       branding={LiveActiveBrand}
       theme={lightTheme}
       router={dashboardRouter}

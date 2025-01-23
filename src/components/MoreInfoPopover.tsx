@@ -39,7 +39,7 @@ const MoreInfoPopover: React.FC<MoreInfoPopoverProps> = ({
     >
       <Box sx={{ padding: 2, maxWidth: 300 }}>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-          {items.map((item, index) => (
+          {items?.map((item, index) => (
             <Chip
               key={index}
               label={item}

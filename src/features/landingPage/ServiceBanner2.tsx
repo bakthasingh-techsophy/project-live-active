@@ -1,7 +1,6 @@
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button, useTheme } from "@mui/material";
 import Banner from "../../components/Banner";
-import { staticStyles, dynamicStyles } from "./ServiceCarousel";
+import { dynamicStyles, staticStyles } from "./ServiceCarousel";
 
 interface ServiceBanner2Props {
   backgroundImage: string;

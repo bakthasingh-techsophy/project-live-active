@@ -178,12 +178,12 @@ const PreferencePrograms = ({
         return (
           !userDetails?.eventIds?.includes(event?.id) &&
           hasMatchingTags &&
-          new Date(event.scheduledTime) > currentDate
+          new Date(event?.scheduledTime) > currentDate
         );
       })
       ?.sort((a: Event, b: Event) => b?.rating - a?.rating);
 
-    setUpcomingEvents(filteredEvents.slice(0, 3));
+    setUpcomingEvents(filteredEvents?.slice(0, 3));
   };
 
   const formatDate = (dateString: string) => {
@@ -217,8 +217,8 @@ const PreferencePrograms = ({
             isOpen: true,
             message:
               enrollFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
-            type: NotificationTypes.SUCCESS,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_SUCCESS,
+            type: NotificationTypes?.SUCCESS,
           })
         );
       } else {
@@ -227,8 +227,8 @@ const PreferencePrograms = ({
             isOpen: true,
             message:
               enrollFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -237,8 +237,8 @@ const PreferencePrograms = ({
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -246,6 +246,7 @@ const PreferencePrograms = ({
 
   useEffect(() => {
     getTopUpcomingEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userDetails, browsedEvents]);
 
   return (

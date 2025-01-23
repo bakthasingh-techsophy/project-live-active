@@ -3,7 +3,7 @@ import { getLocalStorageItem } from "./encrypt";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
 export const isTokenExpired = (): boolean => {
-  const token = getLocalStorageItem(CONSTANTS.ACCESS_TOKEN);
+  const token = getLocalStorageItem(CONSTANTS?.ACCESS_TOKEN);
   if (!token) return true;
 
   try {

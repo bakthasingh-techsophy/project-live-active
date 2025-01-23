@@ -79,20 +79,20 @@ const WellnessHeader: React.FC = () => {
   const currentUrlLocation = useLocation();
 
   const handlePreferencesClick = () => {
-    navigate(AppRouteQueries.USER_SETTINGS_PREFERENCES);
+    navigate(AppRouteQueries?.USER_SETTINGS_PREFERENCES);
   };
 
   const handleModalClose = () => {
-    const searchParams = new URLSearchParams(currentUrlLocation.search);
-    searchParams.delete(AppRouteQueryParams.USER_SETTINGS);
-    navigate({ search: searchParams.toString() }, { replace: true });
+    const searchParams = new URLSearchParams(currentUrlLocation?.search);
+    searchParams?.delete(AppRouteQueryParams?.USER_SETTINGS);
+    navigate({ search: searchParams?.toString() }, { replace: true });
   };
 
   useEffect(() => {
-    const param = new URLSearchParams(currentUrlLocation.search).get(
-      AppRouteQueryParams.USER_SETTINGS
+    const param = new URLSearchParams(currentUrlLocation?.search).get(
+      AppRouteQueryParams?.USER_SETTINGS
     );
-    const isLoginModalOpen = param === AppRouteQueryValues.PREFERENCES;
+    const isLoginModalOpen = param === AppRouteQueryValues?.PREFERENCES;
     setUserModalOpen(isLoginModalOpen);
   }, [currentUrlLocation?.search]);
 

@@ -8,15 +8,15 @@ export const AppRoutes = {
   OTHERS: "*",
 };
 export const AppRoutesCombination = {
-  DASHBOARD_EXPLORE_EVENTS: AppRoutes.DASHBOARD + "/explore-events",
+  DASHBOARD_EXPLORE_EVENTS: AppRoutes?.DASHBOARD + "/explore-events",
 };
 export const AppRouteQueries = {
   AUTH_LOGIN: "?auth=login",
   AUTH_REGISTER: "?auth=register",
   USER_SETTINGS_PREFERENCES: "?user-settings=preferences",
-  DASHBOARD_EXPLORE_EVENTS: AppRoutes.DASHBOARD + "?page=explore-events",
-  DASHBOARD_PROFILE: AppRoutes.DASHBOARD + "?page=profile",
-  DASHBOARD_SETTINGS: AppRoutes.DASHBOARD + "?page=settings",
+  DASHBOARD_EXPLORE_EVENTS: AppRoutes?.DASHBOARD + "?page=explore-events",
+  DASHBOARD_PROFILE: AppRoutes?.DASHBOARD + "?page=profile",
+  DASHBOARD_SETTINGS: AppRoutes?.DASHBOARD + "?page=settings",
 };
 export const AppRouteQueryParams = {
   AUTH: "auth",

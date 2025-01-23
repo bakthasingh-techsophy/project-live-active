@@ -129,6 +129,7 @@ interface ExploreEventsProps {
   selectedEvent: Event | null | undefined;
   setSelectedEvent: (event: Event | undefined | null) => void;
   setIsEmpty?: (value: boolean) => void;
+  reloadEvents?: boolean;
 }
 
 const ExploreEvents = ({
@@ -140,12 +141,12 @@ const ExploreEvents = ({
   handleEditEvent = () => {},
   setSelectedEvent,
   setIsEmpty,
+  reloadEvents,
 }: ExploreEventsProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isTokenActive = !isTokenExpired();
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -160,10 +161,10 @@ const ExploreEvents = ({
   const filteredEvents =
     selectedTags?.length === 0
       ? isOnAdministrationPage
-        ? browsedEvents.sort((a, b) => {
-            const now = new Date().getTime();
-            const timeA = new Date(a.scheduledTime).getTime();
-            const timeB = new Date(b.scheduledTime).getTime();
+        ? browsedEvents?.sort((a, b) => {
+            const now = new Date()?.getTime();
+            const timeA = new Date(a?.scheduledTime)?.getTime();
+            const timeB = new Date(b?.scheduledTime)?.getTime();
 
             const isUpcomingA = timeA > now;
             const isUpcomingB = timeB > now;
@@ -180,7 +181,7 @@ const ExploreEvents = ({
           })
         : browsedEvents?.filter((event) => {
             const upcoming =
-              new Date(event?.scheduledTime).getTime() > new Date().getTime();
+              new Date(event?.scheduledTime)?.getTime() > new Date()?.getTime();
 
             return upcoming;
           })
@@ -188,11 +189,11 @@ const ExploreEvents = ({
           const tagsMatch = event?.tags?.some((tag) =>
             selectedTags?.some(
               (selectedTag: any) =>
-                tag.toLowerCase() === selectedTag.toLowerCase()
+                tag?.toLowerCase() === selectedTag?.toLowerCase()
             )
           );
           const isUpcoming =
-            new Date(event?.scheduledTime).getTime() > new Date().getTime();
+            new Date(event?.scheduledTime)?.getTime() > new Date()?.getTime();
 
           return tagsMatch && isUpcoming;
         });
@@ -238,8 +239,8 @@ const ExploreEvents = ({
             isOpen: true,
             message:
               searchFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -249,15 +250,15 @@ const ExploreEvents = ({
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
   };
 
   const fetchUserDetails = async () => {
-    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    const userId = getLocalStorageItem(CONSTANTS?.USER_ID);
     try {
       const getUserResponse = await getUserDetails(userId || "");
       if (getUserResponse?.success) {
@@ -268,8 +269,8 @@ const ExploreEvents = ({
             isOpen: true,
             message:
               getUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -278,8 +279,8 @@ const ExploreEvents = ({
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -293,7 +294,6 @@ const ExploreEvents = ({
         ],
       };
 
-      setLoading(true);
       try {
         const enrollOrJoinFormResponse = await enrollOrJoinEvent(
           payload,
@@ -306,22 +306,21 @@ const ExploreEvents = ({
           enrollOrJoinFormResponse,
           dispatch,
           isEnrolled
-            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
-            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
+            ? CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_JOINED_SUCCESS
+            : CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_SUCCESS,
           isEnrolled
-            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_FAILURE
-            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE
+            ? CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_JOINED_FAILURE
+            : CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE
         );
       } catch (error: any) {
         handleNotification(
           dispatch,
           error,
           isEnrolled
-            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
-            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS
+            ? CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_JOINED_SUCCESS
+            : CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_SUCCESS
         );
       }
-      setLoading(false);
       return;
     }
     navigate(AppRouteQueries?.AUTH_LOGIN);
@@ -338,13 +337,20 @@ const ExploreEvents = ({
     if (isTokenActive) {
       fetchUserDetails();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    handleReload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reloadEvents]);
 
   useEffect(() => {
     const payload = {
       searchText: searchText,
     };
     handleSearch(payload);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchText]);
 
   const handleCardClick = (eventDetails: Event) => {

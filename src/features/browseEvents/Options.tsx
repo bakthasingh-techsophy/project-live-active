@@ -60,11 +60,11 @@ const Options = ({ searchText, setSearchText }: OptionsProps) => {
   const [localSearchText, setLocalSearchText] = useState(searchText);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalSearchText(event.target.value);
+    setLocalSearchText(event?.target?.value);
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
+    if (event?.key === "Enter") {
       setSearchText(localSearchText);
     }
   };

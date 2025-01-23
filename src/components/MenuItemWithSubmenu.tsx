@@ -26,7 +26,7 @@ const MenuItemWithSubmenu: React.FC<MenuItemWithSubmenuProps> = ({
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {subMenus.map((subMenu, index) => (
+          {subMenus?.map((subMenu, index) => (
             <ListItem key={index} sx={{ pl: 4 }}>
               <ListItemText primary={subMenu} />
             </ListItem>

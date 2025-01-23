@@ -1,4 +1,4 @@
-import { laLogo, userDp } from "@assets/index";
+import { laLogo } from "@assets/index";
 import ConfirmationPopup from "@components/ConfirmationPopup";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
@@ -13,10 +13,6 @@ import {
   Toolbar,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { isTokenExpired } from "@utils/tokenUtils";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import AuthFormModal from "./login/LoginModal";
 import {
   AppRouteQueries,
   AppRouteQueryParams,
@@ -24,6 +20,10 @@ import {
   AppRoutes,
   AppRoutesCombination,
 } from "@utils/AppRoutes";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import AuthFormModal from "./login/LoginModal";
 
 interface ResponsiveToolbarProps {
   menuItems: { label: string; link: string; isLoginRequired: boolean }[];
@@ -212,28 +212,28 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
 
   const handleLogoutConfirm = () => {
     setIsLogoutModalOpen((prev) => !prev);
-    navigate(AppRoutes.HOME);
+    navigate(AppRoutes?.HOME);
     window.location.reload();
     localStorage.clear();
   };
 
   const openLoginModal = () => {
-    navigate(AppRouteQueries.AUTH_LOGIN);
+    navigate(AppRouteQueries?.AUTH_LOGIN);
   };
 
   const handleAuthModalClose = () => {
-    const searchParams = new URLSearchParams(currentUrlLocation.search);
-    searchParams.delete(AppRouteQueryParams.AUTH);
-    navigate({ search: searchParams.toString() }, { replace: true });
+    const searchParams = new URLSearchParams(currentUrlLocation?.search);
+    searchParams?.delete(AppRouteQueryParams?.AUTH);
+    navigate({ search: searchParams?.toString() }, { replace: true });
   };
 
   useEffect(() => {
-    const param = new URLSearchParams(currentUrlLocation.search).get(
-      AppRouteQueryParams.AUTH
+    const param = new URLSearchParams(currentUrlLocation?.search).get(
+      AppRouteQueryParams?.AUTH
     );
     const isLoginModalOpen =
-      param === AppRouteQueryValues.LOGIN ||
-      param === AppRouteQueryValues.REGISTER;
+      param === AppRouteQueryValues?.LOGIN ||
+      param === AppRouteQueryValues?.REGISTER;
     setIsLoginModalOpen(isLoginModalOpen);
   }, [currentUrlLocation?.search]);
 
@@ -255,7 +255,7 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
         <Toolbar sx={customStaticStyles?.container?.toolbar}>
           <Box
             sx={customStaticStyles?.container?.logoHolder}
-            onClick={() => handleNavigation(AppRoutes.HOME, "Home")}
+            onClick={() => handleNavigation(AppRoutes?.HOME, "Home")}
           >
             <Box component={"img"} src={laLogo} sx={{ width: 60 }} />
           </Box>

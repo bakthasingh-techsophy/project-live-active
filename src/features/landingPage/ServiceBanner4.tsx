@@ -1,8 +1,6 @@
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button, useTheme } from "@mui/material";
 import Banner from "../../components/Banner";
-import { staticStyles, dynamicStyles } from "./ServiceCarousel";
-import { isTokenExpired } from "@utils/tokenUtils";
+import { dynamicStyles, staticStyles } from "./ServiceCarousel";
 
 interface ServiceBanner4Props {
   backgroundImage: string;
@@ -10,7 +8,6 @@ interface ServiceBanner4Props {
 
 const ServiceBanner4 = ({ backgroundImage }: ServiceBanner4Props) => {
   const theme = useTheme();
-  const isTokenActive = !isTokenExpired();
 
   return (
     <Banner

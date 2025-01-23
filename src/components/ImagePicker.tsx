@@ -45,22 +45,22 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   function handleWrapperClick(inputRef: any) {
-    inputRef.current.click();
+    inputRef?.current?.click();
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e?.target?.files && e?.target?.files?.[0]) {
       const reader = new FileReader();
       reader.onload = () => setSelectedImage(reader.result as string);
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(e?.target.files?.[0]);
       setIsDialogOpen(true);
     }
   };
 
   const handleCrop = () => {
-    const cropper = cropperRef.current?.cropper;
+    const cropper = cropperRef?.current?.cropper;
     if (cropper) {
-      const croppedDataUrl = cropper.getCroppedCanvas().toDataURL();
+      const croppedDataUrl = cropper?.getCroppedCanvas().toDataURL();
       setCroppedImage(croppedDataUrl);
       setSelectedImage(null);
       setIsDialogOpen(false);
@@ -86,8 +86,8 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
               isOpen: true,
               message:
                 updateUserResponse?.message ||
-                CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_DP_SUCCESS,
-              type: NotificationTypes.SUCCESS,
+                CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_DP_SUCCESS,
+              type: NotificationTypes?.SUCCESS,
             })
           );
           setCroppedImage(null);
@@ -98,8 +98,8 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
               isOpen: true,
               message:
                 updateUserResponse?.message ||
-                CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_DP_SUCCESS,
-              type: NotificationTypes.ERROR,
+                CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_DP_SUCCESS,
+              type: NotificationTypes?.ERROR,
             })
           );
         }
@@ -109,8 +109,8 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
         dispatch(
           pushNotification({
             isOpen: true,
-            message: CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_DP_SUCCESS,
-            type: NotificationTypes.ERROR,
+            message: CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_DP_SUCCESS,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -131,7 +131,7 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
     position: "relative",
     overflow: "hidden",
     cursor: "pointer",
-    boxShadow: theme.shadows[2],
+    boxShadow: theme?.shadows[2],
   }));
 
   const EditIconWrapper = styled(Box)(() => ({
@@ -154,13 +154,13 @@ const ImagePicker = ({ userDetails }: { userDetails: any }) => {
   }));
 
   return (
-    <Box sx={styles.mainContainer}>
+    <Box sx={styles?.mainContainer}>
       <ProfileImage>
         <Box
           component="img"
           src={croppedImage || userDetails?.photoUrl || profilePic}
           alt="Profile"
-          sx={styles.image}
+          sx={styles?.image}
         />
         <EditIconWrapper onClick={() => handleWrapperClick(inputRef)}>
           <IconButton

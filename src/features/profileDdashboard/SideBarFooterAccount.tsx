@@ -67,9 +67,9 @@ function SidebarFooterAccountPopover() {
         Accounts
       </Typography>
       <MenuList>
-        {accounts.map((account) => (
+        {accounts?.map((account) => (
           <MenuItem
-            key={account.id}
+            key={account?.id}
             component="button"
             sx={{
               justifyContent: "flex-start",
@@ -83,12 +83,12 @@ function SidebarFooterAccountPopover() {
                   width: 32,
                   height: 32,
                   fontSize: "0.95rem",
-                  bgcolor: account.color,
+                  bgcolor: account?.color,
                 }}
-                src={account.image ?? ""}
-                alt={account.name ?? ""}
+                src={account?.image ?? ""}
+                alt={account?.name ?? ""}
               >
-                {account.name[0]}
+                {account?.name[0]}
               </Avatar>
             </ListItemIcon>
             <ListItemText
@@ -98,8 +98,8 @@ function SidebarFooterAccountPopover() {
                 alignItems: "flex-start",
                 width: "100%",
               }}
-              primary={account.name}
-              secondary={account.email}
+              primary={account?.name}
+              secondary={account?.email}
               primaryTypographyProps={{ variant: "body2" }}
               secondaryTypographyProps={{ variant: "caption" }}
             />
@@ -136,7 +136,7 @@ const SidebarFooterAccount = ({ mini }: SidebarFooterProps) => {
               sx: {
                 overflow: "visible",
                 filter: (theme) =>
-                  `drop-shadow(0px 2px 8px ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.32)"})`,
+                  `drop-shadow(0px 2px 8px ${theme?.palette?.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.32)"})`,
                 mt: 1,
                 "&::before": {
                   content: '""',

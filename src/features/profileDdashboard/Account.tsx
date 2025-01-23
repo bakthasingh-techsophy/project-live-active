@@ -1,17 +1,9 @@
-import * as React from "react";
-import {
-  Button,
-  Popover,
-  Stack,
-  Typography,
-  Avatar,
-  Box,
-  ButtonProps,
-} from "@mui/material";
-import { useState } from "react";
+import { Avatar, Button, Popover, Stack, Typography } from "@mui/material";
 import { AccountProps } from "@toolpad/core/Account";
+import * as React from "react";
+import { useState } from "react";
 
-// Account Component
+// eslint-disable-next-line no-empty-pattern
 const Account = ({}: AccountProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 

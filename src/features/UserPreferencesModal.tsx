@@ -1,11 +1,11 @@
 import {
-  preferencePic1,
   preferencePic2,
   preferencePic3,
   preferencePic4,
   preferencePic5,
 } from "@assets/index";
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -13,14 +13,13 @@ import {
   CardContent,
   Modal,
   Typography,
-  Alert,
 } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { getUserDetails, updateUser } from "@services/userManagementService";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
 import { NotificationTypes } from "@utils/types";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
 
@@ -193,8 +192,8 @@ const UserPreferencesModal = ({
               isOpen: true,
               message:
                 updateUserResponse?.message ||
-                CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_PREFERENCES_SUCCESS,
-              type: NotificationTypes.SUCCESS,
+                CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_PREFERENCES_SUCCESS,
+              type: NotificationTypes?.SUCCESS,
             })
           );
         } else {
@@ -204,8 +203,8 @@ const UserPreferencesModal = ({
               isOpen: true,
               message:
                 updateUserResponse?.message ||
-                CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_PREFERENCES_FAILURE,
-              type: NotificationTypes.ERROR,
+                CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_PREFERENCES_FAILURE,
+              type: NotificationTypes?.ERROR,
             })
           );
         }
@@ -215,8 +214,9 @@ const UserPreferencesModal = ({
         dispatch(
           pushNotification({
             isOpen: true,
-            message: CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_PREFERENCES_FAILURE,
-            type: NotificationTypes.ERROR,
+            message:
+              CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_PREFERENCES_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -225,7 +225,7 @@ const UserPreferencesModal = ({
   };
 
   const fetchUserDetails = async () => {
-    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    const userId = getLocalStorageItem(CONSTANTS?.USER_ID);
     try {
       setIsLoading(true);
 
@@ -240,8 +240,8 @@ const UserPreferencesModal = ({
             isOpen: true,
             message:
               getUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -251,8 +251,8 @@ const UserPreferencesModal = ({
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -260,11 +260,12 @@ const UserPreferencesModal = ({
 
   useEffect(() => {
     fetchUserDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (userDetails?.preferences) {
-      setSelectedPreferences(userDetails.preferences);
+      setSelectedPreferences(userDetails?.preferences);
     }
   }, [userDetails]);
 

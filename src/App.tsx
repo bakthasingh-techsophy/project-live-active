@@ -13,16 +13,16 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const menuItems = [
-  { label: "My Dashboard", link: AppRoutes.DASHBOARD, isLoginRequired: true },
-  { label: "My Wellness", link: AppRoutes.WELLNESS, isLoginRequired: true },
+  { label: "My Dashboard", link: AppRoutes?.DASHBOARD, isLoginRequired: true },
+  { label: "My Wellness", link: AppRoutes?.WELLNESS, isLoginRequired: true },
   {
     label: "Browse Events",
-    link: AppRoutes.BROWSE_EVENTS,
+    link: AppRoutes?.BROWSE_EVENTS,
     isLoginRequired: false,
   },
   {
     label: "Coaches & Nutrition",
-    link: AppRoutes.COACHES_AND_NUTRITION,
+    link: AppRoutes?.COACHES_AND_NUTRITION,
     isLoginRequired: false,
   },
   // { label: "My Progress", link: "/progress", isLoginRequired: false },
@@ -30,7 +30,7 @@ const menuItems = [
 
 function AppContent() {
   const dispatch = useDispatch();
-  const { notification } = useSelector((state: RootState) => state.loading);
+  const { notification } = useSelector((state: RootState) => state?.loading);
   const [currentLocation, setCurrentLocation] = useState<any>("");
   const currentUrlLocation = useLocation();
 
@@ -44,22 +44,22 @@ function AppContent() {
   };
 
   useEffect(() => {
-    setCurrentLocation(currentUrlLocation.pathname);
-  }, [currentUrlLocation.pathname]);
+    setCurrentLocation(currentUrlLocation?.pathname);
+  }, [currentUrlLocation?.pathname]);
 
   return (
     <Box className="App">
       <Notification
-        isOpen={notification.isOpen}
-        type={notification.type}
-        message={notification.message}
+        isOpen={notification?.isOpen}
+        type={notification?.type}
+        message={notification?.message}
         handleClose={closeNotification}
       />
-      {!currentLocation.startsWith(AppRoutes.DASHBOARD) && (
+      {!currentLocation?.startsWith(AppRoutes?.DASHBOARD) && (
         <ResponsiveToolbar menuItems={menuItems} />
       )}
       <Navigator />
-      {!currentLocation.startsWith(AppRoutes.DASHBOARD) && <Footer />}
+      {!currentLocation?.startsWith(AppRoutes?.DASHBOARD) && <Footer />}
     </Box>
   );
 }

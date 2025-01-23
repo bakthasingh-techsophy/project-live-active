@@ -151,8 +151,8 @@ const LandingPageBanner = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isTokenActive = !isTokenExpired();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmallScreen = useMediaQuery(theme?.breakpoints?.down("sm"));
+  const isMediumScreen = useMediaQuery(theme?.breakpoints?.down("md"));
 
   // const videoStyle = {
   //   objectFit: "cover",
@@ -174,8 +174,8 @@ const LandingPageBanner = () => {
           loop
           muted
           style={{
-            ...staticStyles.videoStyle,
-            ...dynamicStyles.videoStyle(isSmallScreen, isMediumScreen),
+            ...staticStyles?.videoStyle,
+            ...dynamicStyles?.videoStyle(isSmallScreen, isMediumScreen),
           }}
         />
         <video
@@ -184,8 +184,8 @@ const LandingPageBanner = () => {
           loop
           muted
           style={{
-            ...staticStyles.videoStyle,
-            ...dynamicStyles.videoStyle(isSmallScreen, isMediumScreen),
+            ...staticStyles?.videoStyle,
+            ...dynamicStyles?.videoStyle(isSmallScreen, isMediumScreen),
           }}
         />
         <video
@@ -194,8 +194,8 @@ const LandingPageBanner = () => {
           loop
           muted
           style={{
-            ...staticStyles.videoStyle,
-            ...dynamicStyles.videoStyle(isSmallScreen, isMediumScreen),
+            ...staticStyles?.videoStyle,
+            ...dynamicStyles?.videoStyle(isSmallScreen, isMediumScreen),
           }}
         />
         <Box sx={staticStyles?.container?.overlay} />

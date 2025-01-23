@@ -15,7 +15,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { enrollOrJoinEvent } from "@services/eventsService";
-import { AppRouteQueries } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import {
   handleNotification,
@@ -204,14 +203,14 @@ const MyEnrollments = ({
       handleResponseMessage(
         enrollOrJoinFormResponse,
         dispatch,
-        CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS,
-        CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_FAILURE
+        CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_JOINED_SUCCESS,
+        CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_JOINED_FAILURE
       );
     } catch (error: any) {
       handleNotification(
         dispatch,
         error,
-        CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_FAILURE
+        CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_JOINED_FAILURE
       );
     }
     setLoading(false);
@@ -223,7 +222,7 @@ const MyEnrollments = ({
       sx={[staticStyles?.container?.mainContainer(viewMode)]}
       maxWidth={false}
     >
-      {filteredAndSortedEvents.length > 0 ? (
+      {filteredAndSortedEvents?.length > 0 ? (
         <Typography
           variant={viewMode === "browse" ? "h5" : "h6"}
           sx={
@@ -276,13 +275,13 @@ const MyEnrollments = ({
                         handleCardClick(event);
                       }}
                       sx={{
-                        backgroundColor: theme.palette.primary.light,
+                        backgroundColor: theme?.palette?.primary?.light,
                         padding: 1,
                         position: "absolute",
                         top: 10,
                         right: 10,
                         "&:hover": {
-                          backgroundColor: theme.palette.primary.light,
+                          backgroundColor: theme?.palette?.primary?.light,
                           transform: "scale(1.1)",
                         },
                       }}
@@ -311,12 +310,12 @@ const MyEnrollments = ({
                     Scheduled for: {formatDate(event?.scheduledTime)}
                   </Typography>
                   {event?.scheduledTime &&
-                    new Date(event.scheduledTime).getTime() >
+                    new Date(event?.scheduledTime).getTime() >
                       new Date().getTime() && (
                       <Button
                         variant="contained"
                         onClick={(e) => {
-                          e.stopPropagation();
+                          e?.stopPropagation();
                           handleEnrollOrJoinClick(event?.id);
                           window.open(event?.joinLink, "_blank");
                         }}

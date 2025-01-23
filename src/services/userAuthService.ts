@@ -10,16 +10,16 @@ export const postLoginForm = async (payload: object): Promise<ApiResponse> => {
       .post(payload)
       .json()) as ApiResponse;
 
-    if (response.success) {
-      const form = response.data as any;
+    if (response?.success) {
+      const form = response?.data as any;
       return {
-        success: response.success,
+        success: response?.success,
         data: form,
-        message: response.message,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 
@@ -41,16 +41,16 @@ export const postRegisterForm = async (
       .post(payload)
       .json()) as ApiResponse;
 
-    if (response.success) {
-      const form = response.data as any;
+    if (response?.success) {
+      const form = response?.data as any;
       return {
-        success: response.success,
+        success: response?.success,
         data: form,
-        message: response.message,
+        message: response?.message,
       };
     }
 
-    return { success: false, message: response.message };
+    return { success: false, message: response?.message };
   } catch (error: any) {
     const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
 

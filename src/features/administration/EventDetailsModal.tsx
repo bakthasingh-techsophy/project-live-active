@@ -80,7 +80,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 {selectedEvent?.title}
               </Typography>
               {selectedEvent?.scheduledTime &&
-                new Date(selectedEvent.scheduledTime).getTime() >
+                new Date(selectedEvent?.scheduledTime).getTime() >
                   new Date().getTime() && (
                   <Button
                     variant="contained"

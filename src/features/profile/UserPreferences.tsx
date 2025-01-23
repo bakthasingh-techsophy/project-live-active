@@ -23,7 +23,7 @@ interface UserPreferencesProps {
 
 const staticStyles = {
   container: {
-    mainContainer: { display: "flex", flexDirection: "column", gap: 4, p: 3},
+    mainContainer: { display: "flex", flexDirection: "column", gap: 4, p: 3 },
     headerContainer: {
       display: "flex",
       justifyContent: "flex-start",
@@ -100,12 +100,13 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
     };
     if (userDetails?.preferences?.length) {
       userDetails?.preferences?.forEach((preference: string) => {
-        if (temp?.hasOwnProperty(preference)) {
+        if (Object.prototype.hasOwnProperty.call(temp, preference)) {
           temp[preference] = true;
         }
       });
     }
     setInitialPreferences(temp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userDetails]);
 
   const handleSubmit = async (payload: any) => {
@@ -121,8 +122,8 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
             isOpen: true,
             message:
               updateUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_SUCCESS,
-            type: NotificationTypes.SUCCESS,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_USER_SUCCESS,
+            type: NotificationTypes?.SUCCESS,
           })
         );
       } else {
@@ -132,8 +133,8 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
             isOpen: true,
             message:
               updateUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_USER_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -143,15 +144,15 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.UPDATE_USER_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.UPDATE_USER_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
   };
 
   const fetchUserDetails = async () => {
-    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    const userId = getLocalStorageItem(CONSTANTS?.USER_ID);
     try {
       setIsLoading(true);
 
@@ -166,8 +167,8 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
             isOpen: true,
             message:
               getUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -177,8 +178,8 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -186,6 +187,7 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
 
   useEffect(() => {
     fetchUserDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -203,8 +205,8 @@ const UserPreferences = ({ subHeading }: UserPreferencesProps) => {
           validationSchema={validationSchema}
           onSubmit={(values: any) => {
             const payload = {
-              preferences: Object.keys(values.preferences)
-                .filter((key) => values.preferences[key])
+              preferences: Object?.keys(values?.preferences)
+                .filter((key) => values?.preferences[key])
                 .map((key) => key),
               userName: getLocalStorageItem(CONSTANTS?.USER_EMAIL),
               userId: getLocalStorageItem(CONSTANTS?.USER_ID),

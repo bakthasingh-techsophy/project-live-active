@@ -38,8 +38,8 @@ const MyWellness = ({ viewMode, timePeriod }: MyWellnessProps) => {
             isOpen: true,
             message:
               searchFormResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -49,15 +49,15 @@ const MyWellness = ({ viewMode, timePeriod }: MyWellnessProps) => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.EVENTS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
   };
 
   const fetchUserDetails = async () => {
-    const userId = getLocalStorageItem(CONSTANTS.USER_ID);
+    const userId = getLocalStorageItem(CONSTANTS?.USER_ID);
     try {
       setIsLoading(true);
 
@@ -72,8 +72,8 @@ const MyWellness = ({ viewMode, timePeriod }: MyWellnessProps) => {
             isOpen: true,
             message:
               getUserResponse?.message ||
-              CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-            type: NotificationTypes.ERROR,
+              CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
           })
         );
       }
@@ -83,8 +83,8 @@ const MyWellness = ({ viewMode, timePeriod }: MyWellnessProps) => {
       dispatch(
         pushNotification({
           isOpen: true,
-          message: CONSTANTS.API_RESPONSE_MESSAGES.USER_DETAILS_FETCH_FAILURE,
-          type: NotificationTypes.ERROR,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+          type: NotificationTypes?.ERROR,
         })
       );
     }
@@ -103,6 +103,7 @@ const MyWellness = ({ viewMode, timePeriod }: MyWellnessProps) => {
     };
     handleSearch(payload);
     fetchUserDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

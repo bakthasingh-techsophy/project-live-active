@@ -11,31 +11,22 @@ import {
   Modal,
   TextField,
   Typography,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { pushNotification } from "@redux/slices/loadingSlice";
-import { getEventDetailsById } from "@services/eventsService";
-import { AppRouteQueries } from "@utils/AppRoutes";
-import { CONSTANTS } from "@utils/constants";
-import { handleNotification } from "@utils/dispatchNotification";
-import { isTokenExpired } from "@utils/tokenUtils";
-import { Event, NotificationTypes } from "@utils/types";
+import { Event } from "@utils/types";
 import "cropperjs/dist/cropper.css";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Cropper from "react-cropper";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
 interface AddEventModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (values: any) => void;
-  onStart: (values: any) => void;
   loading: boolean;
   availableTags: string[];
   availableHosts: string[];
@@ -46,19 +37,15 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   open,
   onClose,
   onSave,
-  onStart,
   loading,
   availableTags,
   availableHosts,
   selectedEvent,
 }) => {
   const theme = useTheme();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [image, setImage] = useState<string | null>(null);
   const [cropper, setCropper] = useState<any>(null);
   const [openCropperModal, setOpenCropperModal] = useState(false);
-  const [eventDetails, setEventDetails] = useState<any>();
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
   const formik = useFormik({
@@ -99,7 +86,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         ...selectedEvent,
         ...values,
       };
-      formik.resetForm();
+      formik?.resetForm();
       onSave(payload);
     },
     enableReinitialize: true,
@@ -134,49 +121,16 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    formik.resetForm();
+    formik?.resetForm();
   };
 
   const handleCloseCheck = () => {
-    if (formik.dirty) {
+    if (formik?.dirty) {
       toggleConfirmationModal();
       return;
     }
     handleClose();
   };
-
-  const fetchEventDetails = async () => {
-    if (!selectedEvent) return;
-    if (!isTokenExpired()) {
-      try {
-        const fetchEventResponse = await getEventDetailsById(selectedEvent?.id);
-        if (fetchEventResponse?.success) {
-          setEventDetails(fetchEventResponse?.data || null);
-        } else {
-          dispatch(
-            pushNotification({
-              isOpen: true,
-              message:
-                fetchEventResponse?.message ||
-                CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE,
-              type: NotificationTypes?.ERROR,
-            })
-          );
-        }
-      } catch (error: any) {
-        handleNotification(
-          dispatch,
-          error,
-          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE
-        );
-      }
-      return;
-    }
-    navigate(AppRouteQueries?.AUTH_LOGIN);
-  };
-  useEffect(() => {
-    fetchEventDetails();
-  }, [selectedEvent]);
 
   return (
     <Modal
@@ -289,8 +243,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             options={availableHosts}
             getOptionLabel={(option) => option}
             value={formik?.values?.hosts}
-            onChange={(event, newValue) =>
-              formik?.setFieldValue("hosts", newValue.slice(0, 1) || [])
+            onChange={(_event, newValue) =>
+              formik?.setFieldValue("hosts", newValue?.slice(0, 1) || [])
             }
             renderInput={(params) => (
               <TextField
@@ -298,8 +252,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 label="Hosts"
                 variant="outlined"
                 margin="normal"
-                error={formik.touched.hosts && Boolean(formik.errors.hosts)}
-                helperText={formik.touched.hosts && formik.errors.hosts}
+                error={formik?.touched?.hosts && Boolean(formik?.errors?.hosts)}
+                helperText={formik?.touched?.hosts && formik?.errors?.hosts}
               />
             )}
             renderTags={(value, getTagProps) =>
@@ -356,7 +310,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             options={availableTags}
             getOptionLabel={(option) => option}
             value={formik?.values?.tags}
-            onChange={(event, newValue) =>
+            onChange={(_event, newValue) =>
               formik?.setFieldValue("tags", newValue || [])
             }
             renderInput={(params) => (
@@ -365,8 +319,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 label="Tags"
                 variant="outlined"
                 margin="normal"
-                error={formik.touched.tags && Boolean(formik.errors.tags)}
-                helperText={formik.touched.tags && formik.errors.tags}
+                error={formik?.touched?.tags && Boolean(formik?.errors?.tags)}
+                helperText={formik?.touched?.tags && formik?.errors?.tags}
               />
             )}
             renderTags={(value, getTagProps) =>
@@ -395,9 +349,11 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 },
               },
             }}
-            {...formik.getFieldProps("duration")}
-            error={formik.touched.duration && Boolean(formik.errors.duration)}
-            helperText={formik.touched.duration && formik.errors.duration}
+            {...formik?.getFieldProps("duration")}
+            error={
+              formik?.touched?.duration && Boolean(formik?.errors?.duration)
+            }
+            helperText={formik?.touched?.duration && formik?.errors?.duration}
           />
 
           {/* Password Field */}
@@ -419,19 +375,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               display: "flex",
               justifyContent: "flex-end",
               marginTop: 2,
-              gap: 2,
             }}
           >
-            <Button
-              variant="contained"
-              color="secondary"
-              size="large"
-              onClick={() => onStart(formik?.values)}
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : "Start Event"}
-            </Button>
-
             <Button
               variant="contained"
               color="primary"

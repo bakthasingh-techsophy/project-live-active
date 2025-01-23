@@ -10,23 +10,23 @@ import ProtectedRoute from "./ProtectedRoute";
 const Navigator = () => {
   return (
     <Routes>
-      <Route path={AppRoutes.HOME} element={<LandingPage />} />
+      <Route path={AppRoutes?.HOME} element={<LandingPage />} />
       {/* <Route
-        path={AppRoutes.OTHERS}
-        element={<Navigate to={AppRoutes.PROFILE_DASHBOARD} />}
+        path={AppRoutes?.OTHERS}
+        element={<Navigate to={AppRoutes?.PROFILE_DASHBOARD} />}
       /> */}
       {/* Optionally, you can define a default route */}
       <Route
-        path={AppRoutes.WELLNESS}
+        path={AppRoutes?.WELLNESS}
         element={
           <ProtectedRoute>
             <MyWellness viewMode="browse" timePeriod="upcoming" />
           </ProtectedRoute>
         }
       />
-      <Route path={AppRoutes.BROWSE_EVENTS} element={<BrowseEvents />} />
-      <Route path={AppRoutes.COACHES_AND_NUTRITION} element={<Nutrition />} />
-      <Route path={AppRoutes.PROGRESS} element={<MyProgress />} />
+      <Route path={AppRoutes?.BROWSE_EVENTS} element={<BrowseEvents />} />
+      <Route path={AppRoutes?.COACHES_AND_NUTRITION} element={<Nutrition />} />
+      <Route path={AppRoutes?.PROGRESS} element={<MyProgress />} />
       {/* <Route
         path="/profile"
         element={
@@ -36,7 +36,7 @@ const Navigator = () => {
         }
       /> */}
       <Route
-        path={AppRoutes.DASHBOARD + "/*"}
+        path={AppRoutes?.DASHBOARD + "/*"}
         element={
           <ProtectedRoute>
             <Dashboard />

@@ -1,6 +1,6 @@
-import { Box, Container, Typography, useTheme } from "@mui/material";
-import React, { useState } from "react";
 import { Cancel } from "@mui/icons-material"; // Only cross mark
+import { Box, Container, Typography, useTheme } from "@mui/material";
+import React from "react";
 
 interface TagsRowProps {
   tags: string[];

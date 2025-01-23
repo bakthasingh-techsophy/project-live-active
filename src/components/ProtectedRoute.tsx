@@ -13,7 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // If token is expired, redirect to home ("/")
   if (tokenExpired) {
-    return <Navigate to={AppRoutes.HOME} replace />;
+    return <Navigate to={AppRoutes?.HOME} replace />;
   }
 
   // Otherwise, render the children
