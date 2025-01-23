@@ -245,14 +245,12 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
           handleClose={handleAuthModalClose}
         />
       )}
-      {isLogoutModalOpen && (
-        <ConfirmationPopup
-          open={isLogoutModalOpen}
-          onClose={handleLogoutClick}
-          onConfirm={handleLogoutConfirm}
-          title={"Are you sure you want to Logout?"}
-        />
-      )}
+      <ConfirmationPopup
+        open={isLogoutModalOpen}
+        onClose={handleLogoutClick}
+        onConfirm={handleLogoutConfirm}
+        title={"Are you sure you want to Logout?"}
+      />
       <AppBar position="sticky" color="default">
         <Toolbar sx={customStaticStyles?.container?.toolbar}>
           <Box

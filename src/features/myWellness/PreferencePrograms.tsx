@@ -32,6 +32,8 @@ interface Event {
   isStarted: boolean;
   isExpired: boolean;
   loading?: boolean;
+  duration: number;
+  password: string;
 }
 
 const staticStyles = {

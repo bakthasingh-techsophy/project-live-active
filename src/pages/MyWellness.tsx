@@ -26,6 +26,8 @@ interface Event {
   isExpired: boolean;
   loading?: boolean;
   updated?: boolean;
+  duration: number;
+  password: string;
 }
 
 interface MyWellnessProps {

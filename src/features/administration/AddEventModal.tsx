@@ -32,6 +32,7 @@ import { NotificationTypes, ApiResponse } from "@utils/types";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleNotification } from "@utils/dispatchNotification";
+import ConfirmationPopup from "@components/ConfirmationPopup";
 
 interface AddEventModalProps {
   open: boolean;
@@ -41,7 +42,6 @@ interface AddEventModalProps {
   loading: boolean;
   availableTags: string[];
   availableHosts: string[];
-  availableParticipants: string[]; // New prop for available participants
   selectedEvent: Event | undefined | null;
 }
 
@@ -53,17 +53,17 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   loading,
   availableTags,
   availableHosts,
-  availableParticipants, // Access available participants
-  selectedEvent, // Access available participants
+  selectedEvent,
 }) => {
-  const [file, setFile] = useState<File | null>(null);
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [image, setImage] = useState<string | null>(null);
   const [cropper, setCropper] = useState<any>(null);
   const [openCropperModal, setOpenCropperModal] = useState(false);
   const [eventDetails, setEventDetails] = useState<any>();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const theme = useTheme();
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+
   const formik = useFormik({
     initialValues: {
       title: selectedEvent?.title || "",
@@ -71,25 +71,38 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
       hosts: selectedEvent?.hosts || [],
       scheduledTime: selectedEvent?.scheduledTime || "",
       tags: selectedEvent?.tags || [],
-      enrollList: [], // Add enrollList to initialValues
       photoUrl: selectedEvent?.photoUrl || "",
+      duration: selectedEvent?.duration || "",
+      password: selectedEvent?.password || "",
     },
     validationSchema: Yup?.object({
       title: Yup?.string().required("Title is required"),
       scheduledTime: Yup?.string().required("Scheduled Time is required"),
       tags: Yup?.array()
         .of(Yup?.string())
-        .min(1, "At least one tag is required"),
+        .min(1, "At least one tag is required")
+        .required("Hosts field is required"),
       hosts: Yup?.array()
         .of(Yup?.string())
-        .min(1, "At least one host is required"),
-      enrollList: Yup?.array(),
+        .min(1, "Host is required")
+        .max(1, "Only 1 host is required")
+        .required("Hosts field is required"),
+      duration: Yup.number()
+        .required("Duration is required")
+        .positive("Duration must be a positive number")
+        .test(
+          "is-multiple-of-0.5",
+          "Duration must be in increments of 0.5",
+          (value) => value === undefined || value % 0.5 === 0
+        ),
+      password: Yup?.string().required("Password is required"),
     }),
     onSubmit: (values) => {
       const payload = {
         ...selectedEvent,
         ...values,
       };
+      formik.resetForm();
       onSave(payload);
     },
     enableReinitialize: true,
@@ -98,7 +111,6 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   // Handle File Upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e?.target?.files && e?.target?.files[0]) {
-      setFile(e?.target?.files[0]);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImage(reader?.result as string);
@@ -118,6 +130,24 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
     }
     handleCloseCropper();
   };
+
+  const toggleConfirmationModal = () => {
+    setIsConfirmationModalOpen((prev) => !prev);
+  };
+
+  const handleClose = () => {
+    onClose();
+    formik.resetForm();
+  };
+
+  const handleCloseCheck = () => {
+    if (formik.dirty) {
+      toggleConfirmationModal();
+      return;
+    }
+    handleClose();
+  };
+
   const fetchEventDetails = async () => {
     if (!selectedEvent) return;
     if (!isTokenExpired()) {
@@ -125,10 +155,6 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         const fetchEventResponse = await getEventDetailsById(selectedEvent?.id);
         if (fetchEventResponse?.success) {
           setEventDetails(fetchEventResponse?.data || null);
-          formik?.setFieldValue(
-            "enrollList",
-            fetchEventResponse?.data?.enrollList || []
-          );
         } else {
           dispatch(
             pushNotification({
@@ -156,7 +182,13 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   }, [selectedEvent]);
 
   return (
-    <Modal open={open} onClose={onClose} disableAutoFocus>
+    <Modal
+      open={open}
+      onClose={() => {
+        handleCloseCheck();
+      }}
+      disableAutoFocus
+    >
       <Box
         sx={{
           position: "absolute",
@@ -168,10 +200,21 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
           borderRadius: 2,
           width: "80%",
           maxWidth: "600px",
-          maxHeight: "90vh", // Limit the height of the modal
+          maxHeight: "90vh",
           overflowY: "auto",
         }}
       >
+        <ConfirmationPopup
+          open={isConfirmationModalOpen}
+          onClose={toggleConfirmationModal}
+          onConfirm={() => {
+            handleClose();
+            toggleConfirmationModal();
+          }}
+          title={
+            "Unsaved changes will be lost. Are you sure you want to close?"
+          }
+        />
         <Typography variant="h6" gutterBottom>
           Create Event
         </Typography>
@@ -250,7 +293,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             getOptionLabel={(option) => option}
             value={formik?.values?.hosts}
             onChange={(event, newValue) =>
-              formik?.setFieldValue("hosts", newValue || [])
+              formik?.setFieldValue("hosts", newValue.slice(0, 1) || [])
             }
             renderInput={(params) => (
               <TextField
@@ -258,6 +301,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 label="Hosts"
                 variant="outlined"
                 margin="normal"
+                error={formik.touched.hosts && Boolean(formik.errors.hosts)}
+                helperText={formik.touched.hosts && formik.errors.hosts}
               />
             )}
             renderTags={(value, getTagProps) =>
@@ -269,6 +314,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 />
               ))
             }
+            disabled={Boolean(selectedEvent)}
           />
 
           {/* Scheduled Time Picker */}
@@ -322,6 +368,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 label="Tags"
                 variant="outlined"
                 margin="normal"
+                error={formik.touched.tags && Boolean(formik.errors.tags)}
+                helperText={formik.touched.tags && formik.errors.tags}
               />
             )}
             renderTags={(value, getTagProps) =>
@@ -334,33 +382,38 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               ))
             }
           />
-          {/* Enroll List (Autocomplete for participants) */}
-          <Autocomplete
-            multiple
+
+          <TextField
             fullWidth
-            options={availableParticipants} // Use the available participants here
-            getOptionLabel={(option) => option}
-            value={formik?.values?.enrollList}
-            onChange={(event, newValue) =>
-              formik?.setFieldValue("enrollList", newValue || [])
+            label="Event Duration"
+            variant="outlined"
+            placeholder="In Hours"
+            margin="normal"
+            type="number"
+            slotProps={{
+              input: {
+                inputProps: {
+                  step: 0.5,
+                  min: 0,
+                },
+              },
+            }}
+            {...formik.getFieldProps("duration")}
+            error={formik.touched.duration && Boolean(formik.errors.duration)}
+            helperText={formik.touched.duration && formik.errors.duration}
+          />
+
+          {/* Password Field */}
+          <TextField
+            fullWidth
+            label="Join Password"
+            variant="outlined"
+            margin="normal"
+            {...formik?.getFieldProps("password")}
+            error={
+              formik?.touched?.password && Boolean(formik?.errors?.password)
             }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Enroll List (Participants)"
-                variant="outlined"
-                margin="normal"
-              />
-            )}
-            renderTags={(value, getTagProps) =>
-              value?.map((option, index) => (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  {...getTagProps({ index })}
-                />
-              ))
-            }
+            helperText={formik?.touched?.password && formik?.errors?.password}
           />
 
           {/* Action Buttons */}

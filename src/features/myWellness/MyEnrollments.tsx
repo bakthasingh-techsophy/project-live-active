@@ -41,6 +41,8 @@ interface Event {
   isExpired: boolean;
   loading?: boolean;
   updated?: boolean;
+  duration: number;
+  password: string;
 }
 
 const staticStyles = {
@@ -326,26 +328,28 @@ const MyEnrollments = ({
                   <Typography variant="body2" color="text.secondary">
                     Scheduled for: {formatDate(event?.scheduledTime)}
                   </Typography>
-                  {timePeriod === "upcoming" && (
-                    <Button
-                      variant="contained"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEnrollOrJoinClick(event?.id);
-                      }}
-                      sx={staticStyles?.button?.joinButton}
-                    >
-                      {loading ? (
-                        <ClipLoader
-                          color={"#fff"}
-                          loading={loading}
-                          size={24}
-                        />
-                      ) : (
-                        "Join"
-                      )}
-                    </Button>
-                  )}
+                  {event?.scheduledTime &&
+                    new Date(event.scheduledTime).getTime() >
+                      new Date().getTime() && (
+                      <Button
+                        variant="contained"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEnrollOrJoinClick(event?.id);
+                        }}
+                        sx={staticStyles?.button?.joinButton}
+                      >
+                        {loading ? (
+                          <ClipLoader
+                            color={"#fff"}
+                            loading={loading}
+                            size={24}
+                          />
+                        ) : (
+                          "Join"
+                        )}
+                      </Button>
+                    )}
                 </CardContent>
               </Card>
             </Grid>
@@ -361,7 +365,6 @@ const MyEnrollments = ({
         }}
         loading={isLoading}
         userDetails={userDetails}
-        timePeriod={timePeriod}
       />
     </Container>
   );

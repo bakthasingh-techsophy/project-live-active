@@ -17,7 +17,7 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={styles?.popupContainer}>
-        <Typography variant="h6" sx={{ color: "primary." }}>
+        <Typography variant="h6" sx={{ color: "text.primary", fontSize:16 }}>
           {title}
         </Typography>
         <Box sx={styles?.buttonContainer}>

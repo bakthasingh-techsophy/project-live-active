@@ -27,6 +27,8 @@ export interface Event {
   isExpired: boolean;
   loading?: boolean;
   updated?: boolean;
+  duration: number;
+  password: string;
 }
 
 // Sample data
@@ -167,12 +169,31 @@ const ExploreEvents = ({
 
   const filteredEvents =
     selectedTags?.length === 0
-      ? browsedEvents?.filter((event) => {
-          const isUpcoming =
-            new Date(event?.scheduledTime).getTime() > new Date().getTime();
+      ? isOnAdministrationPage
+        ? browsedEvents.sort((a, b) => {
+            const now = new Date().getTime();
+            const timeA = new Date(a.scheduledTime).getTime();
+            const timeB = new Date(b.scheduledTime).getTime();
 
-          return isUpcoming;
-        })
+            const isUpcomingA = timeA > now;
+            const isUpcomingB = timeB > now;
+
+            if (isUpcomingA && !isUpcomingB) {
+              return -1;
+            } else if (!isUpcomingA && isUpcomingB) {
+              return 1;
+            } else if (isUpcomingA && isUpcomingB) {
+              return timeA - timeB;
+            } else {
+              return timeB - timeA;
+            }
+          })
+        : browsedEvents?.filter((event) => {
+            const upcoming =
+              new Date(event?.scheduledTime).getTime() > new Date().getTime();
+
+            return upcoming;
+          })
       : browsedEvents?.filter((event) => {
           const tagsMatch = event?.tags?.some((tag) =>
             selectedTags?.some(
@@ -186,12 +207,14 @@ const ExploreEvents = ({
           return tagsMatch && isUpcoming;
         });
 
-  const sortedFilteredEvents = filteredEvents?.sort((a, b) => {
-    const dateA: any = new Date(a?.scheduledTime);
-    const dateB: any = new Date(b?.scheduledTime);
+  const sortedFilteredEvents = isOnAdministrationPage
+    ? filteredEvents
+    : filteredEvents?.sort((a, b) => {
+        const dateA: any = new Date(a?.scheduledTime);
+        const dateB: any = new Date(b?.scheduledTime);
 
-    return dateA - dateB; // Latest first
-  });
+        return dateA - dateB;
+      });
 
   const handlePopoverOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -207,7 +230,6 @@ const ExploreEvents = ({
   };
 
   const open = Boolean(anchorEl);
-  // const viewMode = "explore";
 
   const handleSearch = async (payload: any) => {
     try {

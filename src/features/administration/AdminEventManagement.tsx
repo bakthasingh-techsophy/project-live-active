@@ -1,6 +1,7 @@
 // AdminEventManagement.tsx
 import { emptyBinPic } from "@assets/index";
 import ExploreEvents, { Event } from "@features/common/ExploreEvents";
+import AddIcon from "@mui/icons-material/Add";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { AppDispatch } from "@redux/store";
@@ -10,12 +11,11 @@ import {
   updateEventInDatabase,
 } from "@services/eventsService";
 import { CONSTANTS } from "@utils/constants";
-import { ApiResponse, NotificationTypes } from "@utils/types";
+import { handleResponseMessage } from "@utils/dispatchNotification";
+import { NotificationTypes } from "@utils/types";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import AddEventModal from "./AddEventModal"; // Import the new AddEventModal component
-import AddIcon from "@mui/icons-material/Add";
-import { handleResponseMessage } from "@utils/dispatchNotification";
 
 const AdminEventManagement: React.FC = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -36,17 +36,28 @@ const AdminEventManagement: React.FC = () => {
   ];
   const availableHosts = ["Host1", "Host2", "Host3", "Host4"];
 
-  const handleOpenModal = () => setOpenAddModal(true);
-  const handleCloseModal = () => setOpenAddModal(false);
+  const handleOpenModal = () => {
+    setOpenAddModal(true);
+  };
+  const handleCloseModal = () => {
+    setSelectedEvent(null);
+    setOpenAddModal(false);
+  };
 
   const handleSaveEvent = async (eventData: Event) => {
     setLoading(true);
     let response;
+    const durationInMinutes = eventData.duration * 60;
 
-    if (eventData?.id) {
-      const eventId = eventData?.id;
-      delete eventData?.updated;
-      response = await updateEventInDatabase(eventId, eventData);
+    const updatedEventData = {
+      ...eventData,
+      duration: durationInMinutes,
+    };
+
+    if (updatedEventData?.id) {
+      const eventId = updatedEventData?.id;
+      delete updatedEventData?.updated;
+      response = await updateEventInDatabase(eventId, updatedEventData);
       if (response?.success) {
         setSelectedEvent((prev) => {
           if (prev) prev.updated = true;
@@ -54,7 +65,8 @@ const AdminEventManagement: React.FC = () => {
         });
       }
     } else {
-      response = await saveEventInDataBase(eventData);
+      setSelectedEvent(null);
+      response = await saveEventInDataBase(updatedEventData);
       handleSearch({
         searchText: "",
       });
@@ -77,6 +89,9 @@ const AdminEventManagement: React.FC = () => {
     handleCloseModal();
   };
 
+  useEffect(() => {
+    console.log("------------ here", selectedEvent);
+  }, [selectedEvent]);
   const handleSearch = async (payload: any) => {
     try {
       setLoading(true);
@@ -161,7 +176,10 @@ const AdminEventManagement: React.FC = () => {
             variant="contained"
             color="primary"
             size="large"
-            onClick={handleOpenModal}
+            onClick={() => {
+              setSelectedEvent(null);
+              handleOpenModal();
+            }}
             sx={{
               marginTop: "20px",
               padding: "15px 30px",
@@ -189,7 +207,10 @@ const AdminEventManagement: React.FC = () => {
             variant="contained"
             color="primary"
             size="small"
-            onClick={handleOpenModal}
+            onClick={() => {
+              setSelectedEvent(null);
+              handleOpenModal();
+            }}
             sx={{
               alignSelf: "flex-end",
               fontSize: "16px",
@@ -222,7 +243,6 @@ const AdminEventManagement: React.FC = () => {
         loading={loading}
         availableTags={availableTags}
         availableHosts={availableHosts}
-        availableParticipants={[]}
         selectedEvent={selectedEvent}
       />
     </Container>

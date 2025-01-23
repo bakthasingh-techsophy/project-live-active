@@ -7,7 +7,7 @@ import {
   CircularProgress,
   Grid,
   Modal,
-  Typography
+  Typography,
 } from "@mui/material";
 import { format } from "date-fns";
 import React, { useEffect } from "react";
@@ -19,7 +19,6 @@ interface EventDetailsModalProps {
   selectedEvent: Event | undefined | null;
   onEnroll: () => void;
   userDetails: any;
-  timePeriod?: "upcoming" | "past";
 }
 
 const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
@@ -29,7 +28,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   selectedEvent,
   onEnroll,
   userDetails,
-  timePeriod = "upcoming",
 }) => {
   useEffect(() => {
     // Any logic to fetch event details if needed, like selectedEvent changes
@@ -81,24 +79,26 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <Typography variant="h5" sx={{ fontWeight: "bold", flex: 1 }}>
                 {selectedEvent?.title}
               </Typography>
-              {timePeriod === "upcoming" && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={onEnroll}
-                  disabled={loading}
-                  sx={{ alignSelf: "flex-start" }}
-                >
-                  {loading ? (
-                    <CircularProgress size={24} />
-                  ) : isUserEnrolled ? (
-                    "Join"
-                  ) : (
-                    "Enroll"
-                  )}
-                </Button>
-              )}
+              {selectedEvent?.scheduledTime &&
+                new Date(selectedEvent.scheduledTime).getTime() >
+                  new Date().getTime() && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={onEnroll}
+                    disabled={loading}
+                    sx={{ alignSelf: "flex-start" }}
+                  >
+                    {loading ? (
+                      <CircularProgress size={24} />
+                    ) : isUserEnrolled ? (
+                      "Join"
+                    ) : (
+                      "Enroll"
+                    )}
+                  </Button>
+                )}
             </Box>
 
             {/* Event Hosts */}
