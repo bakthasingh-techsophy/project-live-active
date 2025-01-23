@@ -8,27 +8,9 @@ import { searchEvents } from "@services/eventsService";
 import { getUserDetails } from "@services/userManagementService";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
-import { NotificationTypes } from "@utils/types";
+import { Event, NotificationTypes } from "@utils/types";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-
-interface Event {
-  id: number;
-  title: string;
-  hosts: string[];
-  rating: number;
-  scheduledTime: string;
-  description: string;
-  tags: string[];
-  photoUrl: string;
-  isEnrolled: boolean;
-  isStarted: boolean;
-  isExpired: boolean;
-  loading?: boolean;
-  updated?: boolean;
-  duration: number;
-  password: string;
-}
 
 interface MyWellnessProps {
   viewMode: "explore" | "browse";

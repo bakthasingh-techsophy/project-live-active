@@ -1,7 +1,6 @@
-import { Event } from "@features/common/ExploreEvents";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
-import { ApiResponse } from "@utils/types";
+import { ApiResponse, Event } from "@utils/types";
 import wretch from "wretch";
 
 const gatewayUrl = "http://localhost:8080/api/live-active";

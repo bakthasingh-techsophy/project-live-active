@@ -1,38 +1,35 @@
-import React, { useEffect, useState } from "react";
+import { defaultEventPic } from "@assets/index";
+import ConfirmationPopup from "@components/ConfirmationPopup";
+import { PhotoCamera } from "@mui/icons-material";
 import {
+  Autocomplete,
   Box,
   Button,
-  TextField,
-  Typography,
-  Modal,
+  Chip,
   CircularProgress,
   IconButton,
-  Autocomplete,
-  Chip,
-  useTheme,
-  FormHelperText,
+  Modal,
+  TextField,
+  Typography,
+  useTheme
 } from "@mui/material";
-import { PhotoCamera } from "@mui/icons-material";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import Cropper from "react-cropper";
-import "cropperjs/dist/cropper.css";
-import { defaultEventPic } from "@assets/index";
-import { Event } from "@features/common/ExploreEvents";
-import { deleteEvent, getEventDetailsById } from "@services/eventsService";
-import { AppRouteQueries } from "@utils/AppRoutes";
-import { isTokenExpired } from "@utils/tokenUtils";
 import { pushNotification } from "@redux/slices/loadingSlice";
-import { AppDispatch } from "@redux/store";
+import { getEventDetailsById } from "@services/eventsService";
+import { AppRouteQueries } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
-import { NotificationTypes, ApiResponse } from "@utils/types";
+import { handleNotification } from "@utils/dispatchNotification";
+import { isTokenExpired } from "@utils/tokenUtils";
+import { Event, NotificationTypes } from "@utils/types";
+import "cropperjs/dist/cropper.css";
+import { useFormik } from "formik";
+import React, { useEffect, useState } from "react";
+import Cropper from "react-cropper";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { handleNotification } from "@utils/dispatchNotification";
-import ConfirmationPopup from "@components/ConfirmationPopup";
+import * as Yup from "yup";
 
 interface AddEventModalProps {
   open: boolean;

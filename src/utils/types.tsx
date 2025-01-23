@@ -18,3 +18,22 @@ export interface ApiResponse {
   data?: any;
   message?: string;
 }
+
+export interface Event {
+  id: number;
+  title: string;
+  hosts: string[];
+  rating: number;
+  scheduledTime: string;
+  description: string;
+  tags: string[];
+  photoUrl: string;
+  isEnrolled: boolean;
+  isStarted: boolean;
+  isExpired: boolean;
+  loading?: boolean;
+  updated?: boolean;
+  duration: number;
+  password: string;
+  joinLink: string;
+}

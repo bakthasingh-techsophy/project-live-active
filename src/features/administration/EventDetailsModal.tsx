@@ -1,5 +1,4 @@
 import { defaultEventPic } from "@assets/index";
-import { Event } from "@features/common/ExploreEvents";
 import {
   Box,
   Button,
@@ -9,6 +8,7 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
+import { Event } from "@utils/types";
 import { format } from "date-fns";
 import React, { useEffect } from "react";
 
@@ -17,7 +17,7 @@ interface EventDetailsModalProps {
   onClose: () => void;
   loading: boolean;
   selectedEvent: Event | undefined | null;
-  onEnroll: () => void;
+  onEnroll: (eventId: number) => void;
   userDetails: any;
 }
 
@@ -86,7 +86,12 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     variant="contained"
                     color="primary"
                     size="large"
-                    onClick={onEnroll}
+                    onClick={() => {
+                      onEnroll(selectedEvent?.id);
+                      if (isUserEnrolled) {
+                        window.open(selectedEvent?.joinLink, "_blank");
+                      }
+                    }}
                     disabled={loading}
                     sx={{ alignSelf: "flex-start" }}
                   >

@@ -25,13 +25,15 @@ import { AppRouteQueries } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
-import { ApiResponse, NotificationTypes } from "@utils/types";
+import { ApiResponse, Event, NotificationTypes } from "@utils/types";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { Event } from "./ExploreEvents";
-import { handleNotification, handleResponseMessage } from "@utils/dispatchNotification";
+import {
+  handleNotification,
+  handleResponseMessage,
+} from "@utils/dispatchNotification";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -53,6 +55,7 @@ interface EventCardProps {
   dynamicStyles: any; // Same as above, if you have a specific type for styles, specify it
   enrolledEventIds?: string[]; // Optional prop, array of event IDs
   handleEditEvent: (event: Event) => void;
+  handleEnrollOrJoinClick: (eventId: any) => void;
   handleReload: () => void;
   handleCardClick: (eventDetails: Event) => void;
 }
@@ -68,6 +71,7 @@ const EventCard: React.FC<EventCardProps> = ({
   dynamicStyles,
   enrolledEventIds,
   handleEditEvent,
+  handleEnrollOrJoinClick,
   setSelectedEvent,
   handleReload,
   handleCardClick,
@@ -79,51 +83,6 @@ const EventCard: React.FC<EventCardProps> = ({
     enrolledEventIds?.includes(localEvent?.id.toString())
   );
   const [loading, setLoading] = useState(false);
-  const handleEnrollOrJoinClick = async () => {
-    //   setSelectedEvent({
-    //     ...event,
-    //     loading: true,
-    //   });
-    const payload = {
-      [`${isEnrolled ? "join" : "enroll"}List`]: [
-        getLocalStorageItem(CONSTANTS?.USER_EMAIL),
-      ],
-    };
-
-    if (!isTokenExpired()) {
-      setLoading(true);
-      try {
-        const enrollOrJoinFormResponse = await enrollOrJoinEvent(
-          payload,
-          localEvent?.id
-        );
-        if (enrollOrJoinFormResponse?.success) {
-          handleReload();
-        }
-        handleResponseMessage(
-          enrollOrJoinFormResponse,
-          dispatch,
-          isEnrolled
-            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
-            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
-          isEnrolled
-            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_FAILURE
-            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE
-        );
-      } catch (error: any) {
-        handleNotification(
-          dispatch,
-          error,
-          isEnrolled
-            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
-            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS
-        );
-      }
-      setLoading(false);
-      return;
-    }
-    navigate(AppRouteQueries?.AUTH_LOGIN);
-  };
 
   const handleDelete = async () => {
     if (!isTokenExpired()) {
@@ -188,7 +147,7 @@ const EventCard: React.FC<EventCardProps> = ({
     fetchCurrentUpdatedEvent();
     setSelectedEvent(null);
   };
-  
+
   useEffect(() => {
     if (selectedEvent?.updated) {
       updateCurrentCard();
@@ -249,7 +208,10 @@ const EventCard: React.FC<EventCardProps> = ({
                 sx={staticStyles?.button?.enrollButton}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleEnrollOrJoinClick();
+                  handleEnrollOrJoinClick(localEvent?.id);
+                  if (isEnrolled) {
+                    window.open(localEvent?.joinLink, "_blank");
+                  }
                 }}
               >
                 {loading ? (
@@ -435,5 +397,3 @@ const EventCard: React.FC<EventCardProps> = ({
 };
 
 export default EventCard;
-
-

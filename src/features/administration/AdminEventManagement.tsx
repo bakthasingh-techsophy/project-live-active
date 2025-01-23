@@ -1,6 +1,6 @@
 // AdminEventManagement.tsx
 import { emptyBinPic } from "@assets/index";
-import ExploreEvents, { Event } from "@features/common/ExploreEvents";
+import ExploreEvents from "@features/common/ExploreEvents";
 import AddIcon from "@mui/icons-material/Add";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
@@ -12,7 +12,7 @@ import {
 } from "@services/eventsService";
 import { CONSTANTS } from "@utils/constants";
 import { handleResponseMessage } from "@utils/dispatchNotification";
-import { NotificationTypes } from "@utils/types";
+import { Event, NotificationTypes } from "@utils/types";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import AddEventModal from "./AddEventModal"; // Import the new AddEventModal component

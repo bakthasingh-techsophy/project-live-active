@@ -2,34 +2,22 @@ import MoreInfoPopover from "@components/MoreInfoPopover";
 import EventDetailsModal from "@features/administration/EventDetailsModal";
 import { Box, Container, Grid, useTheme } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
-import { searchEvents } from "@services/eventsService";
+import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
 import { getUserDetails } from "@services/userManagementService";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
-import { NotificationTypes } from "@utils/types";
+import { Event, NotificationTypes } from "@utils/types";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import EventCard from "./EventCard";
-
-export interface Event {
-  id: number;
-  title: string;
-  hosts: string[];
-  rating: number;
-  scheduledTime: string;
-  description: string;
-  tags: string[];
-  photoUrl: string;
-  isEnrolled: boolean;
-  isStarted: boolean;
-  isExpired: boolean;
-  loading?: boolean;
-  updated?: boolean;
-  duration: number;
-  password: string;
-}
+import {
+  handleNotification,
+  handleResponseMessage,
+} from "@utils/dispatchNotification";
+import { useNavigate } from "react-router-dom";
+import { AppRouteQueries } from "@utils/AppRoutes";
 
 // Sample data
 const staticStyles = {
@@ -154,8 +142,10 @@ const ExploreEvents = ({
   setIsEmpty,
 }: ExploreEventsProps) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const isTokenActive = !isTokenExpired();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverTags, setPopoverTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -294,6 +284,49 @@ const ExploreEvents = ({
       );
     }
   };
+
+  const handleEnrollOrJoinClick = async (eventId: any, isEnrolled?: any) => {
+    if (!isTokenExpired()) {
+      const payload = {
+        [`${isEnrolled ? "join" : "enroll"}List`]: [
+          getLocalStorageItem(CONSTANTS?.USER_EMAIL),
+        ],
+      };
+
+      setLoading(true);
+      try {
+        const enrollOrJoinFormResponse = await enrollOrJoinEvent(
+          payload,
+          eventId
+        );
+        if (enrollOrJoinFormResponse?.success) {
+          handleReload();
+        }
+        handleResponseMessage(
+          enrollOrJoinFormResponse,
+          dispatch,
+          isEnrolled
+            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
+            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS,
+          isEnrolled
+            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_FAILURE
+            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_FAILURE
+        );
+      } catch (error: any) {
+        handleNotification(
+          dispatch,
+          error,
+          isEnrolled
+            ? CONSTANTS.API_RESPONSE_MESSAGES.EVENT_JOINED_SUCCESS
+            : CONSTANTS.API_RESPONSE_MESSAGES.EVENT_ENROLL_SUCCESS
+        );
+      }
+      setLoading(false);
+      return;
+    }
+    navigate(AppRouteQueries?.AUTH_LOGIN);
+  };
+
   const handleReload = () => {
     fetchUserDetails();
     handleSearch({
@@ -349,6 +382,7 @@ const ExploreEvents = ({
                 dynamicStyles={dynamicStyles}
                 enrolledEventIds={userDetails?.eventIds} // Assuming event IDs are from userDetails
                 handleEditEvent={handleEditEvent}
+                handleEnrollOrJoinClick={handleEnrollOrJoinClick}
                 setSelectedEvent={setSelectedEvent}
                 handleReload={handleReload}
                 handleCardClick={handleCardClick}
@@ -377,6 +411,7 @@ const ExploreEvents = ({
                   handleEditEvent={function (): void {
                     throw new Error("Function not implemented.");
                   }}
+                  handleEnrollOrJoinClick={handleEnrollOrJoinClick}
                   setSelectedEvent={setSelectedEvent}
                   handleReload={handleReload}
                   handleCardClick={handleCardClick}
@@ -397,9 +432,7 @@ const ExploreEvents = ({
         selectedEvent={localEventDetails}
         open={openEventDetails}
         onClose={() => setOpenEventDetails(false)}
-        onEnroll={function (): void {
-          throw new Error("Function not implemented.");
-        }}
+        onEnroll={handleEnrollOrJoinClick}
         loading={isLoading}
         userDetails={userDetails}
       />

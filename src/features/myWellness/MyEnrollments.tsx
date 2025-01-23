@@ -22,28 +22,10 @@ import {
   handleResponseMessage,
 } from "@utils/dispatchNotification";
 import { getLocalStorageItem } from "@utils/encrypt";
-import { isTokenExpired } from "@utils/tokenUtils";
+import { Event } from "@utils/types";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
-
-interface Event {
-  id: number;
-  title: string;
-  hosts: string[];
-  rating: number;
-  scheduledTime: string;
-  description: string;
-  tags: string[];
-  photoUrl: string;
-  isEnrolled: boolean;
-  isStarted: boolean;
-  isExpired: boolean;
-  loading?: boolean;
-  updated?: boolean;
-  duration: number;
-  password: string;
-}
 
 const staticStyles = {
   container: {
@@ -336,6 +318,7 @@ const MyEnrollments = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           handleEnrollOrJoinClick(event?.id);
+                          window.open(event?.joinLink, "_blank");
                         }}
                         sx={staticStyles?.button?.joinButton}
                       >
@@ -360,9 +343,7 @@ const MyEnrollments = ({
         selectedEvent={localEventDetails}
         open={openEventDetails}
         onClose={() => setOpenEventDetails(false)}
-        onEnroll={function (): void {
-          throw new Error("Function not implemented.");
-        }}
+        onEnroll={handleEnrollOrJoinClick}
         loading={isLoading}
         userDetails={userDetails}
       />

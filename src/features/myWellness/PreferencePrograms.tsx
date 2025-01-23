@@ -14,27 +14,11 @@ import { pushNotification } from "@redux/slices/loadingSlice";
 import { enrollOrJoinEvent } from "@services/eventsService";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
-import { NotificationTypes } from "@utils/types";
+import { Event, NotificationTypes } from "@utils/types";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
 
-interface Event {
-  id: number;
-  title: string;
-  hosts: string[];
-  rating: number;
-  scheduledTime: string;
-  description: string;
-  tags: string[];
-  photoUrl: string;
-  isEnrolled: boolean;
-  isStarted: boolean;
-  isExpired: boolean;
-  loading?: boolean;
-  duration: number;
-  password: string;
-}
 
 const staticStyles = {
   container: {
