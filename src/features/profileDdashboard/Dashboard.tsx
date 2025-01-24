@@ -20,9 +20,13 @@ import {
   Session,
 } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
-import { AppRouteQueryValues, AppRoutes } from "@utils/AppRoutes";
+import {
+  AppRouteQueries,
+  AppRouteQueryValues,
+  AppRoutes,
+} from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
-import { getLocalStorageItem } from "@utils/encrypt";
+import { getLocalStorageItem, setLocalStorageItem } from "@utils/encrypt";
 import { NotificationTypes } from "@utils/types";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -30,6 +34,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import ExploreEvents from "../common/ExploreEvents";
 import { LiveActiveBrand } from "./Branding";
+import MyEvents from "@features/myEvents/MyEvents";
 
 // Define the navigation items
 const NAVIGATION: Navigation = [
@@ -108,11 +113,15 @@ const useCustomRouter = (initialPath: string): Router => {
   };
 };
 
-const getCurrentLocation = (location: any): string => {
+const getCurrentLocation = (isAdmin: boolean, location: any): string => {
   let currentPath = location?.pathname;
 
   if (currentPath?.includes("/dashboard/explore-events")) {
-    currentPath = currentPath?.replace("/dashboard", "") || "/explore-events";
+    let replacablePath = "/explore-events";
+    if (isAdmin) {
+      replacablePath = "/admin";
+    }
+    currentPath = currentPath?.replace("/dashboard", "") || replacablePath;
   } else if (currentPath?.includes("/dashboard/profile")) {
     currentPath = currentPath?.replace("/dashboard", "") || "/profile";
   } else if (currentPath?.includes("/dashboard/my-events")) {
@@ -134,12 +143,12 @@ const Dashboard = () => {
   };
   const dispatch = useDispatch();
   const userId = getLocalStorageItem(CONSTANTS?.USER_ID) || "";
-  const isAdmin =
-    getLocalStorageItem(CONSTANTS?.USER_ROLE) === CONSTANTS?.LA_ADMIN_ROLE;
+  const [isAdmin, setIsAdmin] = useState(false);
   const [session, setSession] = React.useState<Session | null>(sampleSession);
   const [userDetails, setUserDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
+  const [currentNavigation, setCurrentNavigation] = useState<Navigation>([]);
 
   const authentication = React.useMemo(() => {
     return {
@@ -155,7 +164,9 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const dashboardRouter = useCustomRouter(getCurrentLocation(location));
+  const dashboardRouter = useCustomRouter(
+    getCurrentLocation(isAdmin, location)
+  );
   const navigate = useNavigate();
   const getCurrentPage = () => {
     switch (dashboardRouter?.pathname) {
@@ -172,16 +183,13 @@ const Dashboard = () => {
             setSelectedEvent={() => {}}
           />
         );
-      case "/" +
-        AppRouteQueryValues?.MY_EVENTS +
-        "/" +
-        AppRouteQueryValues?.UPCOMING:
-        return <MyWellness viewMode="explore" timePeriod="upcoming" />;
+      case AppRouteQueries.DASHBOARD_MY_EVENTS_UPCOMMING:
+        return <MyEvents sectionName={AppRouteQueryValues.UPCOMING} />;
       case "/" +
         AppRouteQueryValues?.MY_EVENTS +
         "/" +
         AppRouteQueryValues?.PAST:
-        return <MyWellness viewMode="explore" timePeriod="past" />;
+        return <MyEvents sectionName={AppRouteQueryValues.PAST} />;
       case "/" +
         AppRouteQueryValues?.PROFILE +
         "/" +
@@ -212,6 +220,13 @@ const Dashboard = () => {
       const getUserResponse = await getUserDetails(userId);
 
       if (getUserResponse?.success) {
+        if (getUserResponse?.data?.roles?.includes(CONSTANTS?.LA_ADMIN_ROLE)) {
+          setIsAdmin(true);
+          await setLocalStorageItem(
+            CONSTANTS?.USER_ROLE,
+            CONSTANTS?.LA_ADMIN_ROLE
+          );
+        }
         setIsLoading(false);
         setUserDetails(getUserResponse?.data);
       } else {
@@ -253,14 +268,21 @@ const Dashboard = () => {
           image: userDetails?.photoUrl || "",
         },
       };
-
+      if (userDetails?.roles?.includes(CONSTANTS?.LA_ADMIN_ROLE)) {
+        setIsAdmin(true);
+        setCurrentNavigation([...NAVIGATION_ADMIN]);
+      } else {
+        setIsAdmin(false);
+        setCurrentNavigation([...NAVIGATION]);
+      }
       setSession(updatedSession);
     }
   }, [userDetails]);
 
   return (
     <AppProvider
-      navigation={isAdmin ? [...NAVIGATION, ...NAVIGATION_ADMIN] : NAVIGATION}
+      navigation={currentNavigation}
+      // navigation={isAdmin ? [...NAVIGATION_ADMIN] : NAVIGATION}
       branding={LiveActiveBrand}
       theme={lightTheme}
       router={dashboardRouter}

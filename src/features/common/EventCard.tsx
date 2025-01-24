@@ -1,7 +1,6 @@
 import { defaultEventPic } from "@assets/index";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   Box,
   Button,
@@ -15,16 +14,14 @@ import {
   Typography,
 } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
-import {
-  deleteEvent,
-  getEventById
-} from "@services/eventsService";
+import { deleteEvent, getEventById } from "@services/eventsService";
 import { AppRouteQueries } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import {
   handleNotification,
   handleResponseMessage,
 } from "@utils/dispatchNotification";
+import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
 import { Event, NotificationTypes } from "@utils/types";
 import { useEffect, useState } from "react";
@@ -55,6 +52,7 @@ interface EventCardProps {
   handleEnrollOrJoinClick: (eventId: any) => void;
   handleReload: () => void;
   handleCardClick: (eventDetails: Event) => void;
+  handleStartEvent: (eventId: number) => void;
 }
 const EventCard: React.FC<EventCardProps> = ({
   event,
@@ -72,14 +70,13 @@ const EventCard: React.FC<EventCardProps> = ({
   setSelectedEvent,
   handleReload,
   handleCardClick,
+  handleStartEvent,
 }) => {
   const [localEvent, setLocalEvent] = useState<Event>(event);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isEnrolled] = useState(
-    enrolledEventIds?.includes(localEvent?.id?.toString())
-  );
-  const [loading, setLoading] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleDelete = async () => {
     if (!isTokenExpired()) {
@@ -149,29 +146,44 @@ const EventCard: React.FC<EventCardProps> = ({
     if (selectedEvent?.updated) {
       updateCurrentCard();
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent]);
+  useEffect(() => {
+    if (enrolledEventIds && localEvent) {
+      setLoading(false);
+      setIsEnrolled(
+        enrolledEventIds?.includes(localEvent?.id?.toString()) ?? false
+      );
+    } else {
+      if (isTokenExpired()) {
+        setLoading(false);
+      }
+    }
+  }, [enrolledEventIds, localEvent]);
+
+  const getActionButtonText = () => {
+    if (isOnAdministrationPage) {
+      return "Start Event";
+    } else {
+      return isEnrolled ? "Join" : "Enroll";
+    }
+  };
 
   return (
     <Card
       key={localEvent?.id}
       sx={
         viewMode === "explore"
-          ? [
-              staticStylesExploreEvents?.cardStyle,
-              {
-                "&:hover": {
-                  cursor: "pointer",
-                },
-              },
-            ]
+          ? [staticStylesExploreEvents?.cardStyle]
           : [
               staticStyles?.container?.cardContainer?.(theme),
               dynamicStyles?.container?.cardContainer,
             ]
       }
-      onClick={() => {
-        if (!isOnAdministrationPage) {
+      onClick={(e: any) => {
+        e?.preventDefault();
+        if (localEvent && enrolledEventIds) {
           handleCardClick(localEvent);
         }
       }}
@@ -191,7 +203,18 @@ const EventCard: React.FC<EventCardProps> = ({
       <CardContent sx={staticStyles?.container?.cardContentContainer}>
         {/* Event Title */}
         <Box sx={staticStyles?.container?.contentHeader}>
-          <Typography variant="h6" sx={staticStyles?.typography?.boldText}>
+          <Typography
+            variant="h6"
+            sx={{
+              ...staticStyles?.typography?.boldText,
+              display: "-webkit-box",
+              overflow: "hidden",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 3, // Clamps the text to 3 lines
+              whiteSpace: "normal", // Ensures that text wraps
+              textOverflow: "ellipsis", // Adds ellipses at the end of the truncated text
+            }}
+          >
             {localEvent?.title}
           </Typography>
           <Box
@@ -202,32 +225,33 @@ const EventCard: React.FC<EventCardProps> = ({
               gap: 1,
             }}
           >
-            {!isOnAdministrationPage && (
-              <Button
-                variant="contained"
-                sx={staticStyles?.button?.enrollButton}
-                onClick={(e) => {
-                  e?.stopPropagation();
-                  handleEnrollOrJoinClick(localEvent?.id);
+            <Button
+              variant="contained"
+              sx={staticStyles?.button?.enrollButton}
+              onClick={(e) => {
+                e?.stopPropagation();
+                if (isOnAdministrationPage) {
+                  handleStartEvent(localEvent?.id);
+                } else {
                   if (isEnrolled) {
                     window.open(localEvent?.joinLink, "_blank");
+                  } else {
+                    handleEnrollOrJoinClick(localEvent?.id);
                   }
-                }}
-              >
-                {loading ? (
-                  <ClipLoader color={"#fff"} loading={loading} size={24} />
-                ) : isEnrolled ? (
-                  "Join"
-                ) : (
-                  "Enroll"
-                )}
-              </Button>
-            )}
+                }
+              }}
+            >
+              {loading ? (
+                <ClipLoader color={"#fff"} loading={loading} size={24} />
+              ) : (
+                getActionButtonText()
+              )}
+            </Button>
             {/* Admin Edit/Delete Buttons */}
             {isOnAdministrationPage && (
               <>
                 {/* Edit Icon Button */}
-                <Tooltip title="View Event Details" arrow>
+                {/* <Tooltip title="View Event Details" arrow>
                   <IconButton
                     color="info"
                     onClick={() => {
@@ -244,11 +268,13 @@ const EventCard: React.FC<EventCardProps> = ({
                   >
                     <VisibilityIcon />
                   </IconButton>
-                </Tooltip>
+                </Tooltip> */}
                 <Tooltip title="Edit Event" arrow>
                   <IconButton
                     color="primary"
-                    onClick={() => {
+                    onClick={(e: any) => {
+                      e?.preventDefault();
+                      e?.stopPropagation();
                       handleEditEvent(localEvent);
                     }}
                     sx={{
@@ -268,7 +294,9 @@ const EventCard: React.FC<EventCardProps> = ({
                 <Tooltip title="Delete Event" arrow>
                   <IconButton
                     color="secondary"
-                    onClick={() => {
+                    onClick={(e: any) => {
+                      e?.preventDefault();
+                      e?.stopPropagation();
                       handleDelete();
                     }}
                     sx={{

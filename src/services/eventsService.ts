@@ -221,3 +221,30 @@ export const getEventById = async (evenId: number): Promise<ApiResponse> => {
     };
   }
 };
+export const getEventLinks = async (evenId: number): Promise<ApiResponse> => {
+  const endpoint = `${gatewayUrl}/events/links/${evenId}`;
+  const token = getLocalStorageItem(CONSTANTS?.ACCESS_TOKEN);
+  try {
+    const response = (await wretch(endpoint)
+      .headers({
+        Authorization: `Bearer ${token}`,
+      })
+      .get()
+      .json()) as ApiResponse;
+
+    // Return the response as it is (success and message)
+    if (response?.success) {
+      return response;
+    }
+
+    return { success: false, message: response?.message };
+  } catch (error: any) {
+    const errorMessage = JSON.parse(error?.message)?.message || "Unknown error";
+
+    return {
+      success: false,
+      message: errorMessage,
+      data: null,
+    };
+  }
+};

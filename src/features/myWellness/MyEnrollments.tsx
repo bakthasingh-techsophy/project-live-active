@@ -345,6 +345,10 @@ const MyEnrollments = ({
         onEnroll={handleEnrollOrJoinClick}
         loading={isLoading}
         userDetails={userDetails}
+        isOnAdministrationPage={false}
+        handleStartEvent={function (eventId: number): void {
+          throw new Error("Function not implemented.");
+        }}
       />
     </Container>
   );

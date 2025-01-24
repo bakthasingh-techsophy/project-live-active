@@ -52,7 +52,10 @@ export const getSessionStorageItem = (key: string) => {
   return null;
 };
 
-export const setLocalStorageItem = (key: string, value: string): Promise<void> => {
+export const setLocalStorageItem = (
+  key: string,
+  value: string
+): Promise<void> => {
   return new Promise((resolve) => {
     if (!key || !value) {
       console.error("Local storage set failed: Missing key or value.");
@@ -76,5 +79,18 @@ export const getLocalStorageItem = (key: string) => {
   if (encryptedValue) {
     return decryptData(encryptedValue);
   }
+  return null;
+};
+export const clearLocalStorage = () => {
+  localStorage.clear();
+  return null;
+};
+export const clearSessionStorage = () => {
+  sessionStorage.clear();
+  return null;
+};
+export const clearStorage = () => {
+  clearLocalStorage();
+  clearSessionStorage();
   return null;
 };

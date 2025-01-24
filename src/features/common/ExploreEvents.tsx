@@ -2,7 +2,11 @@ import MoreInfoPopover from "@components/MoreInfoPopover";
 import EventDetailsModal from "@features/administration/EventDetailsModal";
 import { Box, Container, Grid, useTheme } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
-import { enrollOrJoinEvent, searchEvents } from "@services/eventsService";
+import {
+  enrollOrJoinEvent,
+  getEventLinks,
+  searchEvents,
+} from "@services/eventsService";
 import { getUserDetails } from "@services/userManagementService";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
@@ -35,6 +39,10 @@ const staticStyles = {
       position: "relative",
       height: "100%",
       overflow: "hidden",
+      "&:hover": {
+        cursor: "pointer",
+        transform: "scale(1.04)",
+      },
     }),
     cardMediaContainer: {
       objectFit: "cover",
@@ -50,6 +58,7 @@ const staticStyles = {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "start",
+      gap: 3,
     },
     ratingContainer: { display: "flex", alignItems: "center", marginTop: 1 },
     tagsContainer: {
@@ -109,10 +118,18 @@ const staticStylesExploreEvents = {
   boxContainer: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))", // Auto-fill grid with responsive column size
-    gap: "16px", // Gap between items
+    gap: 3, // Gap between items
     padding: 3,
   },
-  cardStyle: { display: "flex", flexDirection: "column", position: "relative" },
+  cardStyle: {
+    display: "flex",
+    flexDirection: "column",
+    position: "relative",
+    "&:hover": {
+      cursor: "pointer",
+      transform: "scale(1.04)",
+    },
+  },
   cardImage: {
     width: "100%",
     height: "200px", // Fixed height for the image
@@ -258,11 +275,13 @@ const ExploreEvents = ({
   };
 
   const fetchUserDetails = async () => {
+    if (isTokenExpired()) return;
     const userId = getLocalStorageItem(CONSTANTS?.USER_ID);
+
     try {
       const getUserResponse = await getUserDetails(userId || "");
       if (getUserResponse?.success) {
-        setUserDetails(getUserResponse?.data);
+        setUserDetails({ ...getUserResponse?.data });
       } else {
         dispatch(
           pushNotification({
@@ -299,9 +318,6 @@ const ExploreEvents = ({
           payload,
           eventId
         );
-        if (enrollOrJoinFormResponse?.success) {
-          handleReload();
-        }
         handleResponseMessage(
           enrollOrJoinFormResponse,
           dispatch,
@@ -312,6 +328,7 @@ const ExploreEvents = ({
             ? CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_JOINED_FAILURE
             : CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_ENROLL_FAILURE
         );
+        handleReload();
       } catch (error: any) {
         handleNotification(
           dispatch,
@@ -358,6 +375,38 @@ const ExploreEvents = ({
     setOpenEventDetails(true);
   };
 
+  const handleStartEvent = async (eventId: number) => {
+    if (!isTokenExpired()) {
+      setIsLoading(true);
+      try {
+        const eventLinkResponse = await getEventLinks(eventId);
+        if (eventLinkResponse?.success) {
+          window.open(eventLinkResponse?.data?.startLink, "_blank");
+        } else {
+          dispatch(
+            pushNotification({
+              isOpen: true,
+              message:
+                eventLinkResponse?.message ||
+                CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE,
+              type: NotificationTypes?.ERROR,
+            })
+          );
+        }
+      } catch (error: any) {
+        handleNotification(
+          dispatch,
+          error,
+          CONSTANTS?.API_RESPONSE_MESSAGES?.EVENT_FETCH_FAILURE
+        );
+      }
+      setIsLoading(false);
+
+      return;
+    }
+    navigate(AppRouteQueries?.AUTH_LOGIN);
+  };
+
   return (
     <Container
       maxWidth={false}
@@ -391,18 +440,19 @@ const ExploreEvents = ({
                 handleEnrollOrJoinClick={handleEnrollOrJoinClick}
                 setSelectedEvent={setSelectedEvent}
                 handleReload={handleReload}
+                handleStartEvent={handleStartEvent}
                 handleCardClick={handleCardClick}
               />
             ))
           )}
         </Box>
       ) : (
-        <Grid container spacing={2} sx={staticStyles?.container?.grid}>
+        <Grid container spacing={4} sx={staticStyles?.container?.grid}>
           {isLoading ? (
             <ClipLoader color={"#fff"} loading={isLoading} size={24} />
           ) : (
             sortedFilteredEvents?.map((event) => (
-              <Grid item xs={12} sm={6} md={4} key={event?.id}>
+              <Grid item xs={12} sm={100} md={100} lg={6} key={event?.id}>
                 <EventCard
                   event={event}
                   handlePopoverOpen={handlePopoverOpen}
@@ -421,6 +471,7 @@ const ExploreEvents = ({
                   setSelectedEvent={setSelectedEvent}
                   handleReload={handleReload}
                   handleCardClick={handleCardClick}
+                  handleStartEvent={handleStartEvent}
                 />
               </Grid>
             ))
@@ -441,6 +492,8 @@ const ExploreEvents = ({
         onEnroll={handleEnrollOrJoinClick}
         loading={isLoading}
         userDetails={userDetails}
+        isOnAdministrationPage={isOnAdministrationPage}
+        handleStartEvent={handleStartEvent}
       />
     </Container>
   );

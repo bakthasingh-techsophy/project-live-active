@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const menuItems = [
   { label: "My Dashboard", link: AppRoutes?.DASHBOARD, isLoginRequired: true },
-  { label: "My Wellness", link: AppRoutes?.WELLNESS, isLoginRequired: true },
+  // { label: "My Wellness", link: AppRoutes?.WELLNESS, isLoginRequired: true },
   {
     label: "Browse Events",
     link: AppRoutes?.BROWSE_EVENTS,

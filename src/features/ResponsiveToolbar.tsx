@@ -24,6 +24,8 @@ import { isTokenExpired } from "@utils/tokenUtils";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthFormModal from "./login/LoginModal";
+import { clearStorage, getLocalStorageItem } from "@utils/encrypt";
+import { CONSTANTS } from "@utils/constants";
 
 interface ResponsiveToolbarProps {
   menuItems: { label: string; link: string; isLoginRequired: boolean }[];
@@ -193,9 +195,14 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
   const handleNavigation = (link: string, label: string) => {
     setSelectedMenu(label);
     let tempLink = link;
+    const role = getLocalStorageItem(CONSTANTS?.USER_ROLE);
     if (tempLink?.includes(AppRoutes?.DASHBOARD)) {
       tempLink = AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS;
+      if (role === "la-admin") {
+        tempLink = AppRoutesCombination?.DASHBOARD_ADMIN;
+      }
     }
+    console.log("templinkhere", tempLink, role);
 
     navigate(tempLink);
   };
@@ -212,9 +219,8 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
 
   const handleLogoutConfirm = () => {
     setIsLogoutModalOpen((prev) => !prev);
+    clearStorage();
     navigate(AppRoutes?.HOME);
-    window.location.reload();
-    localStorage.clear();
   };
 
   const openLoginModal = () => {

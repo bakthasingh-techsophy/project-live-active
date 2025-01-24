@@ -19,6 +19,8 @@ interface EventDetailsModalProps {
   selectedEvent: Event | undefined | null;
   onEnroll: (eventId: number) => void;
   userDetails: any;
+  isOnAdministrationPage: boolean;
+  handleStartEvent: (eventId: number) => void;
 }
 
 const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
@@ -28,13 +30,21 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   selectedEvent,
   onEnroll,
   userDetails,
+  isOnAdministrationPage,
+  handleStartEvent,
 }) => {
   useEffect(() => {
     // Any logic to fetch event details if needed, like selectedEvent changes
   }, [selectedEvent]);
-
   const isUserEnrolled = userDetails?.eventIds?.includes(selectedEvent?.id);
 
+  const getActionButtonText = () => {
+    if (isOnAdministrationPage) {
+      return "Start Event";
+    } else {
+      return isUserEnrolled ? "Join" : "Enroll";
+    }
+  };
   return (
     <Modal open={open} onClose={onClose} disableAutoFocus>
       <Box
@@ -87,20 +97,28 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     color="primary"
                     size="large"
                     onClick={() => {
-                      onEnroll(selectedEvent?.id);
-                      if (isUserEnrolled) {
-                        window.open(selectedEvent?.joinLink, "_blank");
+                      if (isOnAdministrationPage) {
+                        handleStartEvent(selectedEvent?.id);
+                      } else {
+                        if (isUserEnrolled) {
+                          window.open(selectedEvent?.joinLink, "_blank");
+                        } else {
+                          onEnroll(selectedEvent?.id);
+                        }
                       }
                     }}
                     disabled={loading}
                     sx={{ alignSelf: "flex-start" }}
                   >
                     {loading ? (
-                      <CircularProgress size={24} />
-                    ) : isUserEnrolled ? (
-                      "Join"
+                      <CircularProgress
+                        size={24}
+                        sx={{
+                          color: "primary.contrastText",
+                        }}
+                      />
                     ) : (
-                      "Enroll"
+                      getActionButtonText()
                     )}
                   </Button>
                 )}

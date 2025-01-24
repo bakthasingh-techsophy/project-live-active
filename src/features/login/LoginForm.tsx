@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { postLoginForm } from "@services/userAuthService";
+import { getUserDetails } from "@services/userManagementService";
 import { AppRoutesCombination } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { setLocalStorageItem } from "@utils/encrypt";
@@ -72,22 +73,6 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
       const postFormResponse = await postLoginForm(payload);
 
       if (postFormResponse?.success) {
-        setIsLoading(false);
-        await setLocalStorageItem(
-          CONSTANTS?.ACCESS_TOKEN,
-          postFormResponse?.data?.token?.substring(7)
-        );
-        if (postFormResponse?.data?.roles?.includes(CONSTANTS?.LA_ADMIN_ROLE)) {
-          await setLocalStorageItem(
-            CONSTANTS?.USER_ROLE,
-            CONSTANTS?.LA_ADMIN_ROLE
-          );
-        }
-        await setLocalStorageItem(CONSTANTS?.USER_EMAIL, values?.email);
-        await setLocalStorageItem(
-          CONSTANTS?.USER_ID,
-          postFormResponse?.data?.userId
-        );
         await dispatch(
           pushNotification({
             isOpen: true,
@@ -97,9 +82,18 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
             type: NotificationTypes?.SUCCESS,
           })
         );
-        setOpen(false);
-        formik?.resetForm();
-        navigate(`${AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS}`);
+        setIsLoading(false);
+        await setLocalStorageItem(
+          CONSTANTS?.ACCESS_TOKEN,
+          postFormResponse?.data?.token?.substring(7)
+        );
+
+        await setLocalStorageItem(CONSTANTS?.USER_EMAIL, values?.email);
+        await setLocalStorageItem(
+          CONSTANTS?.USER_ID,
+          postFormResponse?.data?.userId
+        );
+        await fetchUserDetails(postFormResponse?.data?.userId);
       } else {
         setIsLoading(false);
 
@@ -120,6 +114,48 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
         pushNotification({
           isOpen: true,
           message: CONSTANTS?.API_RESPONSE_MESSAGES?.LOGIN_FAILURE,
+          type: NotificationTypes?.ERROR,
+        })
+      );
+    }
+  };
+
+  const fetchUserDetails = async (userId: string) => {
+    try {
+      setIsLoading(true);
+
+      const getUserResponse = await getUserDetails(userId);
+
+      setOpen(false);
+      formik?.resetForm();
+      if (getUserResponse?.success) {
+        if (getUserResponse?.data?.roles?.includes(CONSTANTS?.LA_ADMIN_ROLE)) {
+          await setLocalStorageItem(
+            CONSTANTS?.USER_ROLE,
+            CONSTANTS?.LA_ADMIN_ROLE
+          );
+          navigate(`${AppRoutesCombination?.DASHBOARD_ADMIN}`);
+        } else navigate(`${AppRoutesCombination?.DASHBOARD_EXPLORE_EVENTS}`);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        dispatch(
+          pushNotification({
+            isOpen: true,
+            message:
+              getUserResponse?.message ||
+              CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
+            type: NotificationTypes?.ERROR,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      dispatch(
+        pushNotification({
+          isOpen: true,
+          message: CONSTANTS?.API_RESPONSE_MESSAGES?.USER_DETAILS_FETCH_FAILURE,
           type: NotificationTypes?.ERROR,
         })
       );
