@@ -28,14 +28,14 @@ import { ClipLoader } from "react-spinners";
 
 const staticStyles = {
   container: {
-    mainContainer: (viewMode: any) => ({
-      py: viewMode === "browse" ? 4 : 2,
+    mainContainer: {
+      py: 4,
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      gap: viewMode === "browse" ? 4 : 2,
-    }),
+      gap: 4,
+    },
     cardContainer: {
       display: "flex",
       borderRadius: 2,
@@ -44,6 +44,11 @@ const staticStyles = {
       position: "relative",
       height: "100%",
       overflow: "hidden",
+      transition: "transform 0.2s ease-in-out",
+      "&:hover": {
+        cursor: "pointer",
+        transform: "scale(1.02)",
+      },
     },
     cardMediaContainer: {
       width: "100%",
@@ -74,11 +79,6 @@ const staticStyles = {
     },
     caution: {
       color: "text.secondary",
-    },
-    exploreHeader: {
-      color: "text.primary",
-      fontWeight: 600,
-      alignSelf: "flex-start",
     },
   },
   button: {
@@ -123,8 +123,6 @@ interface MyEnrollmentsProps {
   isLoading: any;
   browsedEvents: any;
   userDetails: any;
-  viewMode: "explore" | "browse";
-  timePeriod: "upcoming" | "past";
   handleReload: () => void;
 }
 
@@ -132,8 +130,6 @@ const MyEnrollments = ({
   isLoading,
   browsedEvents,
   userDetails,
-  viewMode,
-  timePeriod,
   handleReload,
 }: MyEnrollmentsProps) => {
   const theme = useTheme();
@@ -144,30 +140,17 @@ const MyEnrollments = ({
   const [openEventDetails, setOpenEventDetails] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const filteredAndSortedEvents =
-    timePeriod === "upcoming"
-      ? browsedEvents
-          ?.filter(
-            (event: Event) =>
-              userDetails?.eventIds?.includes(event?.id) &&
-              new Date(event?.scheduledTime).getTime() > new Date().getTime()
-          )
-          ?.sort(
-            (a: Event, b: Event) =>
-              new Date(a?.scheduledTime).getTime() -
-              new Date(b?.scheduledTime).getTime()
-          )
-      : browsedEvents
-          ?.filter(
-            (event: Event) =>
-              userDetails?.eventIds?.includes(event?.id) &&
-              new Date(event?.scheduledTime).getTime() < new Date().getTime()
-          )
-          ?.sort(
-            (a: Event, b: Event) =>
-              new Date(b?.scheduledTime).getTime() -
-              new Date(a?.scheduledTime).getTime()
-          );
+  const filteredAndSortedEvents = browsedEvents
+    ?.filter(
+      (event: Event) =>
+        userDetails?.eventIds?.includes(event?.id) &&
+        new Date(event?.scheduledTime).getTime() > new Date().getTime()
+    )
+    ?.sort(
+      (a: Event, b: Event) =>
+        new Date(a?.scheduledTime).getTime() -
+        new Date(b?.scheduledTime).getTime()
+    );
 
   const handleCardClick = (eventDetails: Event) => {
     setLocalEventDetails(eventDetails);
@@ -218,35 +201,17 @@ const MyEnrollments = ({
   };
 
   return (
-    <Container
-      sx={[staticStyles?.container?.mainContainer(viewMode)]}
-      maxWidth={false}
-    >
+    <Container sx={[staticStyles?.container?.mainContainer]} maxWidth={false}>
       {filteredAndSortedEvents?.length > 0 ? (
-        <Typography
-          variant={viewMode === "browse" ? "h5" : "h6"}
-          sx={
-            viewMode === "browse"
-              ? staticStyles?.typography?.browseHeader
-              : staticStyles?.typography?.exploreHeader
-          }
-        >
+        <Typography variant="h5" sx={staticStyles?.typography?.browseHeader}>
           My Enrollments
         </Typography>
       ) : (
-        viewMode === "explore" && (
-          <Typography variant="body1" sx={staticStyles?.typography?.caution}>
-            {timePeriod === "upcoming"
-              ? "No Upcoming Enrollments"
-              : "No Past Enrollments"}
-          </Typography>
-        )
+        <Typography variant="body1" sx={staticStyles?.typography?.caution}>
+          No Upcoming Enrollments
+        </Typography>
       )}
-      <Grid
-        container
-        spacing={2}
-        sx={viewMode === "browse" ? dynamicStyles?.container?.grid : {}}
-      >
+      <Grid container spacing={2} sx={dynamicStyles?.container?.grid}>
         {isLoading ? (
           <ClipLoader color={"#fff"} loading={isLoading} size={24} />
         ) : (
@@ -257,6 +222,9 @@ const MyEnrollments = ({
                   staticStyles?.container?.cardContainer,
                   dynamicStyles?.container?.cardContainer,
                 ]}
+                onClick={() => {
+                  handleCardClick(event);
+                }}
               >
                 <CardMedia
                   component="img"
@@ -268,27 +236,6 @@ const MyEnrollments = ({
                   alt={event?.title}
                 />
                 <CardContent sx={staticStyles?.container?.cardContentContainer}>
-                  <Tooltip title="View Event Details" arrow>
-                    <IconButton
-                      color="info"
-                      onClick={() => {
-                        handleCardClick(event);
-                      }}
-                      sx={{
-                        backgroundColor: theme?.palette?.primary?.light,
-                        padding: 1,
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        "&:hover": {
-                          backgroundColor: theme?.palette?.primary?.light,
-                          transform: "scale(1.1)",
-                        },
-                      }}
-                    >
-                      <VisibilityIcon />
-                    </IconButton>
-                  </Tooltip>
                   {/* Event Title */}
                   <Box sx={staticStyles?.container?.contentHeaderFooter}>
                     <Typography
@@ -320,6 +267,7 @@ const MyEnrollments = ({
                           window.open(event?.joinLink, "_blank");
                         }}
                         sx={staticStyles?.button?.joinButton}
+                        disabled={event?.expired || event?.ended}
                       >
                         {loading ? (
                           <ClipLoader

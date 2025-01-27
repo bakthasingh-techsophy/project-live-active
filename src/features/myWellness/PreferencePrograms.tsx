@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
 
-
 const staticStyles = {
   container: {
     mainContainer: {
@@ -320,6 +319,7 @@ const PreferencePrograms = ({
                         handleEnrollClick(event);
                       }}
                       sx={staticStyles?.button?.exploreButton}
+                      disabled={event?.expired || event?.ended}
                     >
                       {selectedEvent?.id === event?.id &&
                       selectedEvent?.loading ? (

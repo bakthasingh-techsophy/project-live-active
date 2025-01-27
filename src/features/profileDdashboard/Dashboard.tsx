@@ -185,9 +185,9 @@ const Dashboard = () => {
             setSelectedEvent={() => {}}
           />
         );
-      case AppSubRouteCombinations.MY_EVENTS_UPCOMMING:
+      case AppSubRouteCombinations.MY_EVENTS_UPCOMING:
         return (
-          <MyEvents sectionPath={AppSubRouteCombinations.MY_EVENTS_UPCOMMING} />
+          <MyEvents sectionPath={AppSubRouteCombinations.MY_EVENTS_UPCOMING} />
         );
       case AppSubRouteCombinations.MY_EVENTS_PAST:
         return (

@@ -21,7 +21,6 @@ import {
   handleNotification,
   handleResponseMessage,
 } from "@utils/dispatchNotification";
-import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
 import { Event, NotificationTypes } from "@utils/types";
 import { useEffect, useState } from "react";
@@ -164,13 +163,13 @@ const EventCard: React.FC<EventCardProps> = ({
 
   const getActionButtonBehaviour = (): { label: string; disable: boolean } => {
     if (isOnAdministrationPage) {
-      if (localEvent?.ended) {
-        return { label: "Ended", disable: true };
+      if (localEvent?.expired) {
+        return { label: "Expired", disable: true };
       }
       return { label: "Start Event", disable: false };
     }
 
-    const isEventEnded: boolean = localEvent?.ended;
+    const isEventEnded: boolean = localEvent?.expired;
     const actionLabel = isEventEnded
       ? isEnrolled
         ? "Join"
@@ -193,14 +192,14 @@ const EventCard: React.FC<EventCardProps> = ({
   return (
     <Card
       key={localEvent?.id}
-      sx={
-        viewMode === "explore"
-          ? [staticStylesExploreEvents?.cardStyle]
-          : [
-              staticStyles?.container?.cardContainer?.(theme),
-              dynamicStyles?.container?.cardContainer,
-            ]
-      }
+      sx={{
+        ...(viewMode === "explore"
+          ? staticStylesExploreEvents?.cardStyle
+          : {
+              ...staticStyles?.container?.cardContainer?.(theme),
+              ...dynamicStyles?.container?.cardContainer,
+            }),
+      }}
       onClick={(e: any) => {
         e?.preventDefault();
         if (localEvent && enrolledEventIds) {
@@ -268,28 +267,8 @@ const EventCard: React.FC<EventCardProps> = ({
                 getActionButtonBehaviour().label
               )}
             </Button>
-            {/* Admin Edit/Delete Buttons */}
             {isOnAdministrationPage && (
               <>
-                {/* Edit Icon Button */}
-                {/* <Tooltip title="View Event Details" arrow>
-                  <IconButton
-                    color="info"
-                    onClick={() => {
-                      handleCardClick(localEvent);
-                    }}
-                    sx={{
-                      backgroundColor: theme?.palette?.primary?.light,
-                      padding: 1,
-                      "&:hover": {
-                        backgroundColor: theme?.palette?.primary?.light,
-                        transform: "scale(1.1)",
-                      },
-                    }}
-                  >
-                    <VisibilityIcon />
-                  </IconButton>
-                </Tooltip> */}
                 <Tooltip title="Edit Event" arrow>
                   <IconButton
                     color="primary"
