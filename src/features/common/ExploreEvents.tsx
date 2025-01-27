@@ -48,7 +48,6 @@ const staticStyles = {
       overflow: "hidden",
       "&:hover": {
         cursor: "pointer",
-        transform: "scale(1.04)",
       },
     }),
     cardMediaContainer: {
@@ -132,6 +131,7 @@ const staticStylesExploreEvents = {
     display: "flex",
     flexDirection: "column",
     position: "relative",
+    transition: "transform 0.3s ease-in-out",
     "&:hover": {
       cursor: "pointer",
       transform: "scale(1.04)",
@@ -240,8 +240,7 @@ const ExploreEvents = ({
           return dateA - dateB;
         });
     setSortedFilteredEvents([...resultEvents]);
-    console.log("browseEvents", browsedEvents);
-  }, [browsedEvents]);
+  }, [browsedEvents,selectedTags]);
 
   const handlePopoverOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -363,7 +362,6 @@ const ExploreEvents = ({
   };
 
   const handleReload = () => {
-    console.log("handlereload");
     fetchUserDetails();
     handleSearch(
       getSearchPayload(page, searchText, userDetails),
@@ -426,7 +424,6 @@ const ExploreEvents = ({
   }, [reloadEvents]);
 
   useEffect(() => {
-    console.log("pagehere 3", page, previousCaller);
     if (
       location.pathname.startsWith("/dashboard") &&
       page &&
@@ -440,9 +437,8 @@ const ExploreEvents = ({
       !isOnAdministrationPage &&
       location.pathname.startsWith(AppRoutes.BROWSE_EVENTS)
     ) {
-      const payload = getSearchPayload(page, "", null);
-      handleSearch(payload, "handleSearch");
-      console.log("enterehere111", payload);
+      const payload = getSearchPayload(page, searchText, null);
+      handleSearch(payload, "handleSearch" + searchText);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -563,21 +559,20 @@ const getSearchPayload = (
 ): {
   searchText: string;
   idsList?: string[];
-  ended?: boolean;
+  expired?: boolean;
 } => {
-  console.log("pagehere", page);
   switch (page) {
-    case AppSubRouteCombinations.MY_EVENTS_UPCOMMING:
+    case AppSubRouteCombinations.MY_EVENTS_UPCOMING:
       return {
         searchText,
         idsList: userDetails?.eventIds ?? [],
-        ended: false,
+        expired: false,
       };
     case AppSubRouteCombinations.MY_EVENTS_PAST:
       return {
         searchText,
         idsList: userDetails?.eventIds ?? [],
-        ended: true,
+        expired: true,
       };
     case AppSubRoutes.ADMIN:
     case AppSubRoutes.EXPLORE_EVENTS:

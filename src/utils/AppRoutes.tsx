@@ -57,5 +57,5 @@ export const AppSubRouteCombinations = {
   MY_EVENTS_PAST: AppSubRoutes.MY_EVENTS + AppSubRoutes?.PAST,
   PROFILE_DETAILS: AppSubRoutes?.PROFILE + AppSubRoutes?.DETAILS,
   PROFILE_PREFERENCES: AppSubRoutes?.PROFILE + AppSubRoutes?.PREFERENCES,
-  MY_EVENTS_UPCOMMING: AppSubRoutes?.MY_EVENTS + AppSubRoutes?.UPCOMING,
+  MY_EVENTS_UPCOMING: AppSubRoutes?.MY_EVENTS + AppSubRoutes?.UPCOMING,
 };

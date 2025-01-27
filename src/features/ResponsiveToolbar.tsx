@@ -202,7 +202,6 @@ const ResponsiveToolbar = ({ menuItems }: ResponsiveToolbarProps) => {
         tempLink = AppRoutesCombination?.DASHBOARD_ADMIN;
       }
     }
-    console.log("templinkhere", tempLink, role);
 
     navigate(tempLink);
   };

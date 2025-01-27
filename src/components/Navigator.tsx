@@ -16,14 +16,14 @@ const Navigator = () => {
         element={<Navigate to={AppRoutes?.PROFILE_DASHBOARD} />}
       /> */}
       {/* Optionally, you can define a default route */}
-      {/* <Route
+      <Route
         path={AppRoutes?.WELLNESS}
         element={
           <ProtectedRoute>
-            <MyWellness viewMode="browse" timePeriod="upcoming" />
+            <MyWellness />
           </ProtectedRoute>
         }
-      /> */}
+      />
       <Route path={AppRoutes?.BROWSE_EVENTS} element={<BrowseEvents />} />
       <Route path={AppRoutes?.COACHES_AND_NUTRITION} element={<Nutrition />} />
       <Route path={AppRoutes?.PROGRESS} element={<MyProgress />} />

@@ -38,13 +38,26 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   }, [selectedEvent]);
   const isUserEnrolled = userDetails?.eventIds?.includes(selectedEvent?.id);
 
-  const getActionButtonText = () => {
+  const getActionButtonBehaviour = (): { label: string; disable: boolean } => {
     if (isOnAdministrationPage) {
-      return "Start Event";
-    } else {
-      return isUserEnrolled ? "Join" : "Enroll";
+      if (selectedEvent?.expired) {
+        return { label: "Expired", disable: true };
+      }
+      return { label: "Start Event", disable: false };
     }
+
+    const isEventEnded: any = selectedEvent?.expired;
+    const actionLabel = isEventEnded
+      ? isUserEnrolled
+        ? "Join"
+        : "Enroll"
+      : isUserEnrolled
+        ? "Join"
+        : "Enroll";
+
+    return { label: actionLabel, disable: isEventEnded };
   };
+
   return (
     <Modal open={open} onClose={onClose} disableAutoFocus>
       <Box
@@ -107,7 +120,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                         }
                       }
                     }}
-                    disabled={loading}
+                    disabled={loading || getActionButtonBehaviour().disable}
                     sx={{ alignSelf: "flex-start" }}
                   >
                     {loading ? (
@@ -118,7 +131,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                         }}
                       />
                     ) : (
-                      getActionButtonText()
+                      getActionButtonBehaviour().label
                     )}
                   </Button>
                 )}
