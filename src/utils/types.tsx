@@ -28,12 +28,12 @@ export interface Event {
   description: string;
   tags: string[];
   photoUrl: string;
-  isEnrolled: boolean;
-  isStarted: boolean;
-  isExpired: boolean;
   loading?: boolean;
   updated?: boolean;
   duration: number;
   password: string;
   joinLink: string;
+  ended: boolean;
+  started: boolean;
+  expired: boolean;
 }

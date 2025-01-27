@@ -162,13 +162,33 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   }, [enrolledEventIds, localEvent]);
 
-  const getActionButtonText = () => {
+  const getActionButtonBehaviour = (): { label: string; disable: boolean } => {
     if (isOnAdministrationPage) {
-      return "Start Event";
-    } else {
-      return isEnrolled ? "Join" : "Enroll";
+      if (localEvent?.ended) {
+        return { label: "Ended", disable: true };
+      }
+      return { label: "Start Event", disable: false };
     }
+
+    const isEventEnded: boolean = localEvent?.ended;
+    const actionLabel = isEventEnded
+      ? isEnrolled
+        ? "Join"
+        : "Enroll"
+      : isEnrolled
+        ? "Join"
+        : "Enroll";
+
+    return { label: actionLabel, disable: isEventEnded };
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const eventId = params.get("event");
+    if (eventId && localEvent?.id + "" === eventId) {
+      handleCardClick(localEvent);
+    }
+  }, [location]);
 
   return (
     <Card
@@ -240,11 +260,12 @@ const EventCard: React.FC<EventCardProps> = ({
                   }
                 }
               }}
+              disabled={getActionButtonBehaviour().disable}
             >
               {loading ? (
                 <ClipLoader color={"#fff"} loading={loading} size={24} />
               ) : (
-                getActionButtonText()
+                getActionButtonBehaviour().label
               )}
             </Button>
             {/* Admin Edit/Delete Buttons */}
@@ -285,6 +306,7 @@ const EventCard: React.FC<EventCardProps> = ({
                         transform: "scale(1.1)",
                       },
                     }}
+                    disabled={getActionButtonBehaviour().disable}
                   >
                     <EditIcon />
                   </IconButton>

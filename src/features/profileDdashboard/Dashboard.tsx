@@ -1,5 +1,6 @@
 import lightTheme from "@customThemes/lightTheme";
 import AdminEventManagement from "@features/administration/AdminEventManagement";
+import MyEvents from "@features/myEvents/MyEvents";
 import ProfileInformation from "@features/profile/ProfileInformation";
 import UserPreferences from "@features/profile/UserPreferences";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -10,7 +11,6 @@ import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
 import UpdateIcon from "@mui/icons-material/Update";
-import MyWellness from "@pages/MyWellness";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { getUserDetails } from "@services/userManagementService";
 import {
@@ -21,9 +21,11 @@ import {
 } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import {
-  AppRouteQueries,
   AppRouteQueryValues,
   AppRoutes,
+  AppRoutesCombination,
+  AppSubRouteCombinations,
+  AppSubRoutes,
 } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem, setLocalStorageItem } from "@utils/encrypt";
@@ -34,7 +36,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import ExploreEvents from "../common/ExploreEvents";
 import { LiveActiveBrand } from "./Branding";
-import MyEvents from "@features/myEvents/MyEvents";
 
 // Define the navigation items
 const NAVIGATION: Navigation = [
@@ -170,9 +171,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const getCurrentPage = () => {
     switch (dashboardRouter?.pathname) {
-      case "/" + AppRouteQueryValues?.EXPLORE_EVENTS:
+      case AppSubRoutes?.EXPLORE_EVENTS:
         return (
           <ExploreEvents
+            page={AppSubRoutes?.EXPLORE_EVENTS}
             viewMode="explore"
             selectedTags={[]}
             searchText={""}
@@ -183,24 +185,19 @@ const Dashboard = () => {
             setSelectedEvent={() => {}}
           />
         );
-      case AppRouteQueries.DASHBOARD_MY_EVENTS_UPCOMMING:
-        return <MyEvents sectionName={AppRouteQueryValues.UPCOMING} />;
-      case "/" +
-        AppRouteQueryValues?.MY_EVENTS +
-        "/" +
-        AppRouteQueryValues?.PAST:
-        return <MyEvents sectionName={AppRouteQueryValues.PAST} />;
-      case "/" +
-        AppRouteQueryValues?.PROFILE +
-        "/" +
-        AppRouteQueryValues?.DETAILS:
+      case AppSubRouteCombinations.MY_EVENTS_UPCOMMING:
+        return (
+          <MyEvents sectionPath={AppSubRouteCombinations.MY_EVENTS_UPCOMMING} />
+        );
+      case AppSubRouteCombinations.MY_EVENTS_PAST:
+        return (
+          <MyEvents sectionPath={AppSubRouteCombinations.MY_EVENTS_PAST} />
+        );
+      case AppSubRouteCombinations.PROFILE_DETAILS:
         return <ProfileInformation subHeading={"Profile Details"} />;
-      case "/" +
-        AppRouteQueryValues?.PROFILE +
-        "/" +
-        AppRouteQueryValues?.PREFERENCES:
+      case AppSubRouteCombinations.PROFILE_PREFERENCES:
         return <UserPreferences subHeading={"User Preferences"} />;
-      case "/" + AppRouteQueryValues?.ADMIN:
+      case AppSubRoutes?.ADMIN:
         if (isAdmin) {
           return <AdminEventManagement />;
         } else {

@@ -12,7 +12,7 @@ import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
 import { isTokenExpired } from "@utils/tokenUtils";
 import { Event, NotificationTypes } from "@utils/types";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import EventCard from "./EventCard";
@@ -20,8 +20,15 @@ import {
   handleNotification,
   handleResponseMessage,
 } from "@utils/dispatchNotification";
-import { useNavigate } from "react-router-dom";
-import { AppRouteQueries } from "@utils/AppRoutes";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  AppRouteQueries,
+  AppRoutes,
+  AppRoutesCombination,
+  AppSubRouteCombinations,
+  AppSubRoutes,
+} from "@utils/AppRoutes";
+import EmptyBin from "@components/EmptyBin";
 
 // Sample data
 const staticStyles = {
@@ -138,6 +145,7 @@ const staticStylesExploreEvents = {
 };
 
 interface ExploreEventsProps {
+  page: string;
   viewMode: "explore" | "browse";
   selectedTags: string[];
   searchText: string;
@@ -147,9 +155,11 @@ interface ExploreEventsProps {
   setSelectedEvent: (event: Event | undefined | null) => void;
   setIsEmpty?: (value: boolean) => void;
   reloadEvents?: boolean;
+  setReloadEvents?: Dispatch<SetStateAction<boolean | undefined>>;
 }
 
 const ExploreEvents = ({
+  page,
   viewMode,
   selectedTags,
   searchText = "",
@@ -159,6 +169,7 @@ const ExploreEvents = ({
   setSelectedEvent,
   setIsEmpty,
   reloadEvents,
+  setReloadEvents,
 }: ExploreEventsProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -172,57 +183,65 @@ const ExploreEvents = ({
   const [localEventDetails, setLocalEventDetails] = useState<
     Event | undefined | null
   >();
-
+  const location = useLocation();
+  const [sortedFilteredEvents, setSortedFilteredEvents] = useState<
+    Event[] | null | undefined
+  >([]);
+  const [previousCaller, setPreviousCaller] = useState<string>("");
   const [userDetails, setUserDetails] = useState<any>();
+  useEffect(() => {
+    const filteredEvents =
+      selectedTags?.length === 0
+        ? isOnAdministrationPage
+          ? browsedEvents?.sort((a, b) => {
+              const now = new Date()?.getTime();
+              const timeA = new Date(a?.scheduledTime)?.getTime();
+              const timeB = new Date(b?.scheduledTime)?.getTime();
 
-  const filteredEvents =
-    selectedTags?.length === 0
-      ? isOnAdministrationPage
-        ? browsedEvents?.sort((a, b) => {
-            const now = new Date()?.getTime();
-            const timeA = new Date(a?.scheduledTime)?.getTime();
-            const timeB = new Date(b?.scheduledTime)?.getTime();
+              const isUpcomingA = timeA > now;
+              const isUpcomingB = timeB > now;
 
-            const isUpcomingA = timeA > now;
-            const isUpcomingB = timeB > now;
+              if (isUpcomingA && !isUpcomingB) {
+                return -1;
+              } else if (!isUpcomingA && isUpcomingB) {
+                return 1;
+              } else if (isUpcomingA && isUpcomingB) {
+                return timeA - timeB;
+              } else {
+                return timeB - timeA;
+              }
+            })
+          : browsedEvents?.filter((event) => {
+              const upcoming =
+                new Date(event?.scheduledTime)?.getTime() >
+                new Date()?.getTime();
 
-            if (isUpcomingA && !isUpcomingB) {
-              return -1;
-            } else if (!isUpcomingA && isUpcomingB) {
-              return 1;
-            } else if (isUpcomingA && isUpcomingB) {
-              return timeA - timeB;
-            } else {
-              return timeB - timeA;
-            }
-          })
+              return upcoming;
+            })
         : browsedEvents?.filter((event) => {
-            const upcoming =
+            const tagsMatch = event?.tags?.some((tag) =>
+              selectedTags?.some(
+                (selectedTag: any) =>
+                  tag?.toLowerCase() === selectedTag?.toLowerCase()
+              )
+            );
+            const isUpcoming =
               new Date(event?.scheduledTime)?.getTime() > new Date()?.getTime();
 
-            return upcoming;
-          })
-      : browsedEvents?.filter((event) => {
-          const tagsMatch = event?.tags?.some((tag) =>
-            selectedTags?.some(
-              (selectedTag: any) =>
-                tag?.toLowerCase() === selectedTag?.toLowerCase()
-            )
-          );
-          const isUpcoming =
-            new Date(event?.scheduledTime)?.getTime() > new Date()?.getTime();
+            return tagsMatch && isUpcoming;
+          });
 
-          return tagsMatch && isUpcoming;
+    const resultEvents = isOnAdministrationPage
+      ? filteredEvents
+      : filteredEvents?.sort((a, b) => {
+          const dateA: any = new Date(a?.scheduledTime);
+          const dateB: any = new Date(b?.scheduledTime);
+
+          return dateA - dateB;
         });
-
-  const sortedFilteredEvents = isOnAdministrationPage
-    ? filteredEvents
-    : filteredEvents?.sort((a, b) => {
-        const dateA: any = new Date(a?.scheduledTime);
-        const dateB: any = new Date(b?.scheduledTime);
-
-        return dateA - dateB;
-      });
+    setSortedFilteredEvents([...resultEvents]);
+    console.log("browseEvents", browsedEvents);
+  }, [browsedEvents]);
 
   const handlePopoverOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -239,12 +258,12 @@ const ExploreEvents = ({
 
   const open = Boolean(anchorEl);
 
-  const handleSearch = async (payload: any) => {
+  const handleSearch = async (payload: any, caller: string) => {
+    if (previousCaller === caller) return;
+    setPreviousCaller(caller);
     try {
       setIsLoading(true);
-
       const searchFormResponse = await searchEvents(payload);
-
       if (searchFormResponse?.success) {
         setIsLoading(false);
         setBrowsedEvents(searchFormResponse?.data);
@@ -344,34 +363,18 @@ const ExploreEvents = ({
   };
 
   const handleReload = () => {
+    console.log("handlereload");
     fetchUserDetails();
-    handleSearch({
-      searchText: "",
-    });
+    handleSearch(
+      getSearchPayload(page, searchText, userDetails),
+      "handleReload"
+    );
   };
-
-  useEffect(() => {
-    if (isTokenActive) {
-      fetchUserDetails();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    handleReload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reloadEvents]);
-
-  useEffect(() => {
-    const payload = {
-      searchText: searchText,
-    };
-    handleSearch(payload);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchText]);
 
   const handleCardClick = (eventDetails: Event) => {
     setLocalEventDetails(eventDetails);
+    const pathName = location.pathname;
+    navigate(pathName + AppRouteQueries.EVENT_SEARCH + eventDetails?.id);
     setOpenEventDetails(true);
   };
 
@@ -407,6 +410,50 @@ const ExploreEvents = ({
     navigate(AppRouteQueries?.AUTH_LOGIN);
   };
 
+  useEffect(() => {
+    if (isTokenActive) {
+      fetchUserDetails();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (reloadEvents) {
+      handleReload();
+      setReloadEvents?.(undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reloadEvents]);
+
+  useEffect(() => {
+    console.log("pagehere 3", page, previousCaller);
+    if (
+      location.pathname.startsWith("/dashboard") &&
+      page &&
+      (searchText !== null || searchText !== undefined) &&
+      userDetails &&
+      page + searchText + userDetails !== previousCaller
+    ) {
+      const payload = getSearchPayload(page, searchText, userDetails);
+      handleSearch(payload, page + searchText + userDetails);
+    } else if (
+      !isOnAdministrationPage &&
+      location.pathname.startsWith(AppRoutes.BROWSE_EVENTS)
+    ) {
+      const payload = getSearchPayload(page, "", null);
+      handleSearch(payload, "handleSearch");
+      console.log("enterehere111", payload);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, searchText, userDetails, location]);
+
+  const handleEventDetailsModalClose = () => {
+    navigate(AppRoutesCombination.DASHBOARD_ADMIN);
+    setOpenEventDetails(false);
+  };
+
+  const handleOpenModal = () => {};
   return (
     <Container
       maxWidth={false}
@@ -418,6 +465,14 @@ const ExploreEvents = ({
           : {}
       }
     >
+      {sortedFilteredEvents && sortedFilteredEvents?.length <= 0 && (
+        <EmptyBin
+          setSelectedEvent={setSelectedEvent}
+          onClick={handleOpenModal}
+          buttonText={"Explore"}
+          isShowButton={page != AppRoutes.BROWSE_EVENTS}
+        />
+      )}
       {/* Masonry Grid Container */}
       {viewMode === "explore" ? (
         <Box sx={[staticStylesExploreEvents?.boxContainer]}>
@@ -488,7 +543,7 @@ const ExploreEvents = ({
       <EventDetailsModal
         selectedEvent={localEventDetails}
         open={openEventDetails}
-        onClose={() => setOpenEventDetails(false)}
+        onClose={handleEventDetailsModalClose}
         onEnroll={handleEnrollOrJoinClick}
         loading={isLoading}
         userDetails={userDetails}
@@ -500,3 +555,39 @@ const ExploreEvents = ({
 };
 
 export default ExploreEvents;
+
+const getSearchPayload = (
+  page: string,
+  searchText: string,
+  userDetails: any
+): {
+  searchText: string;
+  idsList?: string[];
+  ended?: boolean;
+} => {
+  console.log("pagehere", page);
+  switch (page) {
+    case AppSubRouteCombinations.MY_EVENTS_UPCOMMING:
+      return {
+        searchText,
+        idsList: userDetails?.eventIds ?? [],
+        ended: false,
+      };
+    case AppSubRouteCombinations.MY_EVENTS_PAST:
+      return {
+        searchText,
+        idsList: userDetails?.eventIds ?? [],
+        ended: true,
+      };
+    case AppSubRoutes.ADMIN:
+    case AppSubRoutes.EXPLORE_EVENTS:
+    case AppRoutes.BROWSE_EVENTS:
+      return {
+        searchText,
+      };
+    default:
+      return {
+        searchText: "",
+      };
+  }
+};

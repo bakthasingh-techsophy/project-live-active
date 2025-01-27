@@ -2,6 +2,7 @@ import Options from "@features/browseEvents/Options";
 import TagsDisplay from "@features/browseEvents/TagsRow";
 import ExploreEvents from "@features/common/ExploreEvents";
 import { Box } from "@mui/material";
+import { AppRoutes } from "@utils/AppRoutes";
 import { useState } from "react";
 
 const BrowseEvents = () => {
@@ -22,6 +23,7 @@ const BrowseEvents = () => {
         setSelectedTags={setSelectedTags}
       />
       <ExploreEvents
+        page={AppRoutes.BROWSE_EVENTS}
         viewMode="browse"
         selectedTags={selectedTags}
         searchText={searchText}
