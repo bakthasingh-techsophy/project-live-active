@@ -16,11 +16,15 @@ import { Event, NotificationTypes } from "@utils/types";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import AddEventModal from "./AddEventModal";
+import { AppRouteQueryValues, AppSubRoutes } from "@utils/AppRoutes";
+import EmptyBin from "../../components/EmptyBin";
 
 const AdminEventManagement: React.FC = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [reloadEvents, setReloadEvents] = useState(false);
+  const [reloadEvents, setReloadEvents] = useState<boolean | undefined>(
+    undefined
+  );
   const [selectedEvent, setSelectedEvent] = useState<
     Event | undefined | null
   >();
@@ -63,15 +67,15 @@ const AdminEventManagement: React.FC = () => {
           if (prev) prev.updated = true;
           return { ...prev } as Event;
         });
-        setReloadEvents((prev) => !prev);
+        setReloadEvents(true);
       }
     } else {
       setSelectedEvent(null);
       response = await saveEventInDataBase(updatedEventData);
-      handleSearch({
-        searchText: "",
-      });
-      setReloadEvents((prev) => !prev);
+      // handleSearch({
+      //   searchText: "",
+      // });
+      setReloadEvents(true);
     }
 
     handleResponseMessage(
@@ -85,37 +89,37 @@ const AdminEventManagement: React.FC = () => {
     handleCloseModal();
   };
 
-  const handleSearch = async (payload: any) => {
-    try {
-      setLoading(true);
-      const searchFormResponse = await searchEvents(payload);
-      if (searchFormResponse?.success) {
-        setLoading(false);
-        setIsEmpty?.(searchFormResponse?.data?.length === 0);
-      } else {
-        setLoading(false);
-        dispatch(
-          pushNotification({
-            isOpen: true,
-            message:
-              searchFormResponse?.message ||
-              CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
-            type: NotificationTypes?.ERROR,
-          })
-        );
-      }
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-      dispatch(
-        pushNotification({
-          isOpen: true,
-          message: CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
-          type: NotificationTypes?.ERROR,
-        })
-      );
-    }
-  };
+  // const handleSearch = async (payload: any) => {
+  //   try {
+  //     setLoading(true);
+  //     const searchFormResponse = await searchEvents(payload);
+  //     if (searchFormResponse?.success) {
+  //       setLoading(false);
+  //       setIsEmpty?.(searchFormResponse?.data?.length === 0);
+  //     } else {
+  //       setLoading(false);
+  //       dispatch(
+  //         pushNotification({
+  //           isOpen: true,
+  //           message:
+  //             searchFormResponse?.message ||
+  //             CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+  //           type: NotificationTypes?.ERROR,
+  //         })
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     setLoading(false);
+  //     dispatch(
+  //       pushNotification({
+  //         isOpen: true,
+  //         message: CONSTANTS?.API_RESPONSE_MESSAGES?.EVENTS_FETCH_FAILURE,
+  //         type: NotificationTypes?.ERROR,
+  //       })
+  //     );
+  //   }
+  // };
   const handleEditEvent = (event: Event) => {
     setSelectedEvent({
       ...event,
@@ -123,12 +127,12 @@ const AdminEventManagement: React.FC = () => {
     setOpenAddModal(true);
   };
 
-    useEffect(() => {
-      handleSearch({
-        searchText: "",
-      });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+  useEffect(() => {
+    // handleSearch({
+    //   searchText: "",
+    // });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Container
@@ -141,51 +145,12 @@ const AdminEventManagement: React.FC = () => {
       }}
     >
       {isEmpty && (
-        <Box
-          sx={{
-            textAlign: "center",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            width: "100%",
-          }}
-        >
-          <Box sx={{ marginBottom: 4 }}>
-            <img
-              src={emptyBinPic}
-              alt="No Events"
-              style={{ maxWidth: "300px", width: "100%", height: "auto" }}
-            />
-          </Box>
-          <Typography variant="h4" gutterBottom>
-            No Events Yet
-          </Typography>
-          <Typography variant="body1" color="textSecondary" paragraph>
-            It looks like you don't have any events at the moment. To get
-            started, create your first event by clicking the button below.
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={() => {
-              setSelectedEvent(null);
-              handleOpenModal();
-            }}
-            sx={{
-              marginTop: "20px",
-              padding: "15px 30px",
-              fontSize: "16px",
-              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-              "&:hover": {
-                boxShadow: "0px 6px 8px rgba(0, 0, 0, 0.2)",
-              },
-            }}
-          >
-            Add Event
-          </Button>
-        </Box>
+        <EmptyBin
+          setSelectedEvent={setSelectedEvent}
+          onClick={handleOpenModal}
+          isShowButton
+          buttonText="Add Event"
+        />
       )}
 
       {!isEmpty && (
@@ -217,6 +182,7 @@ const AdminEventManagement: React.FC = () => {
             <AddIcon /> Add Event
           </Button>
           <ExploreEvents
+            page={AppSubRoutes.ADMIN}
             viewMode="explore"
             selectedTags={[]}
             searchText={""}
@@ -226,6 +192,7 @@ const AdminEventManagement: React.FC = () => {
             setSelectedEvent={setSelectedEvent}
             setIsEmpty={setIsEmpty}
             reloadEvents={reloadEvents}
+            setReloadEvents={setReloadEvents}
           />
         </Box>
       )}
