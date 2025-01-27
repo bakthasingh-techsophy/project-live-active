@@ -1,6 +1,6 @@
 import MoreInfoPopover from "@components/MoreInfoPopover";
 import EventDetailsModal from "@features/administration/EventDetailsModal";
-import { Box, Container, Grid, useTheme } from "@mui/material";
+import { Box, Container, Grid, Typography, useTheme } from "@mui/material";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import {
   enrollOrJoinEvent,
@@ -46,10 +46,29 @@ const staticStyles = {
       position: "relative",
       height: "100%",
       overflow: "hidden",
+      transition: "transform 0.3s ease-in-out",
       "&:hover": {
         cursor: "pointer",
+        transform: "scale(1.04)",
       },
     }),
+    cardImage: {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+    },
+    liveContainer: {
+      position: "absolute",
+      top: "0px",
+      left: "0px",
+      p: "8px",
+      backgroundColor: "rgb(255, 255, 255,0.5)",
+      borderBottomRightRadius: 4,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 0.5,
+    },
     cardMediaContainer: {
       objectFit: "cover",
     },
@@ -84,6 +103,11 @@ const staticStyles = {
       overflow: "hidden", // Hide overflowed content
       textOverflow: "ellipsis", // Add ellipsis when the text overflows
     },
+    browseHeader: {
+      color: "text.secondary",
+      fontWeight: 600,
+      textAlign: "center",
+    },
     ratingText: { marginLeft: 1 },
     scheduleText: { marginTop: 1 },
   },
@@ -117,6 +141,12 @@ const dynamicStyles = {
         xs: "100%",
       },
     },
+  },
+  boxContainer: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+    gap: 3,
+    padding: 0,
   },
 };
 
@@ -189,6 +219,7 @@ const ExploreEvents = ({
   >([]);
   const [previousCaller, setPreviousCaller] = useState<string>("");
   const [userDetails, setUserDetails] = useState<any>();
+
   useEffect(() => {
     const filteredEvents =
       selectedTags?.length === 0
@@ -240,7 +271,7 @@ const ExploreEvents = ({
           return dateA - dateB;
         });
     setSortedFilteredEvents([...resultEvents]);
-  }, [browsedEvents,selectedTags]);
+  }, [browsedEvents, selectedTags]);
 
   const handlePopoverOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -445,7 +476,7 @@ const ExploreEvents = ({
   }, [page, searchText, userDetails, location]);
 
   const handleEventDetailsModalClose = () => {
-    navigate(AppRoutesCombination.DASHBOARD_ADMIN);
+    navigate(location.pathname);
     setOpenEventDetails(false);
   };
 
@@ -461,17 +492,32 @@ const ExploreEvents = ({
           : {}
       }
     >
-      {sortedFilteredEvents && sortedFilteredEvents?.length <= 0 && (
-        <EmptyBin
-          setSelectedEvent={setSelectedEvent}
-          onClick={handleOpenModal}
-          buttonText={"Explore"}
-          isShowButton={page != AppRoutes.BROWSE_EVENTS}
-        />
-      )}
+      {sortedFilteredEvents &&
+        sortedFilteredEvents?.length <= 0 &&
+        page != AppRoutes.WELLNESS && (
+          <EmptyBin
+            setSelectedEvent={setSelectedEvent}
+            onClick={handleOpenModal}
+            buttonText={"Explore"}
+            isShowButton={page != AppRoutes.BROWSE_EVENTS}
+          />
+        )}
+      {sortedFilteredEvents &&
+        sortedFilteredEvents?.length > 0 &&
+        page === AppRoutes.WELLNESS && (
+          <Typography variant="h5" sx={staticStyles?.typography?.browseHeader}>
+            My Enrollments
+          </Typography>
+        )}
       {/* Masonry Grid Container */}
       {viewMode === "explore" ? (
-        <Box sx={[staticStylesExploreEvents?.boxContainer]}>
+        <Box
+          sx={
+            sortedFilteredEvents && sortedFilteredEvents?.length > 0
+              ? [staticStylesExploreEvents?.boxContainer]
+              : [dynamicStyles?.boxContainer]
+          }
+        >
           {isLoading ? (
             <ClipLoader color={"#fff"} loading={isLoading} size={24} />
           ) : (
@@ -563,6 +609,7 @@ const getSearchPayload = (
 } => {
   switch (page) {
     case AppSubRouteCombinations.MY_EVENTS_UPCOMING:
+    case AppRoutes.WELLNESS:
       return {
         searchText,
         idsList: userDetails?.eventIds ?? [],
