@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -208,6 +209,31 @@ const EventCard: React.FC<EventCardProps> = ({
       }}
     >
       <Box
+        sx={
+          viewMode === "explore"
+            ? staticStylesExploreEvents?.cardImage
+            : [
+                staticStyles?.container?.cardMediaContainer,
+                dynamicStyles?.container?.cardMediaContainer,
+              ]
+        }
+      >
+        <Box
+          component="img"
+          src={localEvent?.photoUrl || defaultEventPic}
+          sx={staticStyles?.container?.cardImage}
+        />
+        {localEvent?.started && <Box sx={staticStyles?.container?.liveContainer}>
+          <RadioButtonCheckedIcon color="error" fontSize="small" />
+          <Typography
+            variant="body2"
+            sx={staticStyles?.typography?.browseHeader}
+          >
+            Live
+          </Typography>
+        </Box>}
+      </Box>
+      {/* <Box
         component="img"
         src={localEvent?.photoUrl || defaultEventPic}
         sx={
@@ -218,7 +244,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 dynamicStyles?.container?.cardMediaContainer,
               ]
         }
-      />
+      /> */}
       <CardContent sx={staticStyles?.container?.cardContentContainer}>
         {/* Event Title */}
         <Box sx={staticStyles?.container?.contentHeader}>

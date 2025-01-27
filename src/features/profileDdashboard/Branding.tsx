@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { Branding } from "@toolpad/core/AppProvider";
 
 export const LiveActiveBrand: Branding = {
-    title: "Live Active",
+    title: "",
     logo: (
       <Box
         sx={{

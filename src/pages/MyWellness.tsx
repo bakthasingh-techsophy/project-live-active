@@ -1,15 +1,16 @@
+import ExploreEvents from "@features/common/ExploreEvents";
 import PreferencePrograms from "@features/myWellness/PreferencePrograms";
-import MyEnrollments from "@features/myWellness/MyEnrollments";
+import QuoteSection from "@features/myWellness/QuoteSection";
 import WellnessHeader from "@features/myWellness/WellnessHeader";
 import { Box } from "@mui/material";
-import QuoteSection from "@features/myWellness/QuoteSection";
 import { pushNotification } from "@redux/slices/loadingSlice";
 import { searchEvents } from "@services/eventsService";
 import { getUserDetails } from "@services/userManagementService";
+import { AppRoutes } from "@utils/AppRoutes";
 import { CONSTANTS } from "@utils/constants";
 import { getLocalStorageItem } from "@utils/encrypt";
 import { Event, NotificationTypes } from "@utils/types";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 const MyWellness = () => {
@@ -111,11 +112,24 @@ const MyWellness = () => {
       }}
     >
       <WellnessHeader />
-      <MyEnrollments
+      {/* <MyEnrollments
         isLoading={isLoading}
         browsedEvents={browsedEvents}
         userDetails={userDetails}
         handleReload={handleReload}
+      /> */}
+      <ExploreEvents
+        page={AppRoutes.WELLNESS}
+        viewMode={"explore"}
+        selectedTags={[]}
+        searchText={""}
+        handleEditEvent={function (event: Event): void {
+          throw new Error("Function not implemented.");
+        }}
+        selectedEvent={undefined}
+        setSelectedEvent={function (event: Event | undefined | null): void {
+          throw new Error("Function not implemented.");
+        }}
       />
       <PreferencePrograms
         isLoading={isLoading}
